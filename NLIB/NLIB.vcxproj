@@ -22,7 +22,7 @@
     <VCProjectVersion>15.0</VCProjectVersion>
     <ProjectGuid>{FC0B1D94-DD37-4FB7-8877-303265443D10}</ProjectGuid>
     <RootNamespace>NLIB</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.17134.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.16299.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -76,7 +76,13 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <AdditionalIncludeDirectories>E:\boost_1_68_0;E:\boost_1_68_0\stage\lib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_SILENCE_ALL_CXX17_DEPRECATION_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
+    <Link>
+      <AdditionalLibraryDirectories>E:\boost_1_68_0\stage\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -120,10 +126,15 @@
     <ClInclude Include="NetworkConfig.h" />
     <ClInclude Include="NetworkDefine.h" />
     <ClInclude Include="NetworkEndpoint.h" />
+    <ClInclude Include="NetworkStruct.h" />
+    <ClInclude Include="TransportLayer.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="ClientState.cpp" />
+    <ClCompile Include="main.cpp" />
     <ClCompile Include="NetworkClient.cpp" />
     <ClCompile Include="NetworkEndpoint.cpp" />
+    <ClCompile Include="TransportLayer.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

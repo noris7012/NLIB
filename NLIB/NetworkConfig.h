@@ -1,10 +1,15 @@
 #ifndef NLIB_NETWORK_CONFIG_H
 #define NLIB_NETWORK_CONFIG_H
 
-class NetworkConfig
+#include <stdint.h>
+
+#include "NetworkDefine.h"
+
+struct NetworkConfig
 {
-public:
-	NetworkConfig();
-	~NetworkConfig();
+	E_TRANSPORT_TYPE transport_type;
+	const char* host;
+	uint32_t port;
 };
+
 #endif
