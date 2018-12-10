@@ -126,6 +126,7 @@
     <ClInclude Include="NetworkConfig.h" />
     <ClInclude Include="NetworkDefine.h" />
     <ClInclude Include="NetworkEndpoint.h" />
+    <ClInclude Include="NetworkServer.h" />
     <ClInclude Include="NetworkStruct.h" />
     <ClInclude Include="TransportLayer.h" />
   </ItemGroup>
@@ -134,6 +135,7 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="NetworkClient.cpp" />
     <ClCompile Include="NetworkEndpoint.cpp" />
+    <ClCompile Include="NetworkServer.cpp" />
     <ClCompile Include="TransportLayer.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
