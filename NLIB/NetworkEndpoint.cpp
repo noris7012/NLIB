@@ -2,6 +2,8 @@
 
 #include <chrono>
 
+#include "Utility.h"
+
 NetworkEndpoint::NetworkEndpoint()
 {
 
@@ -25,7 +27,7 @@ void NetworkEndpoint::Startup(NetworkConfig& config)
 
 		while (_running)
 		{
-			auto time = duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count();
+			auto time = Utility::GetTime();
 
 			InternalUpdate(time);
 			Update(time);
@@ -59,4 +61,14 @@ void NetworkEndpoint::Send(const char* data)
 	send.length = sizeof(data);
 
 	_transport->Send(send);
+}
+
+void NetworkEndpoint::Send(ByteStream& stream)
+{
+	S_Send data;
+	data.length = stream.Length();
+	memcpy_s(data.data, sizeof(data.data), stream.Data(), stream.Length());
+	assert(sizeof(data.data) == MAX_MTU_SIZE);
+	
+	_transport->Send(data);
 }

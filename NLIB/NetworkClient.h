@@ -21,9 +21,6 @@ public:
 private:
 	bool SetState(E_CLIENT_STATE_ID state_id);
 
-	void STATE_CREATE(E_CLIENT_STATE_ID state_id);
-	void TRANSITION_CREATE(E_CLIENT_STATE_ID state_id, E_CLIENT_STATE_ID transition_list[]);
-
 private:
 	ClientState* _state;
 	std::map<E_CLIENT_STATE_ID, ClientState*> _state_map;

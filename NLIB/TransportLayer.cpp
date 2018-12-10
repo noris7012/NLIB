@@ -1,9 +1,10 @@
 #include "TransportLayer.h"
 
 #include <boost/bind.hpp>
-#include "NetworkStruct.h"
 #include <stdlib.h>
 #include <iostream>
+
+#include "NetworkStruct.h"
 
 using namespace boost::asio::ip;
 
@@ -19,6 +20,7 @@ TransportLayer* TransportLayer::Create(E_TRANSPORT_TYPE type)
 }
 
 TransportLayerUDP::TransportLayerUDP()
+	: _remote_endpoint()
 {
 
 }
@@ -36,7 +38,7 @@ void TransportLayerUDP::Startup(NetworkConfig& config, NetworkEndpoint* local_en
 	{
 		boost::asio::io_context io_context;
 
-		if (config.port > 0)
+		if (config.host != nullptr)
 		{
 			udp::resolver resolver(io_context);
 			char s_port[10];
@@ -44,13 +46,13 @@ void TransportLayerUDP::Startup(NetworkConfig& config, NetworkEndpoint* local_en
 			udp::resolver::query query(udp::v4(), config.host, s_port);
 			_remote_endpoint = *resolver.resolve(query).begin();
 
-			_socket = new udp::socket(io_context, udp::endpoint(udp::v4(), config.port));
+			_socket = new udp::socket(io_context, udp::endpoint(udp::v4(), 0));
 
 			Receive();
 		}
 		else
 		{
-			_socket = new udp::socket(io_context, udp::v4());
+			_socket = new udp::socket(io_context, udp::endpoint(udp::v4(), config.port));
 
 			Receive();
 		}
@@ -80,10 +82,9 @@ void TransportLayerUDP::Receive()
 
 void TransportLayerUDP::HandleReceive(const boost::system::error_code& error, std::size_t length)
 {
-	assert(!error);
-
 	if (error)
 	{
+		std::cout << error.message() << std::endl;
 		return;
 	}
 
@@ -100,7 +101,7 @@ void TransportLayerUDP::HandleReceive(const boost::system::error_code& error, st
 void TransportLayerUDP::Send(S_Send data)
 {
 	_socket->async_send_to(
-		boost::asio::buffer(data.data)
+		boost::asio::buffer(data.data, data.length)
 		, _remote_endpoint
 		, boost::bind(&TransportLayerUDP::HandleSend
 			, this,

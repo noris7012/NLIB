@@ -8,8 +8,8 @@
 struct NetworkConfig
 {
 	E_TRANSPORT_TYPE transport_type;
-	const char* host;
-	uint32_t port;
+	const char* host = nullptr;
+	uint32_t port = 0;
 };
 
 #endif

@@ -8,6 +8,7 @@
 #include "NetworkStruct.h"
 #include "NetworkConfig.h"
 #include "TransportLayer.h"
+#include "ByteStream.h"
 
 class TransportLayer;
 
@@ -21,6 +22,7 @@ public:
 	bool IsConnected();
 	void HandleReceive(S_Recv_Ptr data);
 	void Send(const char* data);
+	void Send(ByteStream& stream);
 
 private:
 	void InternalUpdate(long time);

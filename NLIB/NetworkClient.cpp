@@ -3,7 +3,7 @@
 NetworkClient::NetworkClient()
 	: _state(NULL), _state_map(), _state_transition_table()
 {
-#define STATE_CREATE(id) ( _state_map[id] = ClientState::create(id) )
+#define STATE_CREATE(id) ( _state_map[id] = ClientState::create(id, this) )
 #define TRANSITION_CREATE(id, ...) ( _state_transition_table[id] = new std::vector<E_CLIENT_STATE_ID>{ ##__VA_ARGS__ } )
 
 	STATE_CREATE(DISCONNECTED);

@@ -1,5 +1,7 @@
 #include "NetworkServer.h"
 
+#include <assert.h>
+
 NetworkServer::NetworkServer()
 {
 
@@ -15,8 +17,9 @@ bool NetworkServer::Listen(uint32_t port)
 	// TODO Check State
 	NetworkConfig config;
 	config.transport_type = UDP;
-	config.host = nullptr;
 	config.port = port;
+
+	assert(config.host == nullptr);
 
 	Startup(config);
 

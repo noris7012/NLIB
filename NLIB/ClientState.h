@@ -2,17 +2,22 @@
 #define NLIB_CLIENT_STATE_H
 
 #include "NetworkDefine.h"
+#include "NetworkClient.h"
 
 class ClientState
 {
 public:
-	static ClientState* create(E_CLIENT_STATE_ID state_id);
+	static ClientState* create(E_CLIENT_STATE_ID state_id, NetworkClient* client);
 
+	void SetClient(NetworkClient* client);
 public:
 	virtual E_CLIENT_STATE_ID getID() = 0;
 	virtual void OnEnter() { };
 	virtual void Update(long time) { };
 	virtual void OnExit() { };
+
+protected:
+	NetworkClient* _client;
 };
 
 class ClientStateDisconnected : public ClientState
@@ -26,7 +31,12 @@ class ClientStateSendingConnectionRequest : public ClientState
 {
 public:
 	E_CLIENT_STATE_ID getID() { return SENDING_CONNECTIN_REQUEST; }
-	//void Update(long time);
+	void OnEnter();
+	void Update(long time);
+
+private:
+	long _send_request_time;
+	long _next_request_interval;
 };
 
 class ClientStateSendingConnectionResponse : public ClientState
