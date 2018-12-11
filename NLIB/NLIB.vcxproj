@@ -22,11 +22,11 @@
     <VCProjectVersion>15.0</VCProjectVersion>
     <ProjectGuid>{FC0B1D94-DD37-4FB7-8877-303265443D10}</ProjectGuid>
     <RootNamespace>NLIB</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v141</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
@@ -70,6 +70,9 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <TargetExt>.lib</TargetExt>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <TargetExt>.lib</TargetExt>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -127,6 +130,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="BufferPool.h" />
     <ClInclude Include="ByteStream.h" />
     <ClInclude Include="ClientState.h" />
     <ClInclude Include="NetworkClient.h" />
@@ -135,15 +139,18 @@
     <ClInclude Include="NetworkEndpoint.h" />
     <ClInclude Include="NetworkServer.h" />
     <ClInclude Include="NetworkStruct.h" />
+    <ClInclude Include="ProtocolPacket.h" />
     <ClInclude Include="TransportLayer.h" />
     <ClInclude Include="Utility.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="BufferPool.cpp" />
     <ClCompile Include="ByteStream.cpp" />
     <ClCompile Include="ClientState.cpp" />
     <ClCompile Include="NetworkClient.cpp" />
     <ClCompile Include="NetworkEndpoint.cpp" />
     <ClCompile Include="NetworkServer.cpp" />
+    <ClCompile Include="ProtocolPacket.cpp" />
     <ClCompile Include="TransportLayer.cpp" />
     <ClCompile Include="Utility.cpp" />
   </ItemGroup>

@@ -15,6 +15,7 @@ public:
 
 public:
 	void Update(long time);
+	void ProcessReceive(NLIBRecv* data);
 
 private:
 

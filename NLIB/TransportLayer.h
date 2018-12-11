@@ -10,6 +10,7 @@
 #include "NetworkConfig.h"
 #include "NetworkEndpoint.h"
 #include "NetworkStruct.h"
+#include "ByteStream.h"
 
 class NetworkEndpoint;
 
@@ -22,6 +23,7 @@ public:
 	virtual void Startup(NetworkConfig& config, NetworkEndpoint* local_endpoint) = 0;
 	virtual bool IsConnected() { return false; }
 	virtual void Send(S_Send data) = 0;
+	virtual void Send(ByteStream& stream) = 0;
 };
 
 class TransportLayerUDP : public TransportLayer
@@ -35,6 +37,8 @@ public:
 
 public:
 	void Send(S_Send data);
+	void Send(ByteStream& stream);
+
 private:
 	void HandleSend(const boost::system::error_code& error, std::size_t length);
 
@@ -48,6 +52,8 @@ private:
 	boost::asio::ip::udp::endpoint _remote_endpoint;
 
 	NetworkEndpoint* _local_endpoint;
+
+	boost::asio::io_context _io_context;
 };
 
 #endif

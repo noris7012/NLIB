@@ -37,4 +37,9 @@ enum E_TRANSPORT_TYPE
 	TCP,
 };
 
+using byte = unsigned char;
+
+#define NLIB_CONNECT_TOKEN_ENCRYPTED_LENGTH 896
+#define NLIB_CHALLENGE_TOKEN_ENCRYPTED_LENGTH 300
+
 #endif

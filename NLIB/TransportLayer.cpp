@@ -34,30 +34,30 @@ void TransportLayerUDP::Startup(NetworkConfig& config, NetworkEndpoint* local_en
 {
 	_local_endpoint = local_endpoint;
 
-	_thread = new std::thread([this, config]()
+	//boost::asio::io_context io_context;
+
+	if (config.host != nullptr)
 	{
-		boost::asio::io_context io_context;
+		// TODO Á» ´õ ´Ùµë±â
+		udp::resolver resolver(_io_context);
+		char s_port[10];
+		snprintf(s_port, 10, "%d", config.port);
+		udp::resolver::query query(udp::v4(), config.host, s_port);
+		_remote_endpoint = *resolver.resolve(query).begin();
 
-		if (config.host != nullptr)
-		{
-			udp::resolver resolver(io_context);
-			char s_port[10];
-			snprintf(s_port, 10, "%d", config.port);
-			udp::resolver::query query(udp::v4(), config.host, s_port);
-			_remote_endpoint = *resolver.resolve(query).begin();
+		_socket = new udp::socket(_io_context, udp::endpoint(udp::v4(), 0));
 
-			_socket = new udp::socket(io_context, udp::endpoint(udp::v4(), 0));
+		Receive();
+	}
+	else
+	{
+		_socket = new udp::socket(_io_context, udp::endpoint(udp::v4(), config.port));
 
-			Receive();
-		}
-		else
-		{
-			_socket = new udp::socket(io_context, udp::endpoint(udp::v4(), config.port));
+		Receive();
+	}
 
-			Receive();
-		}
-
-		io_context.run();
+	_thread = new std::thread([this]() {
+		_io_context.run();
 	});
 }
 
@@ -88,12 +88,12 @@ void TransportLayerUDP::HandleReceive(const boost::system::error_code& error, st
 		return;
 	}
 
-	S_Recv_Ptr recv = std::make_shared<S_Recv>();
-	assert(sizeof(recv->data) == MAX_MTU_SIZE);
-	memcpy_s(recv->data, sizeof(recv->data), _recv_buffer.data(), length);
-	recv->length = length;
+	//S_Recv_Ptr recv = std::make_shared<S_Recv>();
+	//assert(sizeof(recv->data) == MAX_MTU_SIZE);
+	//memcpy_s(recv->data, sizeof(recv->data), _recv_buffer.data(), length);
+	//recv->length = length;
 
-	_local_endpoint->HandleReceive(recv);
+	_local_endpoint->HandleReceive(_recv_buffer.data(), length);
 
 	Receive();
 }
@@ -111,8 +111,22 @@ void TransportLayerUDP::Send(S_Send data)
 	);
 }
 
+void TransportLayerUDP::Send(ByteStream& stream)
+{
+	_socket->async_send_to(
+		boost::asio::buffer(stream.Data(), stream.Length())
+		, _remote_endpoint
+		, boost::bind(&TransportLayerUDP::HandleSend
+			, this,
+			boost::asio::placeholders::error,
+			boost::asio::placeholders::bytes_transferred
+		)
+	);
+}
+
 void TransportLayerUDP::HandleSend(const boost::system::error_code& error, std::size_t length)
 {
+	assert(!error);
 	if (error)
 	{
 		std::cout << error.message() << std::endl;

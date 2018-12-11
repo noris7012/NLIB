@@ -1,5 +1,6 @@
 #include "NetworkServer.h"
 
+#include <iostream>
 #include <assert.h>
 
 NetworkServer::NetworkServer()
@@ -29,4 +30,19 @@ bool NetworkServer::Listen(uint32_t port)
 void NetworkServer::Update(long time)
 {
 
+}
+
+void NetworkServer::ProcessReceive(NLIBRecv* recv)
+{
+	ByteStream stream(recv->buffer->data, recv->length);
+	ProtocolPacket* packet = ProtocolPacket::Deserialize(stream);
+
+	assert(packet != nullptr);
+	if (packet != nullptr)
+	{
+		packet->Print();
+
+		// TODO Test Code
+		delete packet;
+	}
 }

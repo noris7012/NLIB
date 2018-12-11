@@ -6,6 +6,9 @@
 
 #include "NetworkEndpoint.h"
 #include "ClientState.h"
+#include "ProtocolPacket.h"
+
+class ClientState;
 
 class NetworkClient : public NetworkEndpoint
 {
@@ -17,6 +20,9 @@ public:
 
 public:
 	void Update(long time);
+	void ProcessReceive(NLIBRecv* data);
+
+public:
 
 private:
 	bool SetState(E_CLIENT_STATE_ID state_id);

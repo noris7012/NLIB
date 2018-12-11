@@ -3,5 +3,7 @@
 /x64
 /NLIB/x64
 /NLIB/Debug
+/NClient/Debug
 /NClient/x64
 /NServer/x64
+/NServer/Debug

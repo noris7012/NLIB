@@ -1,5 +1,7 @@
 #include "NetworkClient.h"
 
+#include <iostream>
+
 NetworkClient::NetworkClient()
 	: _state(NULL), _state_map(), _state_transition_table()
 {
@@ -41,15 +43,33 @@ bool NetworkClient::connect(const char* host, unsigned short port)
 
 void NetworkClient::Update(long time)
 {
-	if (_state != NULL)
+	if (_state != nullptr)
 	{
 		_state->Update(time);
 	}
 }
 
+void NetworkClient::ProcessReceive(NLIBRecv* recv)
+{
+	if (_state != nullptr)
+	{
+		ByteStream stream(recv->buffer->data, recv->length);
+		ProtocolPacket* packet = ProtocolPacket::Deserialize(stream);
+
+		assert(packet != nullptr);
+		if (packet != nullptr)
+		{
+			packet->Print();
+
+			// TODO Test Code
+			delete packet;
+		}
+	}
+}
+
 bool NetworkClient::SetState(E_CLIENT_STATE_ID state_id)
 {
-	if (_state == NULL)
+	if (_state == nullptr)
 	{
 		_state = _state_map[state_id];
 		_state->OnEnter();

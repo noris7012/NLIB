@@ -4,6 +4,8 @@
 #include "NetworkDefine.h"
 #include "NetworkClient.h"
 
+class NetworkClient;
+
 class ClientState
 {
 public:
@@ -53,4 +55,4 @@ public:
 	//void Update(long time);
 };
 
-#endif;
+#endif

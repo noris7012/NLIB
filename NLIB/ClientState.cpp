@@ -2,6 +2,7 @@
 
 #include "Utility.h"
 #include "ByteStream.h"
+#include "ProtocolPacket.h"
 
 ClientState* ClientState::create(E_CLIENT_STATE_ID state_id, NetworkClient* client)
 {
@@ -52,11 +53,7 @@ void ClientStateSendingConnectionRequest::Update(long time)
 	{
 		_send_request_time += _next_request_interval;
 
-		ByteStream stream;
-		stream.Write(E_PACKET_ID::CONNECTION_REQUEST);
-		stream.Write(NLIB_PROTOCOL_ID);
-		stream.PadWithZero();
-
-		_client->Send(stream);
+		ProtocolPacketConnectionRequest packet;
+		_client->Send(packet);
 	}
 }
