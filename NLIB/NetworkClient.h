@@ -23,8 +23,6 @@ public:
 	void ProcessReceive(NLIBRecv* data);
 
 public:
-
-private:
 	bool SetState(E_CLIENT_STATE_ID state_id);
 
 private:

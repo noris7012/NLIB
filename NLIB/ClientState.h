@@ -26,6 +26,7 @@ class ClientStateDisconnected : public ClientState
 {
 public:
 	E_CLIENT_STATE_ID getID() { return DISCONNECTED; }
+	void OnEnter();
 	void Update(long time);
 };
 
@@ -39,6 +40,7 @@ public:
 private:
 	long _send_request_time;
 	long _next_request_interval;
+	long _limit_request_time;
 };
 
 class ClientStateSendingConnectionResponse : public ClientState

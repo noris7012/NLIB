@@ -1,5 +1,7 @@
 #include "ClientState.h"
 
+#include <iostream>
+
 #include "Utility.h"
 #include "ByteStream.h"
 #include "ProtocolPacket.h"
@@ -36,6 +38,14 @@ void ClientState::SetClient(NetworkClient* client)
 	_client = client;
 }
 
+void ClientStateDisconnected::OnEnter()
+{
+#ifdef NLIB_LOG_ENABLED
+	std::cout << "[OnEnter] Disconnected" << std::endl;
+#endif // NLIB_LOG_ENABLED
+
+}
+
 void ClientStateDisconnected::Update(long time)
 {
 
@@ -43,13 +53,22 @@ void ClientStateDisconnected::Update(long time)
 
 void ClientStateSendingConnectionRequest::OnEnter()
 {
+#ifdef NLIB_LOG_ENABLED
+	std::cout << "[OnEnter] Sending Connection Request" << std::endl;
+#endif // NLIB_LOG_ENABLED
+
 	_send_request_time = Utility::GetTime();
 	_next_request_interval = 1000;
+	_limit_request_time = _send_request_time + NLIB_CONNECT_TIMEOUT;
 }
 
 void ClientStateSendingConnectionRequest::Update(long time)
 {
-	if (time >= _send_request_time)
+	if (time >= _limit_request_time)
+	{
+		_client->SetState(DISCONNECTED);
+	}
+	else if (time >= _send_request_time)
 	{
 		_send_request_time += _next_request_interval;
 
