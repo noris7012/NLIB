@@ -4,9 +4,16 @@
 
 #include "Utility.h"
 
+#define READ(variable, type) if(!stream.Read<type>(variable)) { return false; }
+#define READ_BYTE(variable, length) if(!stream.Read<const byte*>(variable, length)) { return false; }
+#define VALIDATE(expr) if(!(expr)) { return false; }
+
+// TODO FAST FAIL : 현재 상태에 유효하지 않은 패킷 ID는 바로 리턴할 수 있게
+
 ProtocolPacket* ProtocolPacket::Deserialize(ByteStream & stream)
 {
-	auto packet_id = stream.Read<E_PACKET_ID>();
+	E_PACKET_ID packet_id;
+	if (!stream.Read<E_PACKET_ID>(packet_id)) return nullptr;
 
 	ProtocolPacket* packet = nullptr;
 	switch (packet_id)
@@ -36,7 +43,8 @@ ProtocolPacket* ProtocolPacket::Deserialize(ByteStream & stream)
 		return nullptr;
 	}
 
-	packet->Read(stream);
+	if (!packet->Read(stream))
+		return nullptr;
 
 	return packet;
 }
@@ -68,15 +76,25 @@ void ProtocolPacketConnectionRequest::Write(ByteStream& stream)
 	stream.Write(_protocol_id);
 	stream.Write(_connect_token_expire);
 	stream.Write(_connect_token_sequence);
+
+	// TODO Class ConnectToken
 	stream.Write(_connect_token_encrypted, NLIB_CONNECT_TOKEN_ENCRYPTED_LENGTH);
 }
 
-void ProtocolPacketConnectionRequest::Read(ByteStream& stream)
+bool ProtocolPacketConnectionRequest::Read(ByteStream& stream)
 {
-	_protocol_id = stream.Read<uint32_t>();
-	_connect_token_expire = stream.Read<uint64_t>();
-	_connect_token_sequence = stream.Read<uint64_t>();
-	_connect_token_encrypted = stream.Read<const byte*>(NLIB_CONNECT_TOKEN_ENCRYPTED_LENGTH);
+	VALIDATE(stream.Remain() == sizeof(_protocol_id) + sizeof(_connect_token_expire) + sizeof(_connect_token_sequence) + NLIB_CONNECT_TOKEN_ENCRYPTED_LENGTH);
+
+	READ(_protocol_id, uint32_t);
+	VALIDATE(_protocol_id == NLIB_PROTOCOL_ID);
+
+	READ(_connect_token_expire, uint64_t);
+	VALIDATE(_connect_token_expire < Utility::GetTime());
+
+	READ(_connect_token_sequence, uint64_t);
+	READ_BYTE(_connect_token_encrypted, NLIB_CONNECT_TOKEN_ENCRYPTED_LENGTH);
+
+	return true;
 }
 
 void ProtocolPacketConnectionRequest::Print()
@@ -90,9 +108,9 @@ void ProtocolPacketConnectionDenied::Write(ByteStream& stream)
 
 }
 
-void ProtocolPacketConnectionDenied::Read(ByteStream& stream)
+bool ProtocolPacketConnectionDenied::Read(ByteStream& stream)
 {
-
+	return true;
 }
 
 void ProtocolPacketConnectionDenied::Print()
@@ -108,10 +126,12 @@ void ProtocolPacketConnectionChallenge::Write(ByteStream& stream)
 	stream.Write(_challenge_token_encrypted, NLIB_CHALLENGE_TOKEN_ENCRYPTED_LENGTH);
 }
 
-void ProtocolPacketConnectionChallenge::Read(ByteStream& stream)
+bool ProtocolPacketConnectionChallenge::Read(ByteStream& stream)
 {
-	_challenge_token_sequence = stream.Read<uint64_t>();
-	_challenge_token_encrypted = stream.Read<const byte*>(NLIB_CHALLENGE_TOKEN_ENCRYPTED_LENGTH);
+	READ(_challenge_token_sequence, uint64_t);
+	READ_BYTE(_challenge_token_encrypted, NLIB_CHALLENGE_TOKEN_ENCRYPTED_LENGTH);
+
+	return true;
 }
 
 void ProtocolPacketConnectionChallenge::Print()
@@ -127,10 +147,12 @@ void ProtocolPacketConnectionResponse::Write(ByteStream& stream)
 	stream.Write(_challenge_token_encrypted, NLIB_CHALLENGE_TOKEN_ENCRYPTED_LENGTH);
 }
 
-void ProtocolPacketConnectionResponse::Read(ByteStream& stream)
+bool ProtocolPacketConnectionResponse::Read(ByteStream& stream)
 {
-	_challenge_token_sequence = stream.Read<uint64_t>();
-	_challenge_token_encrypted = stream.Read<const byte*>(NLIB_CHALLENGE_TOKEN_ENCRYPTED_LENGTH);
+	READ(_challenge_token_sequence, uint64_t);
+	READ_BYTE(_challenge_token_encrypted, NLIB_CHALLENGE_TOKEN_ENCRYPTED_LENGTH);
+
+	return true;
 }
 
 void ProtocolPacketConnectionResponse::Print()
@@ -146,10 +168,12 @@ void ProtocolPacketConnectionKeepAlive::Write(ByteStream& stream)
 	stream.Write(_max_clients);
 }
 
-void ProtocolPacketConnectionKeepAlive::Read(ByteStream& stream)
+bool ProtocolPacketConnectionKeepAlive::Read(ByteStream& stream)
 {
-	_client_index = stream.Read<uint32_t>();
-	_max_clients = stream.Read<uint32_t>();
+	READ(_client_index, uint32_t);
+	READ(_max_clients, uint32_t);
+
+	return true;
 }
 
 void ProtocolPacketConnectionKeepAlive::Print()
@@ -164,10 +188,13 @@ void ProtocolPacketConnectionPayload::Write(ByteStream& stream)
 	stream.Write(_payload, _payload_length);
 }
 
-void ProtocolPacketConnectionPayload::Read(ByteStream& stream)
+bool ProtocolPacketConnectionPayload::Read(ByteStream& stream)
 {
 	_payload_length = stream.Remain();
-	_payload = stream.Read<const byte*>(_payload_length);
+
+	READ_BYTE(_payload, _payload_length);
+
+	return true;
 }
 
 void ProtocolPacketConnectionPayload::Print()
@@ -181,12 +208,17 @@ void ProtocolPacketConnectionDisconnect::Write(ByteStream& stream)
 
 }
 
-void ProtocolPacketConnectionDisconnect::Read(ByteStream& stream)
+bool ProtocolPacketConnectionDisconnect::Read(ByteStream& stream)
 {
-
+	return true;
 }
 
 void ProtocolPacketConnectionDisconnect::Print()
 {
 	std::cout << "Packet ID : Connection Disconnect" << std::endl;
 }
+
+
+#undef VALIDATE
+#undef READ_BYTE
+#undef READ

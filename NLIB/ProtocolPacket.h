@@ -15,7 +15,7 @@ public:
 	//virtual void Deserialize(ByteStream& stream) = 0;
 
 	virtual void Write(ByteStream& stream) = 0;
-	virtual void Read(ByteStream& stream) = 0;
+	virtual bool Read(ByteStream& stream) = 0;
 	virtual void Print() = 0;
 };
 
@@ -23,7 +23,7 @@ public:
 public: \
 	E_PACKET_ID GetID() { return id; } \
 	void Write(ByteStream& stream); \
-	void Read(ByteStream& stream); \
+	bool Read(ByteStream& stream); \
 	void Print();
 
 class ProtocolPacketConnectionRequest : public ProtocolPacket

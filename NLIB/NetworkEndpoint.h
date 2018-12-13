@@ -22,9 +22,7 @@ public:
 
 	void Startup(NetworkConfig& config);
 	bool IsConnected();
-	void HandleReceive(char* data, std::size_t length);
-	void Send(const char* data);
-	void Send(ByteStream& stream);
+	void HandleReceive(char* data, std::size_t length, NLIBAddress& address);
 	void Send(ProtocolPacket& packet);
 
 private:

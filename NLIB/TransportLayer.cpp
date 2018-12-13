@@ -82,33 +82,20 @@ void TransportLayerUDP::Receive()
 
 void TransportLayerUDP::HandleReceive(const boost::system::error_code& error, std::size_t length)
 {
+	assert(!error);
 	if (error)
 	{
 		std::cout << error.message() << std::endl;
 		return;
 	}
 
-	//S_Recv_Ptr recv = std::make_shared<S_Recv>();
-	//assert(sizeof(recv->data) == MAX_MTU_SIZE);
-	//memcpy_s(recv->data, sizeof(recv->data), _recv_buffer.data(), length);
-	//recv->length = length;
+	NLIBAddress address;
+	address.ip = _remote_endpoint.address().to_v4().to_ulong();
+	address.port = _remote_endpoint.port();
 
-	_local_endpoint->HandleReceive(_recv_buffer.data(), length);
+	_local_endpoint->HandleReceive(_recv_buffer.data(), length, address);
 
 	Receive();
-}
-
-void TransportLayerUDP::Send(S_Send data)
-{
-	_socket->async_send_to(
-		boost::asio::buffer(data.data, data.length)
-		, _remote_endpoint
-		, boost::bind(&TransportLayerUDP::HandleSend
-			, this,
-			boost::asio::placeholders::error,
-			boost::asio::placeholders::bytes_transferred
-		)
-	);
 }
 
 void TransportLayerUDP::Send(ByteStream& stream)

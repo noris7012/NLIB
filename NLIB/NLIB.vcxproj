@@ -138,6 +138,7 @@
     <ClInclude Include="NetworkDefine.h" />
     <ClInclude Include="NetworkEndpoint.h" />
     <ClInclude Include="NetworkServer.h" />
+    <ClInclude Include="NetworkSession.h" />
     <ClInclude Include="NetworkStruct.h" />
     <ClInclude Include="ProtocolPacket.h" />
     <ClInclude Include="TransportLayer.h" />

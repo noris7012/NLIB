@@ -2,6 +2,7 @@
 #define NLIB_BYTE_STREAM_H
 
 #include <stdint.h>
+#include <assert.h>
 
 #include "NetworkDefine.h"
 #include "NetworkStruct.h"
@@ -33,59 +34,76 @@ private:
 	unsigned int _idx;
 
 public:
-	template<class T> T Read()
+	template<class T> bool Read(T&)
 	{
 		assert(false);
 		return nullptr;
 	}
 
-	template<> E_PACKET_ID Read<E_PACKET_ID>()
+	template<> bool Read<E_PACKET_ID>(E_PACKET_ID& val)
 	{
-		return (E_PACKET_ID)_buffer[_idx++];
+		if (_idx + 1 > _capacity)
+			return false;
+
+		val = (E_PACKET_ID)_buffer[_idx++];
+
+		return true;
 	}
 
-	template<> uint32_t Read<uint32_t>()
+	template<> bool Read<uint32_t>(uint32_t& val)
 	{
-		uint32_t ret = 0;
+		if (_idx + 4 > _capacity)
+			return false;
 
-		ret += _buffer[_idx++] << 8 * 0;
-		ret += _buffer[_idx++] << 8 * 1;
-		ret += _buffer[_idx++] << 8 * 2;
-		ret += _buffer[_idx++] << 8 * 3;
+		val = 0;
+		val += _buffer[_idx++] << 8 * 0;
+		val += _buffer[_idx++] << 8 * 1;
+		val += _buffer[_idx++] << 8 * 2;
+		val += _buffer[_idx++] << 8 * 3;
 
-		return ret;
+		return true;
 	}
 
-	template<> uint64_t Read<uint64_t>()
+	template<> bool Read<uint64_t>(uint64_t& val)
 	{
-		uint64_t ret = 0;
+		if (_idx + 8 > _capacity)
+			return false;
 
-		ret += ((uint64_t)_buffer[_idx++]) << 8 * 0;
-		ret += ((uint64_t)_buffer[_idx++]) << 8 * 1;
-		ret += ((uint64_t)_buffer[_idx++]) << 8 * 2;
-		ret += ((uint64_t)_buffer[_idx++]) << 8 * 3;
-		ret += ((uint64_t)_buffer[_idx++]) << 8 * 4;
-		ret += ((uint64_t)_buffer[_idx++]) << 8 * 5;
-		ret += ((uint64_t)_buffer[_idx++]) << 8 * 6;
-		ret += ((uint64_t)_buffer[_idx++]) << 8 * 7;
+		val = 0;
+		val += ((uint64_t)_buffer[_idx++]) << 8 * 0;
+		val += ((uint64_t)_buffer[_idx++]) << 8 * 1;
+		val += ((uint64_t)_buffer[_idx++]) << 8 * 2;
+		val += ((uint64_t)_buffer[_idx++]) << 8 * 3;
+		val += ((uint64_t)_buffer[_idx++]) << 8 * 4;
+		val += ((uint64_t)_buffer[_idx++]) << 8 * 5;
+		val += ((uint64_t)_buffer[_idx++]) << 8 * 6;
+		val += ((uint64_t)_buffer[_idx++]) << 8 * 7;
 
-		return ret;
+		return true;
 	}
 
-	template<class T> T Read(uint32_t)
+	template<class T> bool Read(const byte*&, uint32_t)
 	{
 		assert(false);
 		return nullptr;
 	}
 
-	template<> const byte* Read<const byte*>(uint32_t length)
+	template<> bool Read<const byte*>(const byte*& val, uint32_t length)
 	{
-		byte* ret = new byte[length];
+		assert(val == nullptr);
+		if (val != nullptr)
+			return false;
 
-		memcpy(ret, _buffer + _idx, length);
+		if (_idx + length > _capacity)
+			return false;
+
+		byte* tmp = new byte[length];
+		memcpy(tmp, _buffer + _idx, length);
 		_idx += length;
 
-		return ret;
+		val = tmp;
+
+		return true;
 	}
 };
 

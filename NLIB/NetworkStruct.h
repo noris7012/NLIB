@@ -25,10 +25,23 @@ struct Buffer
 	byte data[MAX_MTU_SIZE];
 };
 
+struct NLIBAddress
+{
+	uint32_t ip;
+	uint16_t port;
+
+	uint64_t id() {
+		uint64_t ret = 0;
+		ret += ((uint64_t)ip) << 32;
+		ret += port;
+	}
+};
+
 struct NLIBRecv
 {
 	Buffer* buffer;
 	uint32_t length;
+	NLIBAddress address;
 };
 
 #endif

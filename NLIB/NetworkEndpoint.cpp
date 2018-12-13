@@ -71,7 +71,7 @@ NLIBRecv* NetworkEndpoint::Pop()
 	return data;
 }
 
-void NetworkEndpoint::HandleReceive(char* data, std::size_t length)
+void NetworkEndpoint::HandleReceive(char* data, std::size_t length, NLIBAddress& address)
 {
 	auto buffer = _buffer_pool.Acquire();
 	memcpy_s(buffer->data, sizeof(buffer->data), data, length);
@@ -79,30 +79,12 @@ void NetworkEndpoint::HandleReceive(char* data, std::size_t length)
 	NLIBRecv* recv = new NLIBRecv();
 	recv->buffer = buffer;
 	recv->length = length;
+	recv->address = address;
 
 	// TODO Implement Synchronized Queue
 	_recv_queue_mutex.lock();
 	_recv_queue.push(recv);
 	_recv_queue_mutex.unlock();
-}
-
-void NetworkEndpoint::Send(const char* data)
-{
-	S_Send send;
-	memcpy_s(send.data, sizeof(send.data), data, sizeof(data) + 1);
-	send.length = sizeof(data);
-
-	_transport->Send(send);
-}
-
-void NetworkEndpoint::Send(ByteStream& stream)
-{
-	S_Send data;
-	data.length = stream.Length();
-	memcpy_s(data.data, sizeof(data.data), stream.Data(), stream.Length());
-	assert(sizeof(data.data) == MAX_MTU_SIZE);
-
-	_transport->Send(data);
 }
 
 void NetworkEndpoint::Send(ProtocolPacket& packet)

@@ -22,7 +22,6 @@ public:
 public:
 	virtual void Startup(NetworkConfig& config, NetworkEndpoint* local_endpoint) = 0;
 	virtual bool IsConnected() { return false; }
-	virtual void Send(S_Send data) = 0;
 	virtual void Send(ByteStream& stream) = 0;
 };
 
@@ -36,7 +35,6 @@ public:
 	bool IsConnected();
 
 public:
-	void Send(S_Send data);
 	void Send(ByteStream& stream);
 
 private:
