@@ -1,13 +1,14 @@
-﻿// NServer.cpp : 이 파일에는 'main' 함수가 포함됩니다. 거기서 프로그램 실행이 시작되고 종료됩니다.
-//
-
-#include "NetworkServer.h"
+﻿#include "NetworkServer.h"
 
 #include <thread>
 #include <chrono>
 
+#include "ConnectToken.h"
+
 int main()
 {
+	ConnectToken::test();
+
 	NetworkServer server;
 
 	server.Listen(7171);

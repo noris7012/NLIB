@@ -34,6 +34,8 @@ struct NLIBAddress
 		uint64_t ret = 0;
 		ret += ((uint64_t)ip) << 32;
 		ret += port;
+
+		return ret;
 	}
 };
 

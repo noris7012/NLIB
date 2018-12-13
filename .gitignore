@@ -7,3 +7,5 @@
 /NClient/x64
 /NServer/x64
 /NServer/Debug
+/lib/cryptopp/Win32
+/lib/cryptopp/.vs

@@ -82,8 +82,9 @@
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>E:\boost_1_68_0;E:\boost_1_68_0\stage\lib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>E:\GitRepository\NLIB\lib;E:\boost_1_68_0;E:\boost_1_68_0\stage\lib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_SILENCE_ALL_CXX17_DEPRECATION_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>E:\boost_1_68_0\stage\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
@@ -133,6 +134,7 @@
     <ClInclude Include="BufferPool.h" />
     <ClInclude Include="ByteStream.h" />
     <ClInclude Include="ClientState.h" />
+    <ClInclude Include="ConnectToken.h" />
     <ClInclude Include="NetworkClient.h" />
     <ClInclude Include="NetworkConfig.h" />
     <ClInclude Include="NetworkDefine.h" />
@@ -148,12 +150,18 @@
     <ClCompile Include="BufferPool.cpp" />
     <ClCompile Include="ByteStream.cpp" />
     <ClCompile Include="ClientState.cpp" />
+    <ClCompile Include="ConnectToken.cpp" />
     <ClCompile Include="NetworkClient.cpp" />
     <ClCompile Include="NetworkEndpoint.cpp" />
     <ClCompile Include="NetworkServer.cpp" />
     <ClCompile Include="ProtocolPacket.cpp" />
     <ClCompile Include="TransportLayer.cpp" />
     <ClCompile Include="Utility.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\lib\cryptopp\cryptlib.vcxproj">
+      <Project>{c39f4b46-6e89-4074-902e-ca57073044d2}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
