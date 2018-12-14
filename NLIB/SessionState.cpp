@@ -68,6 +68,9 @@ void SessionStateSendingConnectionChallenge::Update(long time)
 	{
 		_send_request_time += _next_request_interval;
 
+		std::cout << "[ Server Challenge Token ] " << std::endl;
+		std::cout << Utility::ByteToString(_session->GetChallengeTokenEncrypted(), NLIB_CHALLENGE_TOKEN_ENCRYPTED_LENGTH) << std::endl;
+
 		ProtocolPacketConnectionChallenge packet;
 		packet.Set(_session->GetChallengeTokenSequence(), _session->GetChallengeTokenEncrypted());
 		_session->Send(packet);

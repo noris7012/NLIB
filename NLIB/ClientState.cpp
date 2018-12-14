@@ -87,7 +87,10 @@ void ClientStateSendingConnectionRequest::HandlePacket(ProtocolPacket* p)
 	if (p->GetID() == E_PACKET_ID::CONNECTION_CHALLENGE)
 	{
 		ProtocolPacketConnectionChallenge* packet = static_cast<ProtocolPacketConnectionChallenge*>(p);
-		
+
+		std::cout << "[ Client Challenge Token ] " << std::endl;
+		std::cout << Utility::ByteToString(packet->GetChallengeTokenEncrypted(), NLIB_CHALLENGE_TOKEN_ENCRYPTED_LENGTH) << std::endl;
+
 		_client->SetChallengeToken(packet->GetChallengeTokenSequence(), packet->GetChallengeTokenEncrypted());
 		_client->SetState(E_CLIENT_STATE_ID::SENDING_CONNECTION_RESPONSE);
 	}
