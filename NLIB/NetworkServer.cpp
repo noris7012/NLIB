@@ -17,7 +17,7 @@ bool NetworkServer::Listen(uint32_t port)
 {
 	// TODO Check State
 	NetworkConfig config;
-	config.transport_type = UDP;
+	config.transport_type = E_TRANSPORT_TYPE::UDP;
 	config.port = port;
 
 	assert(config.host == nullptr);
@@ -29,7 +29,23 @@ bool NetworkServer::Listen(uint32_t port)
 
 void NetworkServer::Update(long time)
 {
+	for (auto it = _connected_session_by_id.begin(); it != _connected_session_by_id.end(); ++it)
+	{
+		auto session = it->second;
+		if (session == nullptr)
+			continue;
 
+		session->Update(time);
+	}
+
+	for (int i = 0; i < NLIB_MAX_CONNECTION_SLOT; ++i)
+	{
+		auto session = _connection_slot[i];
+		if (session == nullptr)
+			continue;
+
+		session->Update(time);
+	}
 }
 
 void NetworkServer::ProcessReceive(NLIBRecv* recv)
@@ -48,6 +64,27 @@ void NetworkServer::ProcessReceive(NLIBRecv* recv)
 		return;
 
 	packet->Print();
+
+	switch (packet->GetID())
+	{
+	case E_PACKET_ID::CONNECTION_REQUEST:
+		HandleConnectionRequest(packet, recv);
+		break;
+	case E_PACKET_ID::CONNECTION_RESPONSE:
+		HandleConnectionResponse(packet, recv);
+		break;
+	case E_PACKET_ID::CONNECTION_KEEP_ALIVE:
+		HandleConnectionKeepAlive(packet, recv);
+		break;
+	case E_PACKET_ID::CONNECTION_PAYLOAD:
+		HandleConnectionPayload(packet, recv);
+		break;
+	case E_PACKET_ID::CONNECTION_DISCONNECT:
+		HandleConnectionDisconnect(packet, recv);
+		break;
+	default:
+		break;
+	}
 
 	// TODO Test Code
 	delete packet;
@@ -73,3 +110,90 @@ void NetworkServer::ProcessReceive(NLIBRecv* recv)
 * 어떠한 이유로 매핑이 되지 않는다면 패킷은 무시한다.
 * 그렇지 않아면 connection challen 패킷으로 응답하고 challenge sequence number를 증가시킨다.
 */
+
+
+void NetworkServer::HandleConnectionRequest(ProtocolPacket* p, NLIBRecv* r)
+{
+	// Check Session Full
+	if (_connected_session_by_id.size() >= NLIB_MAX_SESSION)
+	{
+		ProtocolPacketConnectionDenied packet;
+		Send(packet);
+		return;
+	}
+
+	// Check Slot Full
+	uint32_t idx = -1;
+	for (int i = 0; i < NLIB_MAX_CONNECTION_SLOT; ++i)
+	{
+		auto session = _connection_slot[i];
+		if (session == nullptr)
+		{
+			idx = i;
+			break;
+		}
+	}
+
+	if (idx < 0)
+	{
+		ProtocolPacketConnectionDenied packet;
+		Send(packet);
+		return;
+	}
+
+	// Slot 에 이미 있다면 처리중이므로 무시.
+	for (int i = 0; i < NLIB_MAX_CONNECTION_SLOT; ++i)
+	{
+		auto session = _connection_slot[i];
+		if (session == nullptr)
+			continue;
+
+		if (session->IsSameAddress(r->address))
+		{
+			return;
+		}
+	}
+
+	// TODO challenge_token_encrypted 진짜 암호화하기
+	byte challenge_token_encrypted[NLIB_CHALLENGE_TOKEN_ENCRYPTED_LENGTH];
+	uint64_t challenge_token_sequence = _challenge_token_sequence++;
+
+	_connection_slot[idx] = new NetworkSession(this, challenge_token_sequence, challenge_token_encrypted, r->address);
+}
+
+void NetworkServer::HandleConnectionResponse(ProtocolPacket* p, NLIBRecv* r)
+{
+	NetworkSession* session = nullptr;
+	for (int i = 0; i < NLIB_MAX_CONNECTION_SLOT; ++i)
+	{
+		auto tmp_session = _connection_slot[i];
+		if (tmp_session == nullptr)
+			continue;
+
+		if (tmp_session->IsSameAddress(r->address))
+		{
+			session = tmp_session;
+			break;
+		}
+	}
+
+	// Request 가 없었는데 Response 패킷이 옴
+	if (session == nullptr)
+		return;
+
+	session->HandlePacket(p);
+}
+
+void NetworkServer::HandleConnectionKeepAlive(ProtocolPacket* p, NLIBRecv* r)
+{
+
+}
+
+void NetworkServer::HandleConnectionPayload(ProtocolPacket* p, NLIBRecv* r)
+{
+
+}
+void NetworkServer::HandleConnectionDisconnect(ProtocolPacket* p, NLIBRecv* r)
+{
+
+}

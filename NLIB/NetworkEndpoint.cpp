@@ -95,3 +95,12 @@ void NetworkEndpoint::Send(ProtocolPacket& packet)
 	_transport->Send(stream);
 	_buffer_pool.Release(buffer);
 }
+
+void NetworkEndpoint::SendTo(ProtocolPacket& packet, NLIBAddress& address)
+{
+	auto buffer = _buffer_pool.Acquire();
+	ByteStream stream(buffer);
+	packet.Write(stream);
+	_transport->SendTo(stream, address);
+	_buffer_pool.Release(buffer);
+}

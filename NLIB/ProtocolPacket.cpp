@@ -4,10 +4,6 @@
 
 #include "Utility.h"
 
-#define READ(variable, type) if(!stream.Read<type>(variable)) { return false; }
-#define READ_BYTE(variable, length) if(!stream.Read<const byte*>(variable, length)) { return false; }
-#define VALIDATE(expr) if(!(expr)) { return false; }
-
 // TODO FAST FAIL : 현재 상태에 유효하지 않은 패킷 ID는 바로 리턴할 수 있게
 
 ProtocolPacket* ProtocolPacket::Deserialize(ByteStream & stream)
@@ -18,55 +14,57 @@ ProtocolPacket* ProtocolPacket::Deserialize(ByteStream & stream)
 	ProtocolPacket* packet = nullptr;
 	switch (packet_id)
 	{
-	case CONNECTION_REQUEST:
+	case E_PACKET_ID::CONNECTION_REQUEST:
 		packet = new ProtocolPacketConnectionRequest();
 		break;
-	case CONNECTION_DENIED:
+	case E_PACKET_ID::CONNECTION_DENIED:
 		packet = new ProtocolPacketConnectionDenied();
 		break;
-	case CONNECTION_CHALLENGE:
+	case E_PACKET_ID::CONNECTION_CHALLENGE:
 		packet = new ProtocolPacketConnectionChallenge();
 		break;
-	case CONNECTION_RESPONSE:
+	case E_PACKET_ID::CONNECTION_RESPONSE:
 		packet = new ProtocolPacketConnectionResponse();
 		break;
-	case CONNECTION_KEEP_ALIVE:
+	case E_PACKET_ID::CONNECTION_KEEP_ALIVE:
 		packet = new ProtocolPacketConnectionKeepAlive();
 		break;
-	case CONNECTION_PAYLOAD:
+	case E_PACKET_ID::CONNECTION_PAYLOAD:
 		packet = new ProtocolPacketConnectionPayload();
 		break;
-	case CONNECTION_DISCONNECT:
+	case E_PACKET_ID::CONNECTION_DISCONNECT:
 		packet = new ProtocolPacketConnectionDisconnect();
 		break;
 	default:
 		return nullptr;
 	}
 
-	if (!packet->Read(stream))
+	auto rc = packet->Read(stream);
+	if (rc != E_READ_RESULT::SUCCESS)
 		return nullptr;
 
 	return packet;
 }
 
+// TODO Read 시에 멤버 변수를 초기화할 필요가 없음.
 ProtocolPacketConnectionRequest::ProtocolPacketConnectionRequest()
 	: _protocol_id(NLIB_PROTOCOL_ID)
 {
 	_connect_token_expire = Utility::GetTime() + 60 * 60 * 1000;
 	_connect_token_sequence = 0x12345678;
-	byte* temp = new byte[NLIB_CONNECT_TOKEN_ENCRYPTED_LENGTH];
+	/*byte* temp = new byte[NLIB_CONNECT_TOKEN_ENCRYPTED_LENGTH];
 
 	for (int i = 0; i < NLIB_CONNECT_TOKEN_ENCRYPTED_LENGTH; ++i)
 	{
 		temp[i] = (byte)i;
 	}
 
-	_connect_token_encrypted = temp;
+	_connect_token_encrypted = temp;*/
 }
 
 ProtocolPacketConnectionRequest::~ProtocolPacketConnectionRequest()
 {
-	delete[] _connect_token_encrypted;
+	/*delete[] _connect_token_encrypted;*/
 }
 
 void ProtocolPacketConnectionRequest::Write(ByteStream& stream)
@@ -78,23 +76,24 @@ void ProtocolPacketConnectionRequest::Write(ByteStream& stream)
 	stream.Write(_connect_token_sequence);
 
 	// TODO Class ConnectToken
-	stream.Write(_connect_token_encrypted, NLIB_CONNECT_TOKEN_ENCRYPTED_LENGTH);
+	_connect_token.Write(stream);
+	/*stream.Write(_connect_token_encrypted, NLIB_CONNECT_TOKEN_ENCRYPTED_LENGTH);*/
 }
 
-bool ProtocolPacketConnectionRequest::Read(ByteStream& stream)
+E_READ_RESULT ProtocolPacketConnectionRequest::Read(ByteStream& stream)
 {
-	VALIDATE(stream.Remain() == sizeof(_protocol_id) + sizeof(_connect_token_expire) + sizeof(_connect_token_sequence) + NLIB_CONNECT_TOKEN_ENCRYPTED_LENGTH);
+	NLIB_VALIDATE(stream.Remain() == sizeof(_protocol_id) + sizeof(_connect_token_expire) + sizeof(_connect_token_sequence) + _connect_token.Length(), E_READ_RESULT::FAIL);
 
-	READ(_protocol_id, uint32_t);
-	VALIDATE(_protocol_id == NLIB_PROTOCOL_ID);
+	NLIB_STREAM_READ(_protocol_id, uint32_t);
+	NLIB_VALIDATE(_protocol_id == NLIB_PROTOCOL_ID, E_READ_RESULT::FAIL);
 
-	READ(_connect_token_expire, uint64_t);
-	VALIDATE(_connect_token_expire < Utility::GetTime());
+	NLIB_STREAM_READ(_connect_token_expire, uint64_t);
+	NLIB_VALIDATE(_connect_token_expire >= Utility::GetTime(), E_READ_RESULT::FAIL);
 
-	READ(_connect_token_sequence, uint64_t);
-	READ_BYTE(_connect_token_encrypted, NLIB_CONNECT_TOKEN_ENCRYPTED_LENGTH);
+	NLIB_STREAM_READ(_connect_token_sequence, uint64_t);
+	NLIB_VALIDATE_FUNC(_connect_token.Read(stream));
 
-	return true;
+	return E_READ_RESULT::SUCCESS;
 }
 
 void ProtocolPacketConnectionRequest::Print()
@@ -108,14 +107,18 @@ void ProtocolPacketConnectionDenied::Write(ByteStream& stream)
 
 }
 
-bool ProtocolPacketConnectionDenied::Read(ByteStream& stream)
+E_READ_RESULT ProtocolPacketConnectionDenied::Read(ByteStream& stream)
 {
-	return true;
+	return E_READ_RESULT::SUCCESS;
 }
 
 void ProtocolPacketConnectionDenied::Print()
 {
 	std::cout << "Packet ID : Connection Denied" << std::endl;
+}
+
+ProtocolPacketConnectionChallenge::~ProtocolPacketConnectionChallenge()
+{
 }
 
 void ProtocolPacketConnectionChallenge::Write(ByteStream& stream)
@@ -126,12 +129,18 @@ void ProtocolPacketConnectionChallenge::Write(ByteStream& stream)
 	stream.Write(_challenge_token_encrypted, NLIB_CHALLENGE_TOKEN_ENCRYPTED_LENGTH);
 }
 
-bool ProtocolPacketConnectionChallenge::Read(ByteStream& stream)
+void ProtocolPacketConnectionChallenge::Set(uint64_t challenge_token_sequence, const byte* challenge_token_encrypted)
 {
-	READ(_challenge_token_sequence, uint64_t);
-	READ_BYTE(_challenge_token_encrypted, NLIB_CHALLENGE_TOKEN_ENCRYPTED_LENGTH);
+	_challenge_token_sequence = challenge_token_sequence;
+	_challenge_token_encrypted = challenge_token_encrypted;
+}
 
-	return true;
+E_READ_RESULT ProtocolPacketConnectionChallenge::Read(ByteStream& stream)
+{
+	NLIB_STREAM_READ(_challenge_token_sequence, uint64_t);
+	NLIB_STREAM_READ_BYTE(_challenge_token_encrypted, NLIB_CHALLENGE_TOKEN_ENCRYPTED_LENGTH);
+
+	return E_READ_RESULT::SUCCESS;
 }
 
 void ProtocolPacketConnectionChallenge::Print()
@@ -147,12 +156,18 @@ void ProtocolPacketConnectionResponse::Write(ByteStream& stream)
 	stream.Write(_challenge_token_encrypted, NLIB_CHALLENGE_TOKEN_ENCRYPTED_LENGTH);
 }
 
-bool ProtocolPacketConnectionResponse::Read(ByteStream& stream)
+void ProtocolPacketConnectionResponse::Set(uint64_t challenge_token_sequence, const byte* challenge_token_encrypted)
 {
-	READ(_challenge_token_sequence, uint64_t);
-	READ_BYTE(_challenge_token_encrypted, NLIB_CHALLENGE_TOKEN_ENCRYPTED_LENGTH);
+	_challenge_token_sequence = challenge_token_sequence;
+	_challenge_token_encrypted = challenge_token_encrypted;
+}
 
-	return true;
+E_READ_RESULT ProtocolPacketConnectionResponse::Read(ByteStream& stream)
+{
+	NLIB_STREAM_READ(_challenge_token_sequence, uint64_t);
+	NLIB_STREAM_READ_BYTE(_challenge_token_encrypted, NLIB_CHALLENGE_TOKEN_ENCRYPTED_LENGTH);
+
+	return E_READ_RESULT::SUCCESS;
 }
 
 void ProtocolPacketConnectionResponse::Print()
@@ -168,12 +183,12 @@ void ProtocolPacketConnectionKeepAlive::Write(ByteStream& stream)
 	stream.Write(_max_clients);
 }
 
-bool ProtocolPacketConnectionKeepAlive::Read(ByteStream& stream)
+E_READ_RESULT ProtocolPacketConnectionKeepAlive::Read(ByteStream& stream)
 {
-	READ(_client_index, uint32_t);
-	READ(_max_clients, uint32_t);
+	NLIB_STREAM_READ(_client_index, uint32_t);
+	NLIB_STREAM_READ(_max_clients, uint32_t);
 
-	return true;
+	return E_READ_RESULT::SUCCESS;
 }
 
 void ProtocolPacketConnectionKeepAlive::Print()
@@ -188,13 +203,13 @@ void ProtocolPacketConnectionPayload::Write(ByteStream& stream)
 	stream.Write(_payload, _payload_length);
 }
 
-bool ProtocolPacketConnectionPayload::Read(ByteStream& stream)
+E_READ_RESULT ProtocolPacketConnectionPayload::Read(ByteStream& stream)
 {
 	_payload_length = stream.Remain();
 
-	READ_BYTE(_payload, _payload_length);
+	NLIB_STREAM_READ_BYTE(_payload, _payload_length);
 
-	return true;
+	return E_READ_RESULT::SUCCESS;
 }
 
 void ProtocolPacketConnectionPayload::Print()
@@ -208,17 +223,12 @@ void ProtocolPacketConnectionDisconnect::Write(ByteStream& stream)
 
 }
 
-bool ProtocolPacketConnectionDisconnect::Read(ByteStream& stream)
+E_READ_RESULT ProtocolPacketConnectionDisconnect::Read(ByteStream& stream)
 {
-	return true;
+	return E_READ_RESULT::SUCCESS;
 }
 
 void ProtocolPacketConnectionDisconnect::Print()
 {
 	std::cout << "Packet ID : Connection Disconnect" << std::endl;
 }
-
-
-#undef VALIDATE
-#undef READ_BYTE
-#undef READ

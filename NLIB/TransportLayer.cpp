@@ -12,7 +12,7 @@ TransportLayer* TransportLayer::Create(E_TRANSPORT_TYPE type)
 {
 	switch (type)
 	{
-	case UDP:
+	case E_TRANSPORT_TYPE::UDP:
 		return new TransportLayerUDP();
 	default:
 		return nullptr;
@@ -90,6 +90,7 @@ void TransportLayerUDP::HandleReceive(const boost::system::error_code& error, st
 	}
 
 	NLIBAddress address;
+	address.ip_str = _remote_endpoint.address().to_v4().to_string();
 	address.ip = _remote_endpoint.address().to_v4().to_ulong();
 	address.port = _remote_endpoint.port();
 
@@ -103,6 +104,19 @@ void TransportLayerUDP::Send(ByteStream& stream)
 	_socket->async_send_to(
 		boost::asio::buffer(stream.Data(), stream.Length())
 		, _remote_endpoint
+		, boost::bind(&TransportLayerUDP::HandleSend
+			, this,
+			boost::asio::placeholders::error,
+			boost::asio::placeholders::bytes_transferred
+		)
+	);
+}
+
+void TransportLayerUDP::SendTo(ByteStream& stream, NLIBAddress& address)
+{
+	_socket->async_send_to(
+		boost::asio::buffer(stream.Data(), stream.Length())
+		, udp::endpoint(address::from_string(address.ip_str), address.port)
 		, boost::bind(&TransportLayerUDP::HandleSend
 			, this,
 			boost::asio::placeholders::error,

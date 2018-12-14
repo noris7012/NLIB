@@ -3,6 +3,7 @@
 
 #include "ByteStream.h"
 #include "NetworkDefine.h"
+#include "ConnectToken.h"
 
 class ProtocolPacket
 {
@@ -15,7 +16,7 @@ public:
 	//virtual void Deserialize(ByteStream& stream) = 0;
 
 	virtual void Write(ByteStream& stream) = 0;
-	virtual bool Read(ByteStream& stream) = 0;
+	virtual E_READ_RESULT Read(ByteStream& stream) = 0;
 	virtual void Print() = 0;
 };
 
@@ -23,12 +24,12 @@ public:
 public: \
 	E_PACKET_ID GetID() { return id; } \
 	void Write(ByteStream& stream); \
-	bool Read(ByteStream& stream); \
+	E_READ_RESULT Read(ByteStream& stream); \
 	void Print();
 
 class ProtocolPacketConnectionRequest : public ProtocolPacket
 {
-	PUBLIC_METHOD(CONNECTION_REQUEST)
+	PUBLIC_METHOD(E_PACKET_ID::CONNECTION_REQUEST)
 
 public:
 	ProtocolPacketConnectionRequest();
@@ -38,17 +39,25 @@ private:
 	uint32_t _protocol_id;
 	uint64_t _connect_token_expire;
 	uint64_t _connect_token_sequence;
-	const byte* _connect_token_encrypted;
+	ConnectToken _connect_token;
 };
 
 class ProtocolPacketConnectionDenied : public ProtocolPacket
 {
-	PUBLIC_METHOD(CONNECTION_DENIED)
+	PUBLIC_METHOD(E_PACKET_ID::CONNECTION_DENIED);
 };
 
 class ProtocolPacketConnectionChallenge : public ProtocolPacket
 {
-	PUBLIC_METHOD(CONNECTION_CHALLENGE)
+	PUBLIC_METHOD(E_PACKET_ID::CONNECTION_CHALLENGE);
+	
+public:
+	~ProtocolPacketConnectionChallenge();
+
+	void Set(uint64_t challenge_token_sequence, const byte* challenge_token_encrypted);
+
+	uint64_t GetChallengeTokenSequence() { return _challenge_token_sequence; }
+	const byte* GetChallengeTokenEncrypted() { return _challenge_token_encrypted; }
 
 private:
 	uint64_t _challenge_token_sequence;
@@ -57,7 +66,13 @@ private:
 
 class ProtocolPacketConnectionResponse : public ProtocolPacket
 {
-	PUBLIC_METHOD(CONNECTION_RESPONSE)
+	PUBLIC_METHOD(E_PACKET_ID::CONNECTION_RESPONSE)
+
+public:
+	void Set(uint64_t challenge_token_sequence, const byte* challenge_token_encrypted);
+
+	uint64_t GetChallengeTokenSequence() { return _challenge_token_sequence; }
+	const byte* GetChallengeTokenEncrypted() { return _challenge_token_encrypted; }
 
 private:
 	uint64_t _challenge_token_sequence;
@@ -66,7 +81,7 @@ private:
 
 class ProtocolPacketConnectionKeepAlive : public ProtocolPacket
 {
-	PUBLIC_METHOD(CONNECTION_KEEP_ALIVE)
+	PUBLIC_METHOD(E_PACKET_ID::CONNECTION_KEEP_ALIVE)
 
 private:
 	uint32_t _client_index;
@@ -75,7 +90,7 @@ private:
 
 class ProtocolPacketConnectionPayload : public ProtocolPacket
 {
-	PUBLIC_METHOD(CONNECTION_PAYLOAD)
+	PUBLIC_METHOD(E_PACKET_ID::CONNECTION_PAYLOAD)
 
 private:
 	const byte* _payload;
@@ -84,7 +99,7 @@ private:
 
 class ProtocolPacketConnectionDisconnect : public ProtocolPacket
 {
-	PUBLIC_METHOD(CONNECTION_DISCONNECT)
+	PUBLIC_METHOD(E_PACKET_ID::CONNECTION_DISCONNECT)
 };
 
 #undef PUBLIC_METHOD

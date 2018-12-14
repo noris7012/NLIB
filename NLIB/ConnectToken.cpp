@@ -3,6 +3,12 @@
 #include <iostream>
 #include <string>
 
+#include "cryptopp/cryptlib.h"
+#include "cryptopp/modes.h"
+#include "cryptopp/aes.h"
+#include "cryptopp/filters.h"
+#include "cryptopp/base64.h"
+
 void ConnectToken::test()
 {
 	byte key[CryptoPP::AES::MAX_KEYLENGTH];
@@ -57,4 +63,34 @@ void ConnectToken::test()
 	std::cout << "Decrypted Text: " << std::endl;
 	std::cout << decryptedtext;
 	std::cout << std::endl << std::endl;
+}
+
+ConnectToken::ConnectToken()
+{
+
+}
+
+ConnectToken::~ConnectToken()
+{
+
+}
+
+void ConnectToken::Write(ByteStream& stream)
+{
+	_token = NLIB_CONNECT_TOKEN;
+
+	stream.Write(_token, NLIB_CONNECT_TOKEN_LENGTH);
+}
+
+E_READ_RESULT ConnectToken::Read(ByteStream& stream)
+{
+	NLIB_STREAM_READ_BYTE(_token, NLIB_CONNECT_TOKEN_LENGTH);
+	NLIB_VALIDATE(memcmp(_token, NLIB_CONNECT_TOKEN, NLIB_CONNECT_TOKEN_LENGTH) == 0, E_READ_RESULT::INVALID_TOKEN);
+
+	return E_READ_RESULT::SUCCESS;
+}
+
+uint32_t ConnectToken::Length()
+{
+	return NLIB_CONNECT_TOKEN_LENGTH;
 }

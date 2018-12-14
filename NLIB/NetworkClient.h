@@ -25,10 +25,18 @@ public:
 public:
 	bool SetState(E_CLIENT_STATE_ID state_id);
 
+	void SetChallengeToken(uint64_t challenge_token_sequence, const byte* challenge_token_encrypted);
+
+	uint64_t GetChallengeTokenSequence() { return _challenge_token_sequence; }
+	const byte* GetChallengeTokenEncrypted() { return _challenge_token_encrypted; }
+
 private:
 	ClientState* _state;
 	std::map<E_CLIENT_STATE_ID, ClientState*> _state_map;
 	std::map<E_CLIENT_STATE_ID, std::vector<E_CLIENT_STATE_ID>*> _state_transition_table;
+
+	uint64_t _challenge_token_sequence;
+	const byte* _challenge_token_encrypted;
 };
 
 #endif

@@ -1,8 +1,10 @@
 #ifndef NLIB_NETWORK_STRUCT_H
 #define NLIB_NETWORK_STRUCT_H
 
-#include "NetworkDefine.h"
 #include <memory>
+#include <string>
+
+#include "NetworkDefine.h"
 
 struct S_Recv
 {
@@ -27,6 +29,7 @@ struct Buffer
 
 struct NLIBAddress
 {
+	std::string ip_str;
 	uint32_t ip;
 	uint16_t port;
 

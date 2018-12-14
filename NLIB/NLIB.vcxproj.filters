@@ -57,6 +57,9 @@
     <ClInclude Include="ConnectToken.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
+    <ClInclude Include="SessionState.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="NetworkClient.cpp">
@@ -87,6 +90,12 @@
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="ConnectToken.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="NetworkSession.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="SessionState.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>

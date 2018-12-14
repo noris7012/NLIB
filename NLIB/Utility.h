@@ -1,10 +1,12 @@
 #ifndef NLIB_UTILITY_H
 #define NLIB_UTILITY_H
 
+#include <stdint.h>
+
 class Utility
 {
 public:
-	static long GetTime();
+	static uint64_t GetTime();
 };
 
 #endif

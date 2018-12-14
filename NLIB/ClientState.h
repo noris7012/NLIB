@@ -3,8 +3,10 @@
 
 #include "NetworkDefine.h"
 #include "NetworkClient.h"
+#include "ProtocolPacket.h"
 
 class NetworkClient;
+class ProtocolPacket;
 
 class ClientState
 {
@@ -17,6 +19,7 @@ public:
 	virtual void OnEnter() { };
 	virtual void Update(long time) { };
 	virtual void OnExit() { };
+	virtual void HandlePacket(ProtocolPacket* packet) { };
 
 protected:
 	NetworkClient* _client;
@@ -25,7 +28,7 @@ protected:
 class ClientStateDisconnected : public ClientState
 {
 public:
-	E_CLIENT_STATE_ID getID() { return DISCONNECTED; }
+	E_CLIENT_STATE_ID getID() { return E_CLIENT_STATE_ID::DISCONNECTED; }
 	void OnEnter();
 	void Update(long time);
 };
@@ -33,9 +36,10 @@ public:
 class ClientStateSendingConnectionRequest : public ClientState
 {
 public:
-	E_CLIENT_STATE_ID getID() { return SENDING_CONNECTIN_REQUEST; }
+	E_CLIENT_STATE_ID getID() { return E_CLIENT_STATE_ID::SENDING_CONNECTION_REQUEST; }
 	void OnEnter();
 	void Update(long time);
+	void HandlePacket(ProtocolPacket* packet);
 
 private:
 	long _send_request_time;
@@ -46,15 +50,28 @@ private:
 class ClientStateSendingConnectionResponse : public ClientState
 {
 public:
-	E_CLIENT_STATE_ID getID() { return SENDING_CONNECTIN_RESPONSE; }
-	//void Update(long time);
+	E_CLIENT_STATE_ID getID() { return E_CLIENT_STATE_ID::SENDING_CONNECTION_RESPONSE; }
+	void OnEnter();
+	void Update(long time);
+	void HandlePacket(ProtocolPacket* packet);
+
+private:
+	long _send_response_time;
+	long _next_response_interval;
+	long _limit_response_time;
 };
 
 class ClientStateConnected : public ClientState
 {
 public:
-	E_CLIENT_STATE_ID getID() { return CONNECTED; }
-	//void Update(long time);
+	E_CLIENT_STATE_ID getID() { return E_CLIENT_STATE_ID::CONNECTED; }
+	void OnEnter();
+	void Update(long time);
+	void HandlePacket(ProtocolPacket* packet);
+
+private:
+	long _send_keep_alive_time;
+	long _next_keep_alive_interval;
 };
 
 #endif

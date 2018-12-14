@@ -24,6 +24,7 @@ public:
 	bool IsConnected();
 	void HandleReceive(char* data, std::size_t length, NLIBAddress& address);
 	void Send(ProtocolPacket& packet);
+	void SendTo(ProtocolPacket& packet, NLIBAddress& address);
 
 private:
 	void InternalUpdate(long time);

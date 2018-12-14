@@ -3,16 +3,24 @@
 
 #include "NetworkDefine.h"
 
-#include "cryptopp/cryptlib.h"
-#include "cryptopp/modes.h"
-#include "cryptopp/aes.h"
-#include "cryptopp/filters.h"
-#include "cryptopp/base64.h"
+#include "ByteStream.h"
 
 class ConnectToken
 {
 public:
 	static void test();
+
+public:
+	ConnectToken();
+	~ConnectToken();
+
+	void Write(ByteStream& stream);
+	E_READ_RESULT Read(ByteStream& stream);
+
+	uint32_t Length();
+
+private:
+	const byte* _token;
 };
 
 #endif
