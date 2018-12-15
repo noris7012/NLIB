@@ -127,6 +127,9 @@ void ProtocolPacketConnectionChallenge::Write(ByteStream& stream)
 
 	stream.Write(_challenge_token_sequence);
 	stream.Write(_challenge_token_encrypted, NLIB_CHALLENGE_TOKEN_ENCRYPTED_LENGTH);
+
+	//std::cout << "[ Write Challenge Token ] " << std::endl;
+	//std::cout << Utility::ByteToString(_challenge_token_encrypted, NLIB_CHALLENGE_TOKEN_ENCRYPTED_LENGTH) << std::endl;
 }
 
 void ProtocolPacketConnectionChallenge::Set(uint64_t challenge_token_sequence, const byte* challenge_token_encrypted)
@@ -139,6 +142,9 @@ E_READ_RESULT ProtocolPacketConnectionChallenge::Read(ByteStream& stream)
 {
 	NLIB_STREAM_READ(_challenge_token_sequence, uint64_t);
 	NLIB_STREAM_READ_BYTE(_challenge_token_encrypted, NLIB_CHALLENGE_TOKEN_ENCRYPTED_LENGTH);
+
+	//std::cout << "[ Read Challenge Token ] " << std::endl;
+	//std::cout << Utility::ByteToString(_challenge_token_encrypted, NLIB_CHALLENGE_TOKEN_ENCRYPTED_LENGTH) << std::endl;
 
 	return E_READ_RESULT::SUCCESS;
 }

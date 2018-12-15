@@ -1,6 +1,8 @@
 #include "Utility.h"
 
 #include <chrono>
+#include <sstream>
+#include <iomanip>
 
 uint64_t Utility::GetTime()
 {
@@ -10,14 +12,12 @@ uint64_t Utility::GetTime()
 
 std::string Utility::ByteToString(const byte* data, uint32_t length)
 {
-	char* arr = new char[length * 2 + 1];
+	std::stringstream ss;
+	ss << std::hex << std::setfill('0');
 	for (int i = 0; i < length; ++i)
 	{
-		sprintf_s(arr + i * 2, length * 2 + 1, "%02x", data[i]);
+		ss << std::setw(2) << static_cast<unsigned>(data[i]);
 	}
-	arr[length * 2] = 0;
 
-	auto ret = std::string(arr);
-
-	return ret;
+	return ss.str();
 }

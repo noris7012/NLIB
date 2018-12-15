@@ -4,27 +4,32 @@
 #include <stdio.h>
 #include <string.h>
 
-ByteStream::ByteStream()
-	: ByteStream(1024)
-{
-}
+#include <iostream>
 
-ByteStream::ByteStream(uint32_t capacity)
-{
-	_buffer = new byte[capacity];
-	_capacity = capacity;
-	_idx = 0;
-}
+//ByteStream::ByteStream()
+//	: ByteStream(1024)
+//{
+//}
+//
+//ByteStream::ByteStream(uint32_t capacity)
+//{
+//	_buffer = new byte[capacity];
+//	_capacity = capacity;
+//	_idx = 0;
+//
+//	std::cout << "[buffer1]" << static_cast<void*>(_buffer) << std::endl;
+//}
 
-
-// TODO 카피 해야 할 때와 안해도 될 때 구분하기
-ByteStream::ByteStream(const byte* data, uint32_t length)
+ByteStream::ByteStream(byte* data, uint32_t length)
 {
-	_buffer = new byte[length];
+	//_buffer = new byte[length];
+	_buffer = data;
 	_capacity = length;
 	_idx = 0;
 
 	memcpy_s(_buffer, length, data, length);
+
+	//std::cout << "[buffer2]" << static_cast<void*>(_buffer) << std::endl;
 }
 
 ByteStream::ByteStream(Buffer* buffer)
@@ -32,11 +37,15 @@ ByteStream::ByteStream(Buffer* buffer)
 	_buffer = buffer->data;
 	_capacity = sizeof(buffer->data);
 	_idx = 0;
+
+	//std::cout << "[buffer3]" << static_cast<void*>(_buffer) << std::endl;
 }
 
 ByteStream::~ByteStream()
 {
-	delete[] _buffer;
+	//static int cnt = 0;
+	//std::cout << "[~buffer] " << ++cnt << " : " << static_cast<void*>(_buffer) << std::endl;
+	//delete[] _buffer;
 }
 
 void ByteStream::Write(E_PACKET_ID packet_id)

@@ -5,6 +5,7 @@
 #include <boost/preprocessor/seq/for_each.hpp>
 #include <boost/preprocessor/variadic/to_seq.hpp>
 
+#include "Utility.h"
 
 NetworkClient::NetworkClient()
 	: _state(NULL), _state_map(), _state_transition_table()
@@ -63,6 +64,11 @@ void NetworkClient::ProcessReceive(NLIBRecv* recv)
 	assert(_state != nullptr);
 	if (_state == nullptr)
 		return;
+
+#ifdef NLIB_LOG_ENABLED
+	std::cout << "[ Client Receive ] " << std::endl;
+	std::cout << Utility::ByteToString(recv->buffer->data, recv->length) << std::endl;
+#endif
 
 	ByteStream stream(recv->buffer->data, recv->length);
 	ProtocolPacket* packet = ProtocolPacket::Deserialize(stream);

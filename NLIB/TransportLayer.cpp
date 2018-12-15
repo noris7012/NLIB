@@ -5,6 +5,7 @@
 #include <iostream>
 
 #include "NetworkStruct.h"
+#include "Utility.h"
 
 using namespace boost::asio::ip;
 
@@ -101,6 +102,11 @@ void TransportLayerUDP::HandleReceive(const boost::system::error_code& error, st
 
 void TransportLayerUDP::Send(ByteStream& stream)
 {
+#ifdef NLIB_LOG_ENABLED
+	std::cout << "[ Send ] " << std::endl;
+	std::cout << Utility::ByteToString(stream.Data(), stream.Length()) << std::endl;
+#endif
+
 	_socket->async_send_to(
 		boost::asio::buffer(stream.Data(), stream.Length())
 		, _remote_endpoint
@@ -114,6 +120,11 @@ void TransportLayerUDP::Send(ByteStream& stream)
 
 void TransportLayerUDP::SendTo(ByteStream& stream, NLIBAddress& address)
 {
+#ifdef NLIB_LOG_ENABLED
+	std::cout << "[ SendTo ] " << std::endl;
+	std::cout << Utility::ByteToString(stream.Data(), stream.Length()) << std::endl;
+#endif
+
 	_socket->async_send_to(
 		boost::asio::buffer(stream.Data(), stream.Length())
 		, udp::endpoint(address::from_string(address.ip_str), address.port)

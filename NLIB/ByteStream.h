@@ -10,9 +10,9 @@
 class ByteStream
 {
 public:
-	ByteStream();
-	ByteStream(uint32_t capacity);
-	ByteStream(const byte* data, uint32_t length);
+	//ByteStream();
+	//ByteStream(uint32_t capacity);
+	ByteStream(byte* data, uint32_t length);
 	ByteStream(Buffer* buffer);
 	~ByteStream();
 

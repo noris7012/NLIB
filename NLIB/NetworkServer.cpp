@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <assert.h>
+#include "Utility.h"
 
 NetworkServer::NetworkServer()
 {
@@ -50,6 +51,11 @@ void NetworkServer::Update(long time)
 
 void NetworkServer::ProcessReceive(NLIBRecv* recv)
 {
+#ifdef NLIB_LOG_ENABLED
+	std::cout << "[ Server Receive ] " << std::endl;
+	std::cout << Utility::ByteToString(recv->buffer->data, recv->length) << std::endl;
+#endif
+
 	ByteStream stream(recv->buffer->data, recv->length);
 	ProtocolPacket* packet = ProtocolPacket::Deserialize(stream);
 
@@ -155,7 +161,7 @@ void NetworkServer::HandleConnectionRequest(ProtocolPacket* p, NLIBRecv* r)
 	}
 
 	// TODO challenge_token_encrypted 진짜 암호화하기
-	byte challenge_token_encrypted[NLIB_CHALLENGE_TOKEN_ENCRYPTED_LENGTH];
+	byte* challenge_token_encrypted = new byte[NLIB_CHALLENGE_TOKEN_ENCRYPTED_LENGTH];
 	uint64_t challenge_token_sequence = _challenge_token_sequence++;
 
 	_connection_slot[idx] = new NetworkSession(this, challenge_token_sequence, challenge_token_encrypted, r->address);

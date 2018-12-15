@@ -1,6 +1,7 @@
 #include "BufferPool.h"
 
 #include <assert.h>
+#include <iostream>
 
 BufferPool::BufferPool()
 	: BufferPool(128)
@@ -40,6 +41,8 @@ Buffer* BufferPool::Acquire()
 	_pool.pop();
 	_mutex.unlock();
 
+	//std::cout << "[ Acquire ] " << _pool.size() << std::endl;
+
 	return buffer;
 }
 
@@ -48,4 +51,6 @@ void BufferPool::Release(Buffer* buffer)
 	_mutex.lock();
 	_pool.push(buffer);
 	_mutex.unlock();
+
+	//std::cout << "[ Release ] " << _pool.size() << std::endl;
 }
