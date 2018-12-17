@@ -293,6 +293,6 @@ void NetworkServer::OnDisconnected(NetworkSession* session)
 
 	_connected_session_mutex.unlock();
 
+	// TODO delete 가 잘못될 가능성이 있음. mark 만 해놓고 Update 에서 객체 삭제.
 	delete session;
-
 }

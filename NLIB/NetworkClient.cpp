@@ -41,7 +41,7 @@ NetworkClient::~NetworkClient()
 		delete[] _challenge_token_encrypted;
 }
 
-bool NetworkClient::connect(const char* host, unsigned short port)
+bool NetworkClient::Connect(const char* host, unsigned short port)
 {
 	// TODO Check State
 	NetworkConfig config;

@@ -1,16 +1,16 @@
 ﻿// NClient.cpp : 이 파일에는 'main' 함수가 포함됩니다. 거기서 프로그램 실행이 시작되고 종료됩니다.
 //
 
-#include "NetworkClient.h"
+#include "ReliableClient.h"
 
 #include <thread>
 #include <chrono>
 
 int main()
 {
-	NetworkClient client;
+	ReliableClient client;
 
-	client.connect("127.0.0.1", 7171);
+	client.Connect("127.0.0.1", 7171);
 
 	while (!client.IsConnected())
 	{
@@ -18,6 +18,9 @@ int main()
 	}
 
 	std::this_thread::sleep_for(std::chrono::milliseconds(10000));
+
+	client.Send((const byte*)"123", 3);
+	client.Send((const byte*)"123456789", 9);
 
 	client.Disconnect();
 

@@ -17,7 +17,7 @@ public:
 	NetworkClient();
 	~NetworkClient();
 
-	bool connect(const char* host, unsigned short port);
+	bool Connect(const char* host, unsigned short port);
 	void Disconnect();
 
 public:
