@@ -21,6 +21,7 @@ public:
 
 public:
 	virtual void Startup(NetworkConfig& config, NetworkEndpoint* local_endpoint) = 0;
+	virtual void Destroy() = 0;
 	virtual bool IsConnected() { return false; }
 	virtual void Send(ByteStream& stream) = 0;
 	virtual void SendTo(ByteStream& stream, NLIBAddress& address) = 0;
@@ -33,6 +34,7 @@ public:
 	~TransportLayerUDP();
 
 	void Startup(NetworkConfig& config, NetworkEndpoint* local_endpoint);
+	void Destroy();
 	bool IsConnected();
 
 public:

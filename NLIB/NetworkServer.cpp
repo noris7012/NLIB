@@ -28,15 +28,13 @@ bool NetworkServer::Listen(uint32_t port)
 	return true;
 }
 
-void NetworkServer::Update(long time)
+void NetworkServer::Update(uint64_t time)
 {
-	for (auto it = _connected_session_by_id.begin(); it != _connected_session_by_id.end(); ++it)
+	for (uint32_t i = 0; i < NLIB_MAX_SESSION; ++i)
 	{
-		auto session = it->second;
-		if (session == nullptr)
-			continue;
-
-		session->Update(time);
+		auto session = _connected_session[i];
+		if (session != nullptr)
+			session->Update(time);
 	}
 
 	for (int i = 0; i < NLIB_MAX_CONNECTION_SLOT; ++i)
@@ -63,33 +61,42 @@ void NetworkServer::ProcessReceive(NLIBRecv* recv)
 
 	if (packet == nullptr)
 		return;
-	
-	// 패킷의 source IP 와 port 가 이미 연결되어 있다면 무시한다.
-	auto address_id = recv->address.id();
-	if (_connected_session_by_address_id.find(address_id) != _connected_session_by_address_id.end())
-		return;
 
 	packet->Print();
 
-	switch (packet->GetID())
+	// 패킷의 source IP 와 port 가 이미 연결되어 있다면 무시한다.
+	auto address_id = recv->address.id();
+	if (_connected_session_by_address_id.find(address_id) != _connected_session_by_address_id.end())
 	{
-	case E_PACKET_ID::CONNECTION_REQUEST:
-		HandleConnectionRequest(packet, recv);
-		break;
-	case E_PACKET_ID::CONNECTION_RESPONSE:
-		HandleConnectionResponse(packet, recv);
-		break;
-	case E_PACKET_ID::CONNECTION_KEEP_ALIVE:
-		HandleConnectionKeepAlive(packet, recv);
-		break;
-	case E_PACKET_ID::CONNECTION_PAYLOAD:
-		HandleConnectionPayload(packet, recv);
-		break;
-	case E_PACKET_ID::CONNECTION_DISCONNECT:
-		HandleConnectionDisconnect(packet, recv);
-		break;
-	default:
-		break;
+		switch (packet->GetID())
+		{
+		case E_PACKET_ID::CONNECTION_KEEP_ALIVE:
+			HandleConnectionKeepAlive(packet, recv);
+			break;
+		case E_PACKET_ID::CONNECTION_PAYLOAD:
+			HandleConnectionPayload(packet, recv);
+			break;
+		case E_PACKET_ID::CONNECTION_DISCONNECT:
+			HandleConnectionDisconnect(packet, recv);
+			break;
+		default:
+			break;
+		}
+	}
+	else
+	{
+		switch (packet->GetID())
+		{
+		case E_PACKET_ID::CONNECTION_REQUEST:
+			HandleConnectionRequest(packet, recv);
+			break;
+		case E_PACKET_ID::CONNECTION_RESPONSE:
+			HandleConnectionResponse(packet, recv);
+			break;
+		default:
+			break;
+		}
+
 	}
 
 	// TODO Test Code
@@ -160,11 +167,7 @@ void NetworkServer::HandleConnectionRequest(ProtocolPacket* p, NLIBRecv* r)
 		}
 	}
 
-	// TODO challenge_token_encrypted 진짜 암호화하기
-	byte* challenge_token_encrypted = new byte[NLIB_CHALLENGE_TOKEN_ENCRYPTED_LENGTH];
-	uint64_t challenge_token_sequence = _challenge_token_sequence++;
-
-	_connection_slot[idx] = new NetworkSession(this, challenge_token_sequence, challenge_token_encrypted, r->address);
+	_connection_slot[idx] = new NetworkSession(this, _challenge_token_sequence++, r->address);
 }
 
 void NetworkServer::HandleConnectionResponse(ProtocolPacket* p, NLIBRecv* r)
@@ -192,14 +195,104 @@ void NetworkServer::HandleConnectionResponse(ProtocolPacket* p, NLIBRecv* r)
 
 void NetworkServer::HandleConnectionKeepAlive(ProtocolPacket* p, NLIBRecv* r)
 {
+	assert(p != nullptr && p->GetID() == E_PACKET_ID::CONNECTION_KEEP_ALIVE);
 
+	auto packet = static_cast<ProtocolPacketConnectionKeepAlive*>(p);
+	auto session = _connected_session_by_id[packet->GetClientID()];
+
+	assert(session != nullptr);
+	if (session == nullptr)
+		return;
+
+	session->HandlePacket(p);
 }
 
 void NetworkServer::HandleConnectionPayload(ProtocolPacket* p, NLIBRecv* r)
 {
+	assert(p != nullptr && p->GetID() == E_PACKET_ID::CONNECTION_PAYLOAD);
 
+	auto packet = static_cast<ProtocolPacketConnectionPayload*>(p);
+	auto session = _connected_session_by_id[packet->GetClientID()];
+
+	assert(session != nullptr);
+	if (session == nullptr)
+		return;
+
+	session->HandlePacket(p);
 }
+
 void NetworkServer::HandleConnectionDisconnect(ProtocolPacket* p, NLIBRecv* r)
 {
+	assert(p != nullptr && p->GetID() == E_PACKET_ID::CONNECTION_DISCONNECT);
+
+	auto packet = static_cast<ProtocolPacketConnectionDisconnect*>(p);
+	auto session = _connected_session_by_id[packet->GetClientID()];
+
+	if (session == nullptr)
+		return;
+
+	session->SetState(E_SESSION_STATE_ID::DISCONNECTED);
+}
+
+void NetworkServer::OnConnected(NetworkSession* session)
+{
+	_connected_session_mutex.lock();
+
+	uint32_t client_id = Utility::Rand32();
+	while (_connected_session_by_id.find(client_id) != _connected_session_by_id.end())
+	{
+		client_id = Utility::Rand32();
+	}
+
+	uint32_t slot_id = 0;
+	while (slot_id < NLIB_MAX_SESSION)
+	{
+		auto session = _connected_session[slot_id];
+		if (session == nullptr)
+			break;
+
+		++slot_id;
+	}
+
+	if (slot_id >= NLIB_MAX_SESSION)
+	{
+		session->SetState(E_SESSION_STATE_ID::DISCONNECTED);
+		_connected_session_mutex.unlock();
+		return;
+	}
+
+	_connected_session[slot_id] = session;
+	_connected_session_by_id[client_id] = session;
+	_connected_session_by_address_id[session->GetAddressID()] = session;
+
+	session->SetConnection(slot_id, client_id);
+
+	_connected_session_mutex.unlock();
+
+	for (int i = 0; i < NLIB_MAX_CONNECTION_SLOT; ++i)
+	{
+		auto tmp_session = _connection_slot[i];
+		if (tmp_session == nullptr)
+			continue;
+
+		// 혹시 slot 에 복수개 할당된 경우가 있을까봐.
+		if (tmp_session->IsSameAddress(session->GetAddress()))
+		{
+			_connection_slot[i] = nullptr;
+		}
+	}
+}
+
+void NetworkServer::OnDisconnected(NetworkSession* session)
+{
+	_connected_session_mutex.lock();
+
+	_connected_session[session->GetSlotID()] = nullptr;
+	_connected_session_by_id.erase(session->GetClientID());
+	_connected_session_by_address_id.erase(session->GetAddressID());
+
+	_connected_session_mutex.unlock();
+
+	delete session;
 
 }

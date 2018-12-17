@@ -2,12 +2,20 @@
 
 #include <thread>
 #include <chrono>
+#include <iostream>
 
 #include "ConnectToken.h"
 
+#include "Utility.h"
+
 int main()
 {
-	ConnectToken::test();
+	//ConnectToken::test();
+
+	/*for (int i = 0; i < 100; ++i)
+	{
+		std::cout << Utility::Rand64() << std::endl;
+	}*/
 
 	NetworkServer server;
 

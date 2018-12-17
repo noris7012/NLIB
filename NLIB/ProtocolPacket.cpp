@@ -206,13 +206,15 @@ void ProtocolPacketConnectionPayload::Write(ByteStream& stream)
 {
 	stream.Write(GetID());
 
+	stream.Write(_client_index);
 	stream.Write(_payload, _payload_length);
 }
 
 E_READ_RESULT ProtocolPacketConnectionPayload::Read(ByteStream& stream)
 {
-	_payload_length = stream.Remain();
+	NLIB_STREAM_READ(_client_index, uint32_t);
 
+	_payload_length = stream.Remain();
 	NLIB_STREAM_READ_BYTE(_payload, _payload_length);
 
 	return E_READ_RESULT::SUCCESS;
@@ -227,10 +229,13 @@ void ProtocolPacketConnectionDisconnect::Write(ByteStream& stream)
 {
 	stream.Write(GetID());
 
+	stream.Write(_client_index);
 }
 
 E_READ_RESULT ProtocolPacketConnectionDisconnect::Read(ByteStream& stream)
 {
+	NLIB_STREAM_READ(_client_index, uint32_t);
+
 	return E_READ_RESULT::SUCCESS;
 }
 

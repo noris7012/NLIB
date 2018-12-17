@@ -13,6 +13,9 @@ ClientState* ClientState::create(E_CLIENT_STATE_ID state_id, NetworkClient* clie
 
 	switch (state_id)
 	{
+	case E_CLIENT_STATE_ID::INIT:
+		ret = new ClientStateInit();
+		break;
 	case E_CLIENT_STATE_ID::DISCONNECTED:
 		ret = new ClientStateDisconnected();
 		break;
@@ -45,11 +48,29 @@ void ClientStateDisconnected::OnEnter()
 	std::cout << "[OnEnter] Disconnected" << std::endl;
 #endif // NLIB_LOG_ENABLED
 
+	_send_request_time = Utility::GetTime();
+	_next_request_interval = 1000;
+	_limit_request_time = _send_request_time + NLIB_CONNECT_TIMEOUT;
 }
 
-void ClientStateDisconnected::Update(long time)
+void ClientStateDisconnected::Update(uint64_t time)
 {
+	if (time >= _limit_request_time)
+	{
+		_client->SetState(E_CLIENT_STATE_ID::INIT);
+	}
+	else if (time >= _send_request_time)
+	{
+		_send_request_time += _next_request_interval;
 
+		ProtocolPacketConnectionDisconnect packet;
+		packet.Set(_client->GetClientID());
+		_client->Send(packet);
+	}
+}
+
+void ClientStateDisconnected::OnExit()
+{
 }
 
 void ClientStateSendingConnectionRequest::OnEnter()
@@ -63,7 +84,7 @@ void ClientStateSendingConnectionRequest::OnEnter()
 	_limit_request_time = _send_request_time + NLIB_CONNECT_TIMEOUT;
 }
 
-void ClientStateSendingConnectionRequest::Update(long time)
+void ClientStateSendingConnectionRequest::Update(uint64_t time)
 {
 	if (time >= _limit_request_time)
 	{
@@ -107,7 +128,7 @@ void ClientStateSendingConnectionResponse::OnEnter()
 	_limit_response_time = _send_response_time + NLIB_CONNECT_TIMEOUT;
 }
 
-void ClientStateSendingConnectionResponse::Update(long time)
+void ClientStateSendingConnectionResponse::Update(uint64_t time)
 {
 	if (time >= _limit_response_time)
 	{
@@ -133,6 +154,7 @@ void ClientStateSendingConnectionResponse::HandlePacket(ProtocolPacket* p)
 	{
 		ProtocolPacketConnectionKeepAlive* packet = static_cast<ProtocolPacketConnectionKeepAlive*>(p);
 
+		_client->SetClientID(packet->GetClientID());
 		_client->SetState(E_CLIENT_STATE_ID::CONNECTED);
 	}
 }
@@ -147,14 +169,14 @@ void ClientStateConnected::OnEnter()
 	_next_keep_alive_interval = 1000;
 }
 
-void ClientStateConnected::Update(long time)
+void ClientStateConnected::Update(uint64_t time)
 {
 	if (time >= _send_keep_alive_time)
 	{
 		_send_keep_alive_time += _next_keep_alive_interval;
 
 		ProtocolPacketConnectionKeepAlive packet;
-		// TODO Set Value
+		packet.Set(_client->GetClientID());
 		_client->Send(packet);
 	}
 }

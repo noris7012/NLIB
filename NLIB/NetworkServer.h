@@ -4,6 +4,7 @@
 #include <stdint.h>
 #include <unordered_map>
 #include <stdint.h>
+#include <mutex>
 
 #include "NetworkEndpoint.h"
 #include "NetworkSession.h"
@@ -20,7 +21,7 @@ public:
 	bool Listen(uint32_t port);
 
 public:
-	void Update(long time);
+	void Update(uint64_t time);
 	void ProcessReceive(NLIBRecv* data);
 
 private:
@@ -30,7 +31,13 @@ private:
 	void HandleConnectionPayload(ProtocolPacket*, NLIBRecv*);
 	void HandleConnectionDisconnect(ProtocolPacket*, NLIBRecv*);
 
+public:
+	void OnConnected(NetworkSession* session);
+	void OnDisconnected(NetworkSession* session);
+
 private:
+	std::mutex _connected_session_mutex;
+	NetworkSession* _connected_session[NLIB_MAX_SESSION];
 	std::unordered_map<uint64_t, NetworkSession*> _connected_session_by_address_id;
 	std::unordered_map<uint64_t, NetworkSession*> _connected_session_by_id;
 

@@ -11,6 +11,9 @@ SessionState* SessionState::Create(E_SESSION_STATE_ID state_id, NetworkSession* 
 
 	switch (state_id)
 	{
+	case E_SESSION_STATE_ID::INIT:
+		ret = new SessionStateInit();
+		break;
 	case E_SESSION_STATE_ID::DISCONNECTED:
 		ret = new SessionStateDisconnected();
 		break;
@@ -40,9 +43,10 @@ void SessionStateDisconnected::OnEnter()
 	std::cout << "[OnEnter] Disconnected" << std::endl;
 #endif // NLIB_LOG_ENABLED
 
+	_session->OnDisconnected();
 }
 
-void SessionStateDisconnected::Update(long time)
+void SessionStateDisconnected::Update(uint64_t time)
 {
 
 }
@@ -58,7 +62,7 @@ void SessionStateSendingConnectionChallenge::OnEnter()
 	_limit_request_time = _send_request_time + NLIB_CONNECT_TIMEOUT;
 }
 
-void SessionStateSendingConnectionChallenge::Update(long time) 
+void SessionStateSendingConnectionChallenge::Update(uint64_t time)
 {
 	if (time >= _limit_request_time)
 	{
@@ -103,23 +107,29 @@ void SessionStateConnected::OnEnter()
 	std::cout << "[OnEnter] Connected" << std::endl;
 #endif // NLIB_LOG_ENABLED
 
-	_send_keep_alive_time = Utility::GetTime();
+	_send_keep_alive_time =	_last_recv_time = Utility::GetTime();
 	_next_keep_alive_interval = 1000;
+
+	_session->OnConnected();
 }
 
-void SessionStateConnected::Update(long time)
+void SessionStateConnected::Update(uint64_t time)
 {
-	if (time >= _send_keep_alive_time)
+	if (time >= _last_recv_time + NLIB_CONNECT_TIMEOUT)
+	{
+		_session->SetState(E_SESSION_STATE_ID::DISCONNECTED);
+	}
+	else if (time >= _send_keep_alive_time)
 	{
 		_send_keep_alive_time += _next_keep_alive_interval;
 
 		ProtocolPacketConnectionKeepAlive packet;
-		// TODO Set Value
+		packet.Set(_session->GetClientID());
 		_session->Send(packet);
 	}
 }
 
 void SessionStateConnected::HandlePacket(ProtocolPacket* packet)
 {
-
+	_last_recv_time = Utility::GetTime();
 }

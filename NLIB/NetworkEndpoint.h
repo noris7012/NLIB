@@ -4,6 +4,7 @@
 #include <thread>
 #include <queue>
 #include <mutex>
+#include <stdint.h>
 
 #include "NetworkStruct.h"
 #include "NetworkConfig.h"
@@ -21,19 +22,20 @@ public:
 	~NetworkEndpoint();
 
 	void Startup(NetworkConfig& config);
+	void Destroy();
 	bool IsConnected();
 	void HandleReceive(char* data, std::size_t length, NLIBAddress& address);
 	void Send(ProtocolPacket& packet);
 	void SendTo(ProtocolPacket& packet, NLIBAddress& address);
 
 private:
-	void InternalUpdate(long time);
+	void InternalUpdate(uint64_t time);
 
 private:
 	NLIBRecv* Pop();
 
 public:
-	virtual void Update(long time) = 0;
+	virtual void Update(uint64_t time) = 0;
 	virtual void ProcessReceive(NLIBRecv* data) = 0;
 
 private:

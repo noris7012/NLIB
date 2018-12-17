@@ -2,12 +2,13 @@
 
 #include "Utility.h"
 
-NetworkSession::NetworkSession(NetworkServer* server, uint64_t challenge_token_sequence, const byte* challenge_token_encrypted, NLIBAddress address)
+NetworkSession::NetworkSession(NetworkServer* server, uint64_t challenge_token_sequence, NLIBAddress address)
 	: _server(server)
 	, _challenge_token_sequence(challenge_token_sequence)
-	, _challenge_token_encrypted(challenge_token_encrypted)
 	, _address(address)
 {
+	// TODO challenge_token_encrypted 진짜 암호화하기
+	_challenge_token_encrypted = new byte[NLIB_CHALLENGE_TOKEN_ENCRYPTED_LENGTH];
 	_created_time = Utility::GetTime();
 
 #define STATE_CREATE(id) ( _state_map[E_SESSION_STATE_ID::id] = SessionState::Create(E_SESSION_STATE_ID::id, this) )
@@ -28,7 +29,17 @@ NetworkSession::NetworkSession(NetworkServer* server, uint64_t challenge_token_s
 	SetState(E_SESSION_STATE_ID::SENDING_CONNECTION_CHALLENGE);
 }
 
-void NetworkSession::Update(long time)
+NetworkSession::~NetworkSession()
+{
+	for (auto it = _state_map.begin(); it != _state_map.end(); ++it)
+	{
+		delete it->second;
+	}
+
+	delete _challenge_token_encrypted;
+}
+
+void NetworkSession::Update(uint64_t time)
 {
 	if (_state != nullptr)
 	{
@@ -48,6 +59,16 @@ void NetworkSession::HandlePacket(ProtocolPacket* packet)
 		return;
 
 	_state->HandlePacket(packet);
+}
+
+void NetworkSession::OnConnected()
+{
+	_server->OnConnected(this);
+}
+
+void NetworkSession::OnDisconnected()
+{
+	_server->OnDisconnected(this);
 }
 
 bool NetworkSession::SetState(E_SESSION_STATE_ID state_id)
@@ -87,4 +108,14 @@ E_SESSION_STATE_ID NetworkSession::GetStateID()
 bool NetworkSession::IsSameAddress(NLIBAddress& address)
 {
 	return _address.ip == address.ip && _address.port == address.port;
+}
+
+uint64_t NetworkSession::GetAddressID()
+{
+	return _address.id();
+}
+
+NLIBAddress& NetworkSession::GetAddress()
+{
+	return _address;
 }

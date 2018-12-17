@@ -17,7 +17,7 @@ public:
 public:
 	virtual E_CLIENT_STATE_ID getID() = 0;
 	virtual void OnEnter() { };
-	virtual void Update(long time) { };
+	virtual void Update(uint64_t time) { };
 	virtual void OnExit() { };
 	virtual void HandlePacket(ProtocolPacket* packet) { };
 
@@ -25,12 +25,24 @@ protected:
 	NetworkClient* _client;
 };
 
+class ClientStateInit : public ClientState
+{
+public:
+	E_CLIENT_STATE_ID getID() { return E_CLIENT_STATE_ID::INIT; }
+};
+
 class ClientStateDisconnected : public ClientState
 {
 public:
 	E_CLIENT_STATE_ID getID() { return E_CLIENT_STATE_ID::DISCONNECTED; }
 	void OnEnter();
-	void Update(long time);
+	void Update(uint64_t time);
+	void OnExit();
+
+private:
+	uint64_t _send_request_time;
+	uint64_t _next_request_interval;
+	uint64_t _limit_request_time;
 };
 
 class ClientStateSendingConnectionRequest : public ClientState
@@ -38,13 +50,13 @@ class ClientStateSendingConnectionRequest : public ClientState
 public:
 	E_CLIENT_STATE_ID getID() { return E_CLIENT_STATE_ID::SENDING_CONNECTION_REQUEST; }
 	void OnEnter();
-	void Update(long time);
+	void Update(uint64_t time);
 	void HandlePacket(ProtocolPacket* packet);
 
 private:
-	long _send_request_time;
-	long _next_request_interval;
-	long _limit_request_time;
+	uint64_t _send_request_time;
+	uint64_t _next_request_interval;
+	uint64_t _limit_request_time;
 };
 
 class ClientStateSendingConnectionResponse : public ClientState
@@ -52,13 +64,13 @@ class ClientStateSendingConnectionResponse : public ClientState
 public:
 	E_CLIENT_STATE_ID getID() { return E_CLIENT_STATE_ID::SENDING_CONNECTION_RESPONSE; }
 	void OnEnter();
-	void Update(long time);
+	void Update(uint64_t time);
 	void HandlePacket(ProtocolPacket* packet);
 
 private:
-	long _send_response_time;
-	long _next_response_interval;
-	long _limit_response_time;
+	uint64_t _send_response_time;
+	uint64_t _next_response_interval;
+	uint64_t _limit_response_time;
 };
 
 class ClientStateConnected : public ClientState
@@ -66,12 +78,12 @@ class ClientStateConnected : public ClientState
 public:
 	E_CLIENT_STATE_ID getID() { return E_CLIENT_STATE_ID::CONNECTED; }
 	void OnEnter();
-	void Update(long time);
+	void Update(uint64_t time);
 	void HandlePacket(ProtocolPacket* packet);
 
 private:
-	long _send_keep_alive_time;
-	long _next_keep_alive_interval;
+	uint64_t _send_keep_alive_time;
+	uint64_t _next_keep_alive_interval;
 };
 
 #endif

@@ -62,6 +62,18 @@ void TransportLayerUDP::Startup(NetworkConfig& config, NetworkEndpoint* local_en
 	});
 }
 
+void TransportLayerUDP::Destroy()
+{
+	_io_context.stop();
+	_thread->join();
+	delete _thread;
+	_thread = nullptr;
+
+	delete _socket;
+	// _local_endpoint 가 더 상위 객체이므로 여기서 delete를 하진 않는다.
+	_local_endpoint = nullptr;
+}
+
 bool TransportLayerUDP::IsConnected()
 {
 	return _socket != nullptr;

@@ -18,7 +18,7 @@ public:
 public:
 	virtual E_SESSION_STATE_ID GetID() = 0;
 	virtual void OnEnter() { };
-	virtual void Update(long time) { };
+	virtual void Update(uint64_t time) { };
 	virtual void OnExit() { };
 	virtual void HandlePacket(ProtocolPacket* packet) { };
 
@@ -26,12 +26,18 @@ protected:
 	NetworkSession* _session;
 };
 
+class SessionStateInit : public SessionState
+{
+public:
+	E_SESSION_STATE_ID GetID() { return E_SESSION_STATE_ID::INIT; }
+};
+
 class SessionStateDisconnected : public SessionState
 {
 public:
-	E_SESSION_STATE_ID GetID() { return E_SESSION_STATE_ID::DISCONNECTED;  }
+	E_SESSION_STATE_ID GetID() { return E_SESSION_STATE_ID::DISCONNECTED; }
 	void OnEnter();
-	void Update(long time);
+	void Update(uint64_t time);
 };
 
 class SessionStateSendingConnectionChallenge : public SessionState
@@ -39,13 +45,13 @@ class SessionStateSendingConnectionChallenge : public SessionState
 public:
 	E_SESSION_STATE_ID GetID() { return E_SESSION_STATE_ID::SENDING_CONNECTION_CHALLENGE; }
 	void OnEnter();
-	void Update(long time);
+	void Update(uint64_t time);
 	void HandlePacket(ProtocolPacket* packet);
 
 private:
-	long _send_request_time;
-	long _next_request_interval;
-	long _limit_request_time;
+	uint64_t _send_request_time;
+	uint64_t _next_request_interval;
+	uint64_t _limit_request_time;
 };
 
 class SessionStateConnected : public SessionState
@@ -53,12 +59,13 @@ class SessionStateConnected : public SessionState
 public:
 	E_SESSION_STATE_ID GetID() { return E_SESSION_STATE_ID::CONNECTED; }
 	void OnEnter();
-	void Update(long time);
+	void Update(uint64_t time);
 	void HandlePacket(ProtocolPacket* packet);
 
 private:
-	long _send_keep_alive_time;
-	long _next_keep_alive_interval;
+	uint64_t _send_keep_alive_time;
+	uint64_t _next_keep_alive_interval;
+	uint64_t _last_recv_time;
 };
 
 #endif

@@ -13,8 +13,11 @@ NetworkClient::NetworkClient()
 #define STATE_CREATE(id) ( _state_map[E_CLIENT_STATE_ID::id] = ClientState::create(E_CLIENT_STATE_ID::id, this) )
 #define TRANSITION_CREATE(id, ...) ( _state_transition_table[E_CLIENT_STATE_ID::id] = new std::vector<E_CLIENT_STATE_ID>{ ##__VA_ARGS__ } )
 
+	STATE_CREATE(INIT);
+	TRANSITION_CREATE(INIT, E_CLIENT_STATE_ID::SENDING_CONNECTION_REQUEST);
+
 	STATE_CREATE(DISCONNECTED);
-	TRANSITION_CREATE(DISCONNECTED, E_CLIENT_STATE_ID::SENDING_CONNECTION_REQUEST);
+	TRANSITION_CREATE(DISCONNECTED, E_CLIENT_STATE_ID::INIT);
 
 	STATE_CREATE(SENDING_CONNECTION_REQUEST);
 	TRANSITION_CREATE(SENDING_CONNECTION_REQUEST, E_CLIENT_STATE_ID::DISCONNECTED, E_CLIENT_STATE_ID::SENDING_CONNECTION_RESPONSE);
@@ -28,7 +31,7 @@ NetworkClient::NetworkClient()
 #undef TRANSITIN_CREATE
 #undef STATE_CREATE
 
-	SetState(E_CLIENT_STATE_ID::DISCONNECTED);
+	SetState(E_CLIENT_STATE_ID::INIT);
 }
 
 NetworkClient::~NetworkClient()
@@ -51,7 +54,12 @@ bool NetworkClient::connect(const char* host, unsigned short port)
 	return SetState(E_CLIENT_STATE_ID::SENDING_CONNECTION_REQUEST);
 }
 
-void NetworkClient::Update(long time)
+void NetworkClient::Disconnect()
+{
+	SetState(E_CLIENT_STATE_ID::DISCONNECTED);
+}
+
+void NetworkClient::Update(uint64_t time)
 {
 	if (_state != nullptr)
 	{

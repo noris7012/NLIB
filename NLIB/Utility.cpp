@@ -3,6 +3,7 @@
 #include <chrono>
 #include <sstream>
 #include <iomanip>
+#include <random>
 
 uint64_t Utility::GetTime()
 {
@@ -20,4 +21,20 @@ std::string Utility::ByteToString(const byte* data, uint32_t length)
 	}
 
 	return ss.str();
+}
+
+uint64_t Utility::Rand64()
+{
+	static std::random_device rd;
+	static std::mt19937 gen(rd());
+
+	return (((uint64_t)gen()) << 32) + ((uint64_t)gen());
+}
+
+uint32_t Utility::Rand32()
+{
+	static std::random_device rd;
+	static std::mt19937 gen(rd());
+
+	return gen();
 }

@@ -11,6 +11,8 @@ class Utility
 public:
 	static uint64_t GetTime();
 	static std::string ByteToString(const byte* data, uint32_t length);
+	static uint64_t Rand64();
+	static uint32_t Rand32();
 };
 
 #endif

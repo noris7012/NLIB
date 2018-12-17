@@ -81,7 +81,14 @@ private:
 
 class ProtocolPacketConnectionKeepAlive : public ProtocolPacket
 {
-	PUBLIC_METHOD(E_PACKET_ID::CONNECTION_KEEP_ALIVE)
+	PUBLIC_METHOD(E_PACKET_ID::CONNECTION_KEEP_ALIVE);
+
+	void Set(uint32_t client_index) 
+	{
+		_client_index = client_index;
+	}
+
+	uint32_t GetClientID() { return _client_index; }
 
 private:
 	uint32_t _client_index;
@@ -90,16 +97,34 @@ private:
 
 class ProtocolPacketConnectionPayload : public ProtocolPacket
 {
-	PUBLIC_METHOD(E_PACKET_ID::CONNECTION_PAYLOAD)
+	PUBLIC_METHOD(E_PACKET_ID::CONNECTION_PAYLOAD);
+
+	void Set(uint32_t client_index)
+	{
+		_client_index = client_index;
+	}
+
+	uint32_t GetClientID() { return _client_index; }
 
 private:
+	uint32_t _client_index;
 	const byte* _payload;
 	uint32_t _payload_length;
 };
 
 class ProtocolPacketConnectionDisconnect : public ProtocolPacket
 {
-	PUBLIC_METHOD(E_PACKET_ID::CONNECTION_DISCONNECT)
+	PUBLIC_METHOD(E_PACKET_ID::CONNECTION_DISCONNECT);
+
+	void Set(uint32_t client_index)
+	{
+		_client_index = client_index;
+	}
+
+	uint32_t GetClientID() { return _client_index; }
+
+private:
+	uint32_t _client_index;
 };
 
 #undef PUBLIC_METHOD

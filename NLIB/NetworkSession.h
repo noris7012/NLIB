@@ -17,13 +17,17 @@ class NetworkServer;
 class NetworkSession
 {
 public:
-	NetworkSession(NetworkServer* server, uint64_t challenge_token_sequence, const byte* challenge_token_encrypted, NLIBAddress address);
+	NetworkSession(NetworkServer* server, uint64_t challenge_token_sequence, NLIBAddress address);
+	~NetworkSession();
 
 public:
-	void Update(long time);
+	void Update(uint64_t time);
 	void Send(ProtocolPacket& packet);
 	void HandlePacket(ProtocolPacket* packet);
 	//void ProcessReceive(NLIBRecv* data);
+
+	void OnConnected();
+	void OnDisconnected();
 
 public:
 	bool SetState(E_SESSION_STATE_ID state_id);
@@ -33,6 +37,16 @@ public:
 	const byte* GetChallengeTokenEncrypted() { return _challenge_token_encrypted;  }
 
 	bool IsSameAddress(NLIBAddress& address);
+	uint64_t GetAddressID();
+	NLIBAddress& GetAddress();
+
+	uint32_t GetClientID() { return _client_id; }
+	uint32_t GetSlotID() { return _slot_id; }
+	void SetConnection(uint32_t slot_id, uint32_t client_id)
+	{
+		_slot_id = slot_id;
+		_client_id = client_id; 
+	};
 
 private:
 	NetworkServer* _server;
@@ -45,6 +59,9 @@ private:
 	uint64_t _challenge_token_sequence;
 	const byte* _challenge_token_encrypted;
 	NLIBAddress _address;
+
+	uint32_t _client_id;
+	uint32_t _slot_id;
 };
 
 #endif

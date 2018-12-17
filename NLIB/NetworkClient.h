@@ -3,6 +3,7 @@
 
 #include <map>
 #include <vector>
+#include <stdint.h>
 
 #include "NetworkEndpoint.h"
 #include "ClientState.h"
@@ -17,9 +18,10 @@ public:
 	~NetworkClient();
 
 	bool connect(const char* host, unsigned short port);
+	void Disconnect();
 
 public:
-	void Update(long time);
+	void Update(uint64_t time);
 	void ProcessReceive(NLIBRecv* data);
 
 public:
@@ -30,6 +32,9 @@ public:
 	uint64_t GetChallengeTokenSequence() { return _challenge_token_sequence; }
 	const byte* GetChallengeTokenEncrypted() { return _challenge_token_encrypted; }
 
+	uint32_t GetClientID() { return _client_id; }
+	void SetClientID(uint32_t client_id) { _client_id = client_id; };
+
 private:
 	ClientState* _state;
 	std::map<E_CLIENT_STATE_ID, ClientState*> _state_map;
@@ -37,6 +42,8 @@ private:
 
 	uint64_t _challenge_token_sequence;
 	const byte* _challenge_token_encrypted;
+
+	uint32_t _client_id;
 };
 
 #endif

@@ -36,12 +36,27 @@ void NetworkEndpoint::Startup(NetworkConfig& config)
 	});
 }
 
+void NetworkEndpoint::Destroy()
+{
+	/*
+	_running = false;
+	_thread->join();
+
+	delete _thread;
+	_thread = nullptr;
+
+	_transport->Destroy();
+	delete _transport;
+	_transport = nullptr;
+	*/
+}
+
 bool NetworkEndpoint::IsConnected()
 {
 	return _transport->IsConnected();
 }
 
-void NetworkEndpoint::InternalUpdate(long time)
+void NetworkEndpoint::InternalUpdate(uint64_t time)
 {
 	while (true)
 	{
