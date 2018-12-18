@@ -5,6 +5,7 @@
 #include <vector>
 #include <stdint.h>
 
+#include "NetworkDefine.h"
 #include "NetworkEndpoint.h"
 #include "ClientState.h"
 #include "ProtocolPacket.h"
@@ -18,11 +19,15 @@ public:
 	~NetworkClient();
 
 	bool Connect(const char* host, unsigned short port);
+	bool IsConnected();
 	void Disconnect();
 
 public:
 	void Update(uint64_t time);
 	void ProcessReceive(NLIBRecv* data);
+
+public:
+	void SendPacket(const byte* data, uint32_t length);
 
 public:
 	bool SetState(E_CLIENT_STATE_ID state_id);

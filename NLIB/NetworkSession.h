@@ -23,7 +23,7 @@ public:
 public:
 	void Update(uint64_t time);
 	void Send(ProtocolPacket& packet);
-	void HandlePacket(ProtocolPacket* packet);
+	void RecvPacket(ProtocolPacket* packet);
 	//void ProcessReceive(NLIBRecv* data);
 
 	void OnConnected();

@@ -54,6 +54,12 @@ bool NetworkClient::Connect(const char* host, unsigned short port)
 	return SetState(E_CLIENT_STATE_ID::SENDING_CONNECTION_REQUEST);
 }
 
+bool NetworkClient::IsConnected()
+{
+	assert(_state != nullptr);
+	return _state->getID() == E_CLIENT_STATE_ID::CONNECTED;
+}
+
 void NetworkClient::Disconnect()
 {
 	SetState(E_CLIENT_STATE_ID::DISCONNECTED);
@@ -87,9 +93,18 @@ void NetworkClient::ProcessReceive(NLIBRecv* recv)
 
 	packet->Print();
 
-	_state->HandlePacket(packet);
+	_state->RecvPacket(packet);
 	
 	delete packet;
+}
+
+void NetworkClient::SendPacket(const byte* data, uint32_t length)
+{
+	assert(_state != nullptr);
+	if (_state == nullptr)
+		return;
+
+	_state->SendPacket(data, length);
 }
 
 bool NetworkClient::SetState(E_CLIENT_STATE_ID state_id)

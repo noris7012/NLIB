@@ -32,6 +32,8 @@
 		if (_rc != E_READ_RESULT::SUCCESS) return _rc; \
 	}
 
+#define NLIB_RELIABLE_BUFFER_SIZE 256
+
 enum class E_CLIENT_STATE_ID
 {
 	INIT = 0,

@@ -51,11 +51,6 @@ void NetworkEndpoint::Destroy()
 	*/
 }
 
-bool NetworkEndpoint::IsConnected()
-{
-	return _transport->IsConnected();
-}
-
 void NetworkEndpoint::InternalUpdate(uint64_t time)
 {
 	while (true)

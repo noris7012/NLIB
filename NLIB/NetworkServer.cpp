@@ -2,7 +2,9 @@
 
 #include <iostream>
 #include <assert.h>
+
 #include "Utility.h"
+#include "ReliableSession.h"
 
 NetworkServer::NetworkServer()
 {
@@ -64,7 +66,6 @@ void NetworkServer::ProcessReceive(NLIBRecv* recv)
 
 	packet->Print();
 
-	// 패킷의 source IP 와 port 가 이미 연결되어 있다면 무시한다.
 	auto address_id = recv->address.id();
 	if (_connected_session_by_address_id.find(address_id) != _connected_session_by_address_id.end())
 	{
@@ -167,7 +168,7 @@ void NetworkServer::HandleConnectionRequest(ProtocolPacket* p, NLIBRecv* r)
 		}
 	}
 
-	_connection_slot[idx] = new NetworkSession(this, _challenge_token_sequence++, r->address);
+	_connection_slot[idx] = new ReliableSession(this, _challenge_token_sequence++, r->address);
 }
 
 void NetworkServer::HandleConnectionResponse(ProtocolPacket* p, NLIBRecv* r)
@@ -190,7 +191,7 @@ void NetworkServer::HandleConnectionResponse(ProtocolPacket* p, NLIBRecv* r)
 	if (session == nullptr)
 		return;
 
-	session->HandlePacket(p);
+	session->RecvPacket(p);
 }
 
 void NetworkServer::HandleConnectionKeepAlive(ProtocolPacket* p, NLIBRecv* r)
@@ -204,7 +205,7 @@ void NetworkServer::HandleConnectionKeepAlive(ProtocolPacket* p, NLIBRecv* r)
 	if (session == nullptr)
 		return;
 
-	session->HandlePacket(p);
+	session->RecvPacket(p);
 }
 
 void NetworkServer::HandleConnectionPayload(ProtocolPacket* p, NLIBRecv* r)
@@ -218,7 +219,7 @@ void NetworkServer::HandleConnectionPayload(ProtocolPacket* p, NLIBRecv* r)
 	if (session == nullptr)
 		return;
 
-	session->HandlePacket(p);
+	session->RecvPacket(p);
 }
 
 void NetworkServer::HandleConnectionDisconnect(ProtocolPacket* p, NLIBRecv* r)

@@ -23,7 +23,6 @@ public:
 
 	void Startup(NetworkConfig& config);
 	void Destroy();
-	bool IsConnected();
 	void HandleReceive(char* data, std::size_t length, NLIBAddress& address);
 	void Send(ProtocolPacket& packet);
 	void SendTo(ProtocolPacket& packet, NLIBAddress& address);
@@ -47,6 +46,7 @@ private:
 	std::mutex _recv_queue_mutex;
 	std::queue<NLIBRecv*> _recv_queue;
 
+protected:
 	BufferPool _buffer_pool;
 };
 

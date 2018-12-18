@@ -5,6 +5,8 @@
 
 #include "ByteStream.h"
 
+class ByteStream;
+
 class ConnectToken
 {
 public:

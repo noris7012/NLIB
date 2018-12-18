@@ -52,13 +52,13 @@ void NetworkSession::Send(ProtocolPacket& packet)
 	_server->SendTo(packet, _address);
 }
 
-void NetworkSession::HandlePacket(ProtocolPacket* packet)
+void NetworkSession::RecvPacket(ProtocolPacket* packet)
 {
 	assert(_state != nullptr);
 	if (_state == nullptr)
 		return;
 
-	_state->HandlePacket(packet);
+	_state->RecvPacket(packet);
 }
 
 void NetworkSession::OnConnected()

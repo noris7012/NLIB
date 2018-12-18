@@ -81,7 +81,7 @@ void SessionStateSendingConnectionChallenge::Update(uint64_t time)
 	}
 }
 
-void SessionStateSendingConnectionChallenge::HandlePacket(ProtocolPacket* p)
+void SessionStateSendingConnectionChallenge::RecvPacket(ProtocolPacket* p)
 {
 	assert(p != nullptr);
 	if (p == nullptr)
@@ -129,7 +129,19 @@ void SessionStateConnected::Update(uint64_t time)
 	}
 }
 
-void SessionStateConnected::HandlePacket(ProtocolPacket* packet)
+void SessionStateConnected::RecvPacket(ProtocolPacket* p)
 {
 	_last_recv_time = Utility::GetTime();
+
+	if (p->GetID() == E_PACKET_ID::CONNECTION_KEEP_ALIVE)
+	{
+		ProtocolPacketConnectionKeepAlive* packet = static_cast<ProtocolPacketConnectionKeepAlive*>(p);
+
+		// TODO Something
+	}
+	else if (p->GetID() == E_PACKET_ID::CONNECTION_PAYLOAD)
+	{
+		ProtocolPacketConnectionPayload* packet = static_cast<ProtocolPacketConnectionPayload*>(p);
+
+	}
 }

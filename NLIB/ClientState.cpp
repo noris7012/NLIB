@@ -99,7 +99,7 @@ void ClientStateSendingConnectionRequest::Update(uint64_t time)
 	}
 }
 
-void ClientStateSendingConnectionRequest::HandlePacket(ProtocolPacket* p)
+void ClientStateSendingConnectionRequest::RecvPacket(ProtocolPacket* p)
 {
 	assert(p != nullptr);
 	if (p == nullptr)
@@ -144,7 +144,7 @@ void ClientStateSendingConnectionResponse::Update(uint64_t time)
 	}
 }
 
-void ClientStateSendingConnectionResponse::HandlePacket(ProtocolPacket* p)
+void ClientStateSendingConnectionResponse::RecvPacket(ProtocolPacket* p)
 {
 	assert(p != nullptr);
 	if (p == nullptr)
@@ -181,7 +181,17 @@ void ClientStateConnected::Update(uint64_t time)
 	}
 }
 
-void ClientStateConnected::HandlePacket(ProtocolPacket* packet)
+void ClientStateConnected::RecvPacket(ProtocolPacket* packet)
 {
 
 }
+
+void ClientStateConnected::SendPacket(const byte* data, uint32_t length)
+{
+	_send_keep_alive_time = Utility::GetTime() + _next_keep_alive_interval;
+
+	ProtocolPacketConnectionPayload packet;
+	packet.Set(_client->GetClientID(), data, length);
+	_client->Send(packet);
+}
+

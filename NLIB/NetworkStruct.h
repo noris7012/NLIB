@@ -49,4 +49,10 @@ struct NLIBRecv
 	NLIBAddress address;
 };
 
+struct NLIBSend
+{
+	Buffer* buffer;
+	uint32_t length;
+};
+
 #endif

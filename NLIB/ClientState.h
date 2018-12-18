@@ -19,7 +19,8 @@ public:
 	virtual void OnEnter() { };
 	virtual void Update(uint64_t time) { };
 	virtual void OnExit() { };
-	virtual void HandlePacket(ProtocolPacket* packet) { };
+	virtual void RecvPacket(ProtocolPacket* packet) { };
+	virtual void SendPacket(const byte* data, uint32_t length) { };
 
 protected:
 	NetworkClient* _client;
@@ -51,7 +52,7 @@ public:
 	E_CLIENT_STATE_ID getID() { return E_CLIENT_STATE_ID::SENDING_CONNECTION_REQUEST; }
 	void OnEnter();
 	void Update(uint64_t time);
-	void HandlePacket(ProtocolPacket* packet);
+	void RecvPacket(ProtocolPacket* packet);
 
 private:
 	uint64_t _send_request_time;
@@ -65,7 +66,7 @@ public:
 	E_CLIENT_STATE_ID getID() { return E_CLIENT_STATE_ID::SENDING_CONNECTION_RESPONSE; }
 	void OnEnter();
 	void Update(uint64_t time);
-	void HandlePacket(ProtocolPacket* packet);
+	void RecvPacket(ProtocolPacket* packet);
 
 private:
 	uint64_t _send_response_time;
@@ -79,7 +80,8 @@ public:
 	E_CLIENT_STATE_ID getID() { return E_CLIENT_STATE_ID::CONNECTED; }
 	void OnEnter();
 	void Update(uint64_t time);
-	void HandlePacket(ProtocolPacket* packet);
+	void RecvPacket(ProtocolPacket* packet);
+	void SendPacket(const byte* data, uint32_t length);
 
 private:
 	uint64_t _send_keep_alive_time;

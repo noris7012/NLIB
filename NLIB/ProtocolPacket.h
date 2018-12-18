@@ -99,9 +99,11 @@ class ProtocolPacketConnectionPayload : public ProtocolPacket
 {
 	PUBLIC_METHOD(E_PACKET_ID::CONNECTION_PAYLOAD);
 
-	void Set(uint32_t client_index)
+	void Set(uint32_t client_index, const byte* payload, uint32_t payload_length)
 	{
 		_client_index = client_index;
+		_payload = payload;
+		_payload_length = payload_length;
 	}
 
 	uint32_t GetClientID() { return _client_index; }

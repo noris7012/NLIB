@@ -20,7 +20,7 @@ public:
 	virtual void OnEnter() { };
 	virtual void Update(uint64_t time) { };
 	virtual void OnExit() { };
-	virtual void HandlePacket(ProtocolPacket* packet) { };
+	virtual void RecvPacket(ProtocolPacket* packet) { };
 
 protected:
 	NetworkSession* _session;
@@ -46,7 +46,7 @@ public:
 	E_SESSION_STATE_ID GetID() { return E_SESSION_STATE_ID::SENDING_CONNECTION_CHALLENGE; }
 	void OnEnter();
 	void Update(uint64_t time);
-	void HandlePacket(ProtocolPacket* packet);
+	void RecvPacket(ProtocolPacket* packet);
 
 private:
 	uint64_t _send_request_time;
@@ -60,7 +60,7 @@ public:
 	E_SESSION_STATE_ID GetID() { return E_SESSION_STATE_ID::CONNECTED; }
 	void OnEnter();
 	void Update(uint64_t time);
-	void HandlePacket(ProtocolPacket* packet);
+	void RecvPacket(ProtocolPacket* packet);
 
 private:
 	uint64_t _send_keep_alive_time;
