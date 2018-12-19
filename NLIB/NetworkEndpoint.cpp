@@ -4,19 +4,17 @@
 
 #include "Utility.h"
 
-NetworkEndpoint::NetworkEndpoint()
+NetworkEndpoint::NetworkEndpoint(CUDPLayer* cudp_layer)
+	: _cudp_layer(cudp_layer)
+	, _thread(nullptr)
+	, _running(false)
+	, _transport(nullptr)
 {
-
-}
-
-NetworkEndpoint::~NetworkEndpoint()
-{
-
 }
 
 void NetworkEndpoint::Startup(NetworkConfig& config)
 {
-	_transport = TransportLayer::Create(config.transport_type);
+	_transport = new TransportLayer();
 	_transport->Startup(config, this);
 
 	_thread = new std::thread([this]()
@@ -29,7 +27,8 @@ void NetworkEndpoint::Startup(NetworkConfig& config)
 			auto time = Utility::GetTime();
 
 			InternalUpdate(time);
-			Update(time);
+			if (_cudp_layer)
+				_cudp_layer->Update(time);
 
 			std::this_thread::sleep_for(std::chrono::milliseconds(10));
 		}
@@ -59,7 +58,8 @@ void NetworkEndpoint::InternalUpdate(uint64_t time)
 		if (data == nullptr)
 			break;
 
-		ProcessReceive(data);
+		if (_cudp_layer)
+			_cudp_layer->OnRecv(data);
 
 		_buffer_pool.Release(data->buffer);
 		delete data;
@@ -97,20 +97,26 @@ void NetworkEndpoint::HandleReceive(char* data, std::size_t length, NLIBAddress&
 	_recv_queue_mutex.unlock();
 }
 
-void NetworkEndpoint::Send(ProtocolPacket& packet)
+void NetworkEndpoint::Send(NLIBAddress& address, const byte* data, uint32_t length)
 {
-	auto buffer = _buffer_pool.Acquire();
-	ByteStream stream(buffer);
-	packet.Write(stream);
-	_transport->Send(stream);
-	_buffer_pool.Release(buffer);
+	if (_transport)
+		_transport->Send(address, data, length);
 }
 
-void NetworkEndpoint::SendTo(ProtocolPacket& packet, NLIBAddress& address)
-{
-	auto buffer = _buffer_pool.Acquire();
-	ByteStream stream(buffer);
-	packet.Write(stream);
-	_transport->SendTo(stream, address);
-	_buffer_pool.Release(buffer);
-}
+// void NetworkEndpoint::Send(ProtocolPacket& packet)
+// {
+// 	auto buffer = _buffer_pool.Acquire();
+// 	ByteStream stream(buffer);
+// 	packet.Write(stream);
+// 	_transport->Send(stream);
+// 	_buffer_pool.Release(buffer);
+// }
+//
+// void NetworkEndpoint::SendTo(ProtocolPacket& packet, NLIBAddress& address)
+// {
+// 	auto buffer = _buffer_pool.Acquire();
+// 	ByteStream stream(buffer);
+// 	packet.Write(stream);
+// 	_transport->SendTo(stream, address);
+// 	_buffer_pool.Release(buffer);
+// }

@@ -9,29 +9,7 @@
 
 using namespace boost::asio::ip;
 
-TransportLayer* TransportLayer::Create(E_TRANSPORT_TYPE type)
-{
-	switch (type)
-	{
-	case E_TRANSPORT_TYPE::UDP:
-		return new TransportLayerUDP();
-	default:
-		return nullptr;
-	}
-}
-
-TransportLayerUDP::TransportLayerUDP()
-	: _remote_endpoint()
-{
-
-}
-
-TransportLayerUDP::~TransportLayerUDP()
-{
-
-}
-
-void TransportLayerUDP::Startup(NetworkConfig& config, NetworkEndpoint* local_endpoint)
+void TransportLayer::Startup(NetworkConfig& config, NetworkEndpoint* local_endpoint)
 {
 	_local_endpoint = local_endpoint;
 
@@ -62,7 +40,7 @@ void TransportLayerUDP::Startup(NetworkConfig& config, NetworkEndpoint* local_en
 	});
 }
 
-void TransportLayerUDP::Destroy()
+void TransportLayer::Destroy()
 {
 	_io_context.stop();
 	_thread->join();
@@ -74,18 +52,18 @@ void TransportLayerUDP::Destroy()
 	_local_endpoint = nullptr;
 }
 
-bool TransportLayerUDP::IsConnected()
+bool TransportLayer::IsConnected()
 {
 	return _socket != nullptr;
 }
 
-void TransportLayerUDP::Receive()
+void TransportLayer::Receive()
 {
 	_socket->async_receive_from(
 		boost::asio::buffer(_recv_buffer)
 		, _remote_endpoint
 		, boost::bind(
-			&TransportLayerUDP::HandleReceive
+			&TransportLayer::HandleReceive
 			, this
 			, boost::asio::placeholders::error
 			, boost::asio::placeholders::bytes_transferred
@@ -93,7 +71,7 @@ void TransportLayerUDP::Receive()
 	);
 }
 
-void TransportLayerUDP::HandleReceive(const boost::system::error_code& error, std::size_t length)
+void TransportLayer::HandleReceive(const boost::system::error_code& error, std::size_t length)
 {
 	assert(!error);
 	if (error)
@@ -112,35 +90,17 @@ void TransportLayerUDP::HandleReceive(const boost::system::error_code& error, st
 	Receive();
 }
 
-void TransportLayerUDP::Send(ByteStream& stream)
+void TransportLayer::Send(NLIBAddress& address, const byte* data, uint32_t length)
 {
 #ifdef NLIB_LOG_ENABLED
 	std::cout << "[ Send ] " << std::endl;
-	std::cout << Utility::ByteToString(stream.Data(), stream.Length()) << std::endl;
+	std::cout << Utility::ByteToString(data, length) << std::endl;
 #endif
 
 	_socket->async_send_to(
-		boost::asio::buffer(stream.Data(), stream.Length())
-		, _remote_endpoint
-		, boost::bind(&TransportLayerUDP::HandleSend
-			, this,
-			boost::asio::placeholders::error,
-			boost::asio::placeholders::bytes_transferred
-		)
-	);
-}
-
-void TransportLayerUDP::SendTo(ByteStream& stream, NLIBAddress& address)
-{
-#ifdef NLIB_LOG_ENABLED
-	std::cout << "[ SendTo ] " << std::endl;
-	std::cout << Utility::ByteToString(stream.Data(), stream.Length()) << std::endl;
-#endif
-
-	_socket->async_send_to(
-		boost::asio::buffer(stream.Data(), stream.Length())
+		boost::asio::buffer(data, length)
 		, udp::endpoint(address::from_string(address.ip_str), address.port)
-		, boost::bind(&TransportLayerUDP::HandleSend
+		, boost::bind(&TransportLayer::HandleSend
 			, this,
 			boost::asio::placeholders::error,
 			boost::asio::placeholders::bytes_transferred
@@ -148,7 +108,7 @@ void TransportLayerUDP::SendTo(ByteStream& stream, NLIBAddress& address)
 	);
 }
 
-void TransportLayerUDP::HandleSend(const boost::system::error_code& error, std::size_t length)
+void TransportLayer::HandleSend(const boost::system::error_code& error, std::size_t length)
 {
 	assert(!error);
 	if (error)

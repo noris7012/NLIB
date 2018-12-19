@@ -1,20 +1,10 @@
 #include "NetworkServer.h"
 
 #include <iostream>
-#include <assert.h>
+#include <cassert>
 
 #include "Utility.h"
 #include "ReliableSession.h"
-
-NetworkServer::NetworkServer()
-{
-
-}
-
-NetworkServer::~NetworkServer()
-{
-
-}
 
 bool NetworkServer::Listen(uint32_t port)
 {
@@ -24,32 +14,42 @@ bool NetworkServer::Listen(uint32_t port)
 	config.port = port;
 
 	assert(config.host == nullptr);
+	assert(_endpoint != nullptr);
 
-	Startup(config);
+	_endpoint->Startup(config);
 
 	return true;
 }
 
 void NetworkServer::Update(uint64_t time)
 {
-	for (uint32_t i = 0; i < NLIB_MAX_SESSION; ++i)
+	for (auto session : _connected_session)
 	{
-		auto session = _connected_session[i];
 		if (session != nullptr)
 			session->Update(time);
 	}
 
-	for (int i = 0; i < NLIB_MAX_CONNECTION_SLOT; ++i)
+	for (auto session : _connection_slot)
 	{
-		auto session = _connection_slot[i];
-		if (session == nullptr)
-			continue;
-
-		session->Update(time);
+		if (session != nullptr)
+			session->Update(time);
 	}
 }
 
-void NetworkServer::ProcessReceive(NLIBRecv* recv)
+
+void NetworkServer::Send(NLIBAddress& address, ProtocolPacket& packet)
+{
+	if (_endpoint)
+	{
+		auto buffer = _buffer_pool.Acquire();
+		ByteStream stream(buffer);
+		packet.Write(stream);
+		_endpoint->Send(address, stream.Data(), stream.Length());
+		_buffer_pool.Release(buffer);		
+	}
+}
+
+void NetworkServer::OnRecv(NLIBRecv* recv)
 {
 #ifdef NLIB_LOG_ENABLED
 	std::cout << "[ Server Receive ] " << std::endl;
@@ -132,13 +132,13 @@ void NetworkServer::HandleConnectionRequest(ProtocolPacket* p, NLIBRecv* r)
 	if (_connected_session_by_id.size() >= NLIB_MAX_SESSION)
 	{
 		ProtocolPacketConnectionDenied packet;
-		Send(packet);
+		Send(r->address, packet);
 		return;
 	}
 
 	// Check Slot Full
-	uint32_t idx = -1;
-	for (int i = 0; i < NLIB_MAX_CONNECTION_SLOT; ++i)
+	int32_t idx = -1;
+	for (int32_t i = 0; i < NLIB_MAX_CONNECTION_SLOT; ++i)
 	{
 		auto session = _connection_slot[i];
 		if (session == nullptr)
@@ -151,14 +151,13 @@ void NetworkServer::HandleConnectionRequest(ProtocolPacket* p, NLIBRecv* r)
 	if (idx < 0)
 	{
 		ProtocolPacketConnectionDenied packet;
-		Send(packet);
+		Send(r->address, packet);
 		return;
 	}
 
 	// Slot 에 이미 있다면 처리중이므로 무시.
-	for (int i = 0; i < NLIB_MAX_CONNECTION_SLOT; ++i)
+	for (auto session : _connection_slot)
 	{
-		auto session = _connection_slot[i];
 		if (session == nullptr)
 			continue;
 
@@ -168,15 +167,14 @@ void NetworkServer::HandleConnectionRequest(ProtocolPacket* p, NLIBRecv* r)
 		}
 	}
 
-	_connection_slot[idx] = new ReliableSession(this, _challenge_token_sequence++, r->address);
+	_connection_slot[idx] = new NetworkSession(this, _challenge_token_sequence++, r->address);
 }
 
 void NetworkServer::HandleConnectionResponse(ProtocolPacket* p, NLIBRecv* r)
 {
 	NetworkSession* session = nullptr;
-	for (int i = 0; i < NLIB_MAX_CONNECTION_SLOT; ++i)
+	for (auto tmp_session : _connection_slot)
 	{
-		auto tmp_session = _connection_slot[i];
 		if (tmp_session == nullptr)
 			continue;
 
@@ -270,16 +268,16 @@ void NetworkServer::OnConnected(NetworkSession* session)
 
 	_connected_session_mutex.unlock();
 
-	for (int i = 0; i < NLIB_MAX_CONNECTION_SLOT; ++i)
+	for (auto& i : _connection_slot)
 	{
-		auto tmp_session = _connection_slot[i];
+		auto tmp_session = i;
 		if (tmp_session == nullptr)
 			continue;
 
 		// 혹시 slot 에 복수개 할당된 경우가 있을까봐.
 		if (tmp_session->IsSameAddress(session->GetAddress()))
 		{
-			_connection_slot[i] = nullptr;
+			i = nullptr;
 		}
 	}
 }

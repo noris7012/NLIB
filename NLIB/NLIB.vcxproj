@@ -83,7 +83,7 @@
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <AdditionalIncludeDirectories>E:\GitRepository\NLIB\lib;E:\boost_1_68_0;E:\boost_1_68_0\stage\lib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_SILENCE_ALL_CXX17_DEPRECATION_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_SILENCE_ALL_CXX17_DEPRECATION_WARNINGS;_WIN32_WINDOWS;_WINSOCK_DEPRECATED_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
@@ -149,6 +149,7 @@
     <ClInclude Include="ReliableSession.h" />
     <ClInclude Include="SessionState.h" />
     <ClInclude Include="TransportLayer.h" />
+    <ClInclude Include="CUDPLayer.h" />
     <ClInclude Include="Utility.h" />
   </ItemGroup>
   <ItemGroup>
@@ -156,6 +157,7 @@
     <ClCompile Include="ByteStream.cpp" />
     <ClCompile Include="ClientState.cpp" />
     <ClCompile Include="ConnectToken.cpp" />
+    <ClCompile Include="CUDPLayer.cpp" />
     <ClCompile Include="NetworkClient.cpp" />
     <ClCompile Include="NetworkEndpoint.cpp" />
     <ClCompile Include="NetworkServer.cpp" />

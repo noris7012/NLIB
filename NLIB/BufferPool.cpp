@@ -13,7 +13,7 @@ BufferPool::BufferPool(uint32_t capacity)
 {
 	assert(capacity > 0);
 
-	for (int i = 0; i < capacity; ++i)
+	for (uint32_t i = 0; i < capacity; ++i)
 	{
 		_pool.push(new Buffer());
 	}

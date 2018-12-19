@@ -8,8 +8,9 @@
 #include "Utility.h"
 
 NetworkClient::NetworkClient()
-	: _state(NULL), _state_map(), _state_transition_table()
+	: _state(nullptr), _state_map(), _state_transition_table()
 {
+
 #define STATE_CREATE(id) ( _state_map[E_CLIENT_STATE_ID::id] = ClientState::create(E_CLIENT_STATE_ID::id, this) )
 #define TRANSITION_CREATE(id, ...) ( _state_transition_table[E_CLIENT_STATE_ID::id] = new std::vector<E_CLIENT_STATE_ID>{ ##__VA_ARGS__ } )
 
@@ -49,7 +50,12 @@ bool NetworkClient::Connect(const char* host, unsigned short port)
 	config.host = host;
 	config.port = port;
 
-	Startup(config);
+	_address.ip_str = std::string(host);
+	_address.ip = Utility::IPToInt(host);
+	_address.port = port;
+
+	assert(_endpoint != nullptr);
+	_endpoint->Startup(config);
 
 	return SetState(E_CLIENT_STATE_ID::SENDING_CONNECTION_REQUEST);
 }
@@ -73,7 +79,7 @@ void NetworkClient::Update(uint64_t time)
 	}
 }
 
-void NetworkClient::ProcessReceive(NLIBRecv* recv)
+void NetworkClient::OnRecv(NLIBRecv* recv)
 {
 	assert(_state != nullptr);
 	if (_state == nullptr)
@@ -105,6 +111,18 @@ void NetworkClient::SendPacket(const byte* data, uint32_t length)
 		return;
 
 	_state->SendPacket(data, length);
+}
+
+void NetworkClient::Send(ProtocolPacket& packet)
+{
+	if (_endpoint)
+	{
+		auto buffer = _buffer_pool.Acquire();
+		ByteStream stream(buffer);
+		packet.Write(stream);
+		_endpoint->Send(_address, stream.Data(), stream.Length());
+		_buffer_pool.Release(buffer);
+	}
 }
 
 bool NetworkClient::SetState(E_CLIENT_STATE_ID state_id)

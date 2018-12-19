@@ -4,7 +4,7 @@
 #include <thread>
 #include <queue>
 #include <mutex>
-#include <stdint.h>
+#include <cstdint>
 
 #include "NetworkStruct.h"
 #include "NetworkConfig.h"
@@ -12,20 +12,20 @@
 #include "ByteStream.h"
 #include "ProtocolPacket.h"
 #include "BufferPool.h"
+#include "CUDPLayer.h"
 
 class TransportLayer;
+class CUDPLayer;
 
-class NetworkEndpoint
+class NetworkEndpoint final
 {
 public:
-	NetworkEndpoint();
-	~NetworkEndpoint();
+	NetworkEndpoint(CUDPLayer* cudp_layer);
 
 	void Startup(NetworkConfig& config);
 	void Destroy();
 	void HandleReceive(char* data, std::size_t length, NLIBAddress& address);
-	void Send(ProtocolPacket& packet);
-	void SendTo(ProtocolPacket& packet, NLIBAddress& address);
+	void Send(NLIBAddress& address, const byte* data, uint32_t length);
 
 private:
 	void InternalUpdate(uint64_t time);
@@ -34,10 +34,11 @@ private:
 	NLIBRecv* Pop();
 
 public:
-	virtual void Update(uint64_t time) = 0;
-	virtual void ProcessReceive(NLIBRecv* data) = 0;
+	//virtual void Update(uint64_t time) = 0;
+	//virtual void ProcessReceive(NLIBRecv* data) = 0;
 
 private:
+	CUDPLayer* _cudp_layer;
 	std::thread* _thread;
 	bool _running;
 
@@ -46,7 +47,6 @@ private:
 	std::mutex _recv_queue_mutex;
 	std::queue<NLIBRecv*> _recv_queue;
 
-protected:
 	BufferPool _buffer_pool;
 };
 

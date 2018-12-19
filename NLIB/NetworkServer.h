@@ -1,28 +1,27 @@
 #ifndef NLIB_NETWORK_SERVER_H
 #define NLIB_NETWORK_SERVER_H
 
-#include <stdint.h>
+#include <cstdint>
 #include <unordered_map>
-#include <stdint.h>
+#include <cstdint>
 #include <mutex>
 
 #include "NetworkEndpoint.h"
 #include "NetworkSession.h"
 #include "ProtocolPacket.h"
+#include "CUDPLayer.h"
 
 class NetworkSession;
 
-class NetworkServer : public NetworkEndpoint
+class NetworkServer final : public CUDPLayer
 {
 public:
-	NetworkServer();
-	~NetworkServer();
-
 	bool Listen(uint32_t port);
 
 public:
-	void Update(uint64_t time);
-	void ProcessReceive(NLIBRecv* data);
+	void Update(uint64_t time) override;
+	void Send(NLIBAddress& address, ProtocolPacket& packet);
+	void OnRecv(NLIBRecv* recv) override;
 
 private:
 	void HandleConnectionRequest(ProtocolPacket*, NLIBRecv*);
@@ -43,6 +42,7 @@ private:
 
 	uint64_t _challenge_token_sequence;
 	NetworkSession* _connection_slot[NLIB_MAX_CONNECTION_SLOT];
+	
 };
 
 #endif

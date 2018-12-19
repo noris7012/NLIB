@@ -77,14 +77,14 @@ void ByteStream::Write(uint64_t v)
 
 	if (_idx + 8 <= _capacity)
 	{
-		_buffer[_idx++] = v >> 8 * 0;
-		_buffer[_idx++] = v >> 8 * 1;
-		_buffer[_idx++] = v >> 8 * 2;
-		_buffer[_idx++] = v >> 8 * 3;
-		_buffer[_idx++] = v >> 8 * 4;
-		_buffer[_idx++] = v >> 8 * 5;
-		_buffer[_idx++] = v >> 8 * 6;
-		_buffer[_idx++] = v >> 8 * 7;
+		_buffer[_idx++] = byte(v >> 8 * 0);
+		_buffer[_idx++] = byte(v >> 8 * 1);
+		_buffer[_idx++] = byte(v >> 8 * 2);
+		_buffer[_idx++] = byte(v >> 8 * 3);
+		_buffer[_idx++] = byte(v >> 8 * 4);
+		_buffer[_idx++] = byte(v >> 8 * 5);
+		_buffer[_idx++] = byte(v >> 8 * 6);
+		_buffer[_idx++] = byte(v >> 8 * 7);
 	}
 }
 

@@ -3,16 +3,17 @@
 
 #include <map>
 #include <vector>
-#include <stdint.h>
+#include <cstdint>
 
 #include "NetworkDefine.h"
 #include "NetworkEndpoint.h"
 #include "ClientState.h"
 #include "ProtocolPacket.h"
+#include "CUDPLayer.h"
 
 class ClientState;
 
-class NetworkClient : public NetworkEndpoint
+class NetworkClient : public CUDPLayer
 {
 public:
 	NetworkClient();
@@ -23,11 +24,14 @@ public:
 	void Disconnect();
 
 public:
-	void Update(uint64_t time);
-	void ProcessReceive(NLIBRecv* data);
+	void Update(uint64_t time) override;
+	void OnRecv(NLIBRecv* recv) override;
 
 public:
 	void SendPacket(const byte* data, uint32_t length);
+
+public:
+	void Send(ProtocolPacket& packet);
 
 public:
 	bool SetState(E_CLIENT_STATE_ID state_id);
@@ -41,6 +45,7 @@ public:
 	void SetClientID(uint32_t client_id) { _client_id = client_id; };
 
 private:
+	NLIBAddress _address;
 	ClientState* _state;
 	std::map<E_CLIENT_STATE_ID, ClientState*> _state_map;
 	std::map<E_CLIENT_STATE_ID, std::vector<E_CLIENT_STATE_ID>*> _state_transition_table;

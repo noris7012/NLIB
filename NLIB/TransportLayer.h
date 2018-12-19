@@ -17,29 +17,15 @@ class NetworkEndpoint;
 class TransportLayer
 {
 public:
-	static TransportLayer* Create(E_TRANSPORT_TYPE type);
-
-public:
-	virtual void Startup(NetworkConfig& config, NetworkEndpoint* local_endpoint) = 0;
-	virtual void Destroy() = 0;
-	virtual bool IsConnected() { return false; }
-	virtual void Send(ByteStream& stream) = 0;
-	virtual void SendTo(ByteStream& stream, NLIBAddress& address) = 0;
-};
-
-class TransportLayerUDP : public TransportLayer
-{
-public:
-	TransportLayerUDP();
-	~TransportLayerUDP();
+	TransportLayer();
+	~TransportLayer();
 
 	void Startup(NetworkConfig& config, NetworkEndpoint* local_endpoint);
 	void Destroy();
 	bool IsConnected();
 
 public:
-	void Send(ByteStream& stream);
-	void SendTo(ByteStream& stream, NLIBAddress& address);
+	void Send(NLIBAddress& address, const byte* data, uint32_t length);
 
 private:
 	void HandleSend(const boost::system::error_code& error, std::size_t length);

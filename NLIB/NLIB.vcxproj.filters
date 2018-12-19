@@ -13,30 +13,21 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="RUDPLayer">
+      <UniqueIdentifier>{788ff28e-5950-4add-8afc-cb697c7124da}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="CUDPLayer">
+      <UniqueIdentifier>{0c44057d-c62d-4a42-b8e3-fd61e817d7b1}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="NetworkConfig.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="NetworkEndpoint.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="NetworkClient.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
     <ClInclude Include="NetworkDefine.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="ClientState.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="TransportLayer.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
     <ClInclude Include="NetworkStruct.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="NetworkServer.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="ByteStream.h">
@@ -45,54 +36,54 @@
     <ClInclude Include="Utility.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="ProtocolPacket.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
     <ClInclude Include="BufferPool.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="NetworkSession.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="ConnectToken.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
+    <ClInclude Include="NetworkEndpoint.h">
+      <Filter>CUDPLayer</Filter>
+    </ClInclude>
+    <ClInclude Include="NetworkServer.h">
+      <Filter>CUDPLayer</Filter>
+    </ClInclude>
+    <ClInclude Include="NetworkSession.h">
+      <Filter>CUDPLayer</Filter>
+    </ClInclude>
+    <ClInclude Include="NetworkClient.h">
+      <Filter>CUDPLayer</Filter>
+    </ClInclude>
     <ClInclude Include="SessionState.h">
-      <Filter>헤더 파일</Filter>
+      <Filter>CUDPLayer</Filter>
+    </ClInclude>
+    <ClInclude Include="ClientState.h">
+      <Filter>CUDPLayer</Filter>
+    </ClInclude>
+    <ClInclude Include="TransportLayer.h">
+      <Filter>CUDPLayer</Filter>
+    </ClInclude>
+    <ClInclude Include="ProtocolPacket.h">
+      <Filter>CUDPLayer</Filter>
     </ClInclude>
     <ClInclude Include="ReliableClient.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="ReliableSession.h">
-      <Filter>헤더 파일</Filter>
+      <Filter>RUDPLayer</Filter>
     </ClInclude>
     <ClInclude Include="ReliablePacket.h">
-      <Filter>헤더 파일</Filter>
+      <Filter>RUDPLayer</Filter>
+    </ClInclude>
+    <ClInclude Include="ReliableSession.h">
+      <Filter>RUDPLayer</Filter>
+    </ClInclude>
+    <ClInclude Include="CUDPLayer.h">
+      <Filter>CUDPLayer</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="NetworkClient.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="NetworkEndpoint.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="ClientState.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="TransportLayer.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="NetworkServer.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
     <ClCompile Include="ByteStream.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="Utility.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="ProtocolPacket.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="BufferPool.cpp">
@@ -101,20 +92,41 @@
     <ClCompile Include="ConnectToken.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
+    <ClCompile Include="NetworkClient.cpp">
+      <Filter>CUDPLayer</Filter>
+    </ClCompile>
+    <ClCompile Include="NetworkEndpoint.cpp">
+      <Filter>CUDPLayer</Filter>
+    </ClCompile>
+    <ClCompile Include="NetworkServer.cpp">
+      <Filter>CUDPLayer</Filter>
+    </ClCompile>
     <ClCompile Include="NetworkSession.cpp">
-      <Filter>소스 파일</Filter>
+      <Filter>CUDPLayer</Filter>
+    </ClCompile>
+    <ClCompile Include="ClientState.cpp">
+      <Filter>CUDPLayer</Filter>
     </ClCompile>
     <ClCompile Include="SessionState.cpp">
-      <Filter>소스 파일</Filter>
+      <Filter>CUDPLayer</Filter>
+    </ClCompile>
+    <ClCompile Include="TransportLayer.cpp">
+      <Filter>CUDPLayer</Filter>
+    </ClCompile>
+    <ClCompile Include="ProtocolPacket.cpp">
+      <Filter>CUDPLayer</Filter>
     </ClCompile>
     <ClCompile Include="ReliableClient.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="ReliableSession.cpp">
-      <Filter>소스 파일</Filter>
+      <Filter>RUDPLayer</Filter>
     </ClCompile>
     <ClCompile Include="ReliablePacket.cpp">
-      <Filter>소스 파일</Filter>
+      <Filter>RUDPLayer</Filter>
+    </ClCompile>
+    <ClCompile Include="ReliableSession.cpp">
+      <Filter>RUDPLayer</Filter>
+    </ClCompile>
+    <ClCompile Include="CUDPLayer.cpp">
+      <Filter>CUDPLayer</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

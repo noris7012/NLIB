@@ -49,7 +49,7 @@ void NetworkSession::Update(uint64_t time)
 
 void NetworkSession::Send(ProtocolPacket& packet)
 {
-	_server->SendTo(packet, _address);
+	_server->Send(_address, packet);
 }
 
 void NetworkSession::RecvPacket(ProtocolPacket* packet)
