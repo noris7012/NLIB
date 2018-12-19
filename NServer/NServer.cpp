@@ -1,4 +1,4 @@
-﻿#include "NetworkServer.h"
+﻿#include "GameServer.h"
 
 #include <thread>
 #include <chrono>
@@ -17,7 +17,7 @@ int main()
 		std::cout << Utility::Rand64() << std::endl;
 	}*/
 
-	NetworkServer server;
+	GameServer server;
 
 	server.Listen(7171);
 

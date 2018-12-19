@@ -4,9 +4,8 @@
 
 #include "Utility.h"
 
-NetworkEndpoint::NetworkEndpoint(CUDPLayer* cudp_layer)
-	: _cudp_layer(cudp_layer)
-	, _thread(nullptr)
+NetworkEndpoint::NetworkEndpoint()
+	: _thread(nullptr)
 	, _running(false)
 	, _transport(nullptr)
 {
@@ -27,8 +26,7 @@ void NetworkEndpoint::Startup(NetworkConfig& config)
 			auto time = Utility::GetTime();
 
 			InternalUpdate(time);
-			if (_cudp_layer)
-				_cudp_layer->Update(time);
+			Update(time);
 
 			std::this_thread::sleep_for(std::chrono::milliseconds(10));
 		}
@@ -58,8 +56,7 @@ void NetworkEndpoint::InternalUpdate(uint64_t time)
 		if (data == nullptr)
 			break;
 
-		if (_cudp_layer)
-			_cudp_layer->OnRecv(data);
+		OnRecv(data);
 
 		_buffer_pool.Release(data->buffer);
 		delete data;
@@ -102,21 +99,3 @@ void NetworkEndpoint::Send(NLIBAddress& address, const byte* data, uint32_t leng
 	if (_transport)
 		_transport->Send(address, data, length);
 }
-
-// void NetworkEndpoint::Send(ProtocolPacket& packet)
-// {
-// 	auto buffer = _buffer_pool.Acquire();
-// 	ByteStream stream(buffer);
-// 	packet.Write(stream);
-// 	_transport->Send(stream);
-// 	_buffer_pool.Release(buffer);
-// }
-//
-// void NetworkEndpoint::SendTo(ProtocolPacket& packet, NLIBAddress& address)
-// {
-// 	auto buffer = _buffer_pool.Acquire();
-// 	ByteStream stream(buffer);
-// 	packet.Write(stream);
-// 	_transport->SendTo(stream, address);
-// 	_buffer_pool.Release(buffer);
-// }

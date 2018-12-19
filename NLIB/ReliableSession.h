@@ -1,14 +1,26 @@
 #ifndef NLIB_RELIABLE_SESSION_H
 #define NLIB_RELIABLE_SESSION_H
 
-#include <stdint.h>
+#include <cstdint>
 
 #include "NetworkSession.h"
+#include "NetworkStruct.h"
+#include "ReliablePacket.h"
 
-class ReliableSession : public NetworkSession
+class ReliableSession
 {
 public:
-	ReliableSession(NetworkServer* server, uint64_t challenge_token_sequence, NLIBAddress address);
+	ReliableSession();
+
+	void OnRecv(NLIBData data);
+
+	uint32_t GetHeaderLength() { return ReliablePacket::GetHeaderLength(); }
+
+private:
+	BufferPool _buffer_pool;
+
+public:
+	std::function<void(NLIBData)> _recv_next = nullptr;
 };
 
 #endif

@@ -55,4 +55,10 @@ struct NLIBSend
 	uint32_t length;
 };
 
+struct NLIBData
+{
+	const byte* data;
+	uint32_t length;
+};
+
 #endif

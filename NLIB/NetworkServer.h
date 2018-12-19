@@ -13,7 +13,7 @@
 
 class NetworkSession;
 
-class NetworkServer final : public CUDPLayer
+class GameServer final : public CUDPLayer
 {
 public:
 	bool Listen(uint32_t port);

@@ -2,7 +2,7 @@
 
 #include "Utility.h"
 
-NetworkSession::NetworkSession(NetworkServer* server, uint64_t challenge_token_sequence, NLIBAddress address)
+NetworkSession::NetworkSession(GameServer* server, uint64_t challenge_token_sequence, NLIBAddress address)
 	: _server(server)
 	, _challenge_token_sequence(challenge_token_sequence)
 	, _address(address)
@@ -118,4 +118,17 @@ uint64_t NetworkSession::GetAddressID()
 NLIBAddress& NetworkSession::GetAddress()
 {
 	return _address;
+}
+
+void NetworkSession::OnRecv(ProtocolPacket* recv)
+{
+	assert(_state != nullptr);
+
+	_state->RecvPacket(recv);
+}
+
+void NetworkSession::OnRecvNext(NLIBData data)
+{
+	if (_recv_next != nullptr)
+		_recv_next(data);
 }

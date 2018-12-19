@@ -1,7 +1,7 @@
 #ifndef NLIB_NETWORK_SESSION_H
 #define NLIB_NETWORK_SESSION_H
 
-#include <stdint.h>
+#include <cstdint>
 #include <map>
 #include <vector>
 
@@ -9,15 +9,15 @@
 #include "NetworkStruct.h"
 #include "SessionState.h"
 #include "ProtocolPacket.h"
-#include "NetworkServer.h"
+#include "GameServer.h"
 
 class SessionState;
-class NetworkServer;
+class GameServer;
 
 class NetworkSession
 {
 public:
-	NetworkSession(NetworkServer* server, uint64_t challenge_token_sequence, NLIBAddress address);
+	NetworkSession(GameServer* server, uint64_t challenge_token_sequence, NLIBAddress address);
 	~NetworkSession();
 
 public:
@@ -46,10 +46,13 @@ public:
 	{
 		_slot_id = slot_id;
 		_client_id = client_id; 
-	};
+	}
+
+	void OnRecv(ProtocolPacket* recv);
+	void OnRecvNext(NLIBData data);
 
 private:
-	NetworkServer* _server;
+	GameServer* _server;
 	uint64_t _created_time;
 
 	SessionState* _state;
@@ -62,6 +65,9 @@ private:
 
 	uint32_t _client_id;
 	uint32_t _slot_id;
+
+public:
+	std::function<void(NLIBData)> _recv_next = nullptr;
 };
 
 #endif

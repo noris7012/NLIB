@@ -12,15 +12,14 @@
 #include "ByteStream.h"
 #include "ProtocolPacket.h"
 #include "BufferPool.h"
-#include "CUDPLayer.h"
 
 class TransportLayer;
 class CUDPLayer;
 
-class NetworkEndpoint final
+class NetworkEndpoint
 {
 public:
-	NetworkEndpoint(CUDPLayer* cudp_layer);
+	NetworkEndpoint();
 
 	void Startup(NetworkConfig& config);
 	void Destroy();
@@ -34,11 +33,10 @@ private:
 	NLIBRecv* Pop();
 
 public:
-	//virtual void Update(uint64_t time) = 0;
-	//virtual void ProcessReceive(NLIBRecv* data) = 0;
+	virtual void Update(uint64_t time) = 0;
+	virtual void OnRecv(NLIBRecv* data) = 0;
 
 private:
-	CUDPLayer* _cudp_layer;
 	std::thread* _thread;
 	bool _running;
 

@@ -6,6 +6,11 @@
 #include "Utility.h"
 #include "ReliableSession.h"
 
+GameServer::GameServer(PGameServerHandler handler)
+	: _handler(handler)
+{
+}
+
 bool GameServer::Listen(uint32_t port)
 {
 	// TODO Check State
@@ -14,9 +19,8 @@ bool GameServer::Listen(uint32_t port)
 	config.port = port;
 
 	assert(config.host == nullptr);
-	assert(_endpoint != nullptr);
 
-	_endpoint->Startup(config);
+	Startup(config);
 
 	return true;
 }
@@ -39,14 +43,11 @@ void GameServer::Update(uint64_t time)
 
 void GameServer::Send(NLIBAddress& address, ProtocolPacket& packet)
 {
-	if (_endpoint)
-	{
-		auto buffer = _buffer_pool.Acquire();
-		ByteStream stream(buffer);
-		packet.Write(stream);
-		_endpoint->Send(address, stream.Data(), stream.Length());
-		_buffer_pool.Release(buffer);		
-	}
+	auto buffer = _buffer_pool.Acquire();
+	ByteStream stream(buffer);
+	packet.Write(stream);
+	NetworkEndpoint::Send(address, stream.Data(), stream.Length());
+	_buffer_pool.Release(buffer);
 }
 
 void GameServer::OnRecv(NLIBRecv* recv)
@@ -69,19 +70,11 @@ void GameServer::OnRecv(NLIBRecv* recv)
 	auto address_id = recv->address.id();
 	if (_connected_session_by_address_id.find(address_id) != _connected_session_by_address_id.end())
 	{
-		switch (packet->GetID())
+		auto session = _connected_session_by_id[packet->GetClientID()];
+		assert(session != nullptr);
+		if (session != nullptr)
 		{
-		case E_PACKET_ID::CONNECTION_KEEP_ALIVE:
-			HandleConnectionKeepAlive(packet, recv);
-			break;
-		case E_PACKET_ID::CONNECTION_PAYLOAD:
-			HandleConnectionPayload(packet, recv);
-			break;
-		case E_PACKET_ID::CONNECTION_DISCONNECT:
-			HandleConnectionDisconnect(packet, recv);
-			break;
-		default:
-			break;
+			session->OnRecv(packet);			
 		}
 	}
 	else
@@ -97,7 +90,6 @@ void GameServer::OnRecv(NLIBRecv* recv)
 		default:
 			break;
 		}
-
 	}
 
 	// TODO Test Code
@@ -192,53 +184,53 @@ void GameServer::HandleConnectionResponse(ProtocolPacket* p, NLIBRecv* r)
 	session->RecvPacket(p);
 }
 
-void GameServer::HandleConnectionKeepAlive(ProtocolPacket* p, NLIBRecv* r)
-{
-	assert(p != nullptr && p->GetID() == E_PACKET_ID::CONNECTION_KEEP_ALIVE);
-
-	auto packet = static_cast<ProtocolPacketConnectionKeepAlive*>(p);
-	auto session = _connected_session_by_id[packet->GetClientID()];
-
-	assert(session != nullptr);
-	if (session == nullptr)
-		return;
-
-	session->RecvPacket(p);
-}
-
-void GameServer::HandleConnectionPayload(ProtocolPacket* p, NLIBRecv* r)
-{
-	assert(p != nullptr && p->GetID() == E_PACKET_ID::CONNECTION_PAYLOAD);
-
-	auto packet = static_cast<ProtocolPacketConnectionPayload*>(p);
-	auto session = _connected_session_by_id[packet->GetClientID()];
-
-	assert(session != nullptr);
-	if (session == nullptr)
-		return;
-
-	session->RecvPacket(p);
-}
-
-void GameServer::HandleConnectionDisconnect(ProtocolPacket* p, NLIBRecv* r)
-{
-	assert(p != nullptr && p->GetID() == E_PACKET_ID::CONNECTION_DISCONNECT);
-
-	auto packet = static_cast<ProtocolPacketConnectionDisconnect*>(p);
-	auto session = _connected_session_by_id[packet->GetClientID()];
-
-	if (session == nullptr)
-		return;
-
-	session->SetState(E_SESSION_STATE_ID::DISCONNECTED);
-}
+// void GameServer::HandleConnectionKeepAlive(ProtocolPacket* p, NLIBRecv* r)
+// {
+// 	assert(p != nullptr && p->GetID() == E_PACKET_ID::CONNECTION_KEEP_ALIVE);
+//
+// 	auto packet = static_cast<ProtocolPacketConnectionKeepAlive*>(p);
+// 	auto session = _connected_session_by_id[packet->GetClientID()];
+//
+// 	assert(session != nullptr);
+// 	if (session == nullptr)
+// 		return;
+//
+// 	session->RecvPacket(p);
+// }
+//
+// void GameServer::HandleConnectionPayload(ProtocolPacket* p, NLIBRecv* r)
+// {
+// 	assert(p != nullptr && p->GetID() == E_PACKET_ID::CONNECTION_PAYLOAD);
+//
+// 	auto packet = static_cast<ProtocolPacketConnectionPayload*>(p);
+// 	auto session = _connected_session_by_id[packet->GetClientID()];
+//
+// 	assert(session != nullptr);
+// 	if (session == nullptr)
+// 		return;
+//
+// 	session->RecvPacket(p);
+// }
+//
+// void GameServer::HandleConnectionDisconnect(ProtocolPacket* p, NLIBRecv* r)
+// {
+// 	assert(p != nullptr && p->GetID() == E_PACKET_ID::CONNECTION_DISCONNECT);
+//
+// 	auto packet = static_cast<ProtocolPacketConnectionDisconnect*>(p);
+// 	auto session = _connected_session_by_id[packet->GetClientID()];
+//
+// 	if (session == nullptr)
+// 		return;
+//
+// 	session->SetState(E_SESSION_STATE_ID::DISCONNECTED);
+// }
 
 void GameServer::OnConnected(NetworkSession* session)
 {
 	_connected_session_mutex.lock();
 
 	uint32_t client_id = Utility::Rand32();
-	while (_connected_session_by_id.find(client_id) != _connected_session_by_id.end())
+	while (!(client_id > 0 && _connected_session_by_id.find(client_id) == _connected_session_by_id.end()))
 	{
 		client_id = Utility::Rand32();
 	}
@@ -260,9 +252,10 @@ void GameServer::OnConnected(NetworkSession* session)
 		return;
 	}
 
-	_connected_session[slot_id] = session;
-	_connected_session_by_id[client_id] = session;
-	_connected_session_by_address_id[session->GetAddressID()] = session;
+	auto game_session = new GameSession(_handler, session);
+	_connected_session[slot_id] = game_session;
+	_connected_session_by_id[client_id] = game_session;
+	_connected_session_by_address_id[session->GetAddressID()] = game_session;
 
 	session->SetConnection(slot_id, client_id);
 

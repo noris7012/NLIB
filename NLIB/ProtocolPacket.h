@@ -12,6 +12,7 @@ public:
 
 public:
 	virtual E_PACKET_ID GetID() = 0;
+	virtual uint32_t GetClientID() { return 0; }
 	//virtual ByteStream Serialize() = 0;
 	//virtual void Deserialize(ByteStream& stream) = 0;
 
@@ -88,7 +89,7 @@ class ProtocolPacketConnectionKeepAlive : public ProtocolPacket
 		_client_index = client_index;
 	}
 
-	uint32_t GetClientID() { return _client_index; }
+	uint32_t GetClientID() override { return _client_index; }
 
 private:
 	uint32_t _client_index;
@@ -106,7 +107,8 @@ class ProtocolPacketConnectionPayload : public ProtocolPacket
 		_payload_length = payload_length;
 	}
 
-	uint32_t GetClientID() { return _client_index; }
+	uint32_t GetClientID() override { return _client_index; }
+	NLIBData GetPayload() { return NLIBData{ _payload, _payload_length }; }
 
 private:
 	uint32_t _client_index;
@@ -123,7 +125,7 @@ class ProtocolPacketConnectionDisconnect : public ProtocolPacket
 		_client_index = client_index;
 	}
 
-	uint32_t GetClientID() { return _client_index; }
+	uint32_t GetClientID() override { return _client_index; }
 
 private:
 	uint32_t _client_index;

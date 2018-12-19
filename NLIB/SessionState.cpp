@@ -135,13 +135,14 @@ void SessionStateConnected::RecvPacket(ProtocolPacket* p)
 
 	if (p->GetID() == E_PACKET_ID::CONNECTION_KEEP_ALIVE)
 	{
-		ProtocolPacketConnectionKeepAlive* packet = static_cast<ProtocolPacketConnectionKeepAlive*>(p);
+		auto packet = static_cast<ProtocolPacketConnectionKeepAlive*>(p);
 
 		// TODO Something
 	}
 	else if (p->GetID() == E_PACKET_ID::CONNECTION_PAYLOAD)
 	{
-		ProtocolPacketConnectionPayload* packet = static_cast<ProtocolPacketConnectionPayload*>(p);
+		auto packet = static_cast<ProtocolPacketConnectionPayload*>(p);
 
+		_session->OnRecvNext(packet->GetPayload());
 	}
 }
