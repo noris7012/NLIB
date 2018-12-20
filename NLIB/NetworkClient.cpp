@@ -29,7 +29,7 @@ NetworkClient::NetworkClient()
 	STATE_CREATE(CONNECTED);
 	TRANSITION_CREATE(CONNECTED, E_CLIENT_STATE_ID::DISCONNECTED);
 
-#undef TRANSITIN_CREATE
+#undef TRANSITION_CREATE
 #undef STATE_CREATE
 
 	SetState(E_CLIENT_STATE_ID::INIT);
@@ -78,15 +78,14 @@ void NetworkClient::Update(uint64_t time)
 	}
 }
 
-void NetworkClient::OnRecv(NLIBRecv* recv)
+void NetworkClient::HandleReceive(NLIBRecv* recv)
 {
 	assert(_state != nullptr);
 	if (_state == nullptr)
 		return;
 
 #ifdef NLIB_LOG_ENABLED
-	std::cout << "[ Client Receive ] " << std::endl;
-	std::cout << Utility::ByteToString(recv->buffer->data, recv->length) << std::endl;
+	std::cout << "[ Client Receive ] " << Utility::ByteToString(recv->buffer->data, recv->length) << std::endl;
 #endif
 
 	ByteStream stream(recv->buffer->data, recv->length);
@@ -103,22 +102,25 @@ void NetworkClient::OnRecv(NLIBRecv* recv)
 	delete packet;
 }
 
-void NetworkClient::SendPacket(const byte* data, uint32_t length)
-{
-	assert(_state != nullptr);
-	if (_state == nullptr)
-		return;
-
-	_state->SendPacket(data, length);
-}
-
 void NetworkClient::Send(ProtocolPacket& packet)
 {
 	auto buffer = _buffer_pool.Acquire();
 	ByteStream stream(buffer);
 	packet.Write(stream);
-	Send(_address, stream.Data(), stream.Length());
+	NetworkEndpoint::Send(_address, stream.Data(), stream.Length());
 	_buffer_pool.Release(buffer);
+}
+
+void NetworkClient::Send(UNLIBData data)
+{
+	NetworkEndpoint::Send(_address, std::move(data));
+}
+
+void NetworkClient::Write(UNLIBData data)
+{
+	assert(_state != nullptr);
+
+	_state->Write(std::move(data));
 }
 
 bool NetworkClient::SetState(E_CLIENT_STATE_ID state_id)

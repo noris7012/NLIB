@@ -1,12 +1,15 @@
 #include "NetworkSession.h"
 
 #include "Utility.h"
+#include <iostream>
 
 NetworkSession::NetworkSession(GameServer* server, uint64_t challenge_token_sequence, NLIBAddress address)
 	: _server(server)
 	, _challenge_token_sequence(challenge_token_sequence)
 	, _address(address)
 {
+	std::cout << "[NetworkSession]" << std::endl;
+
 	// TODO challenge_token_encrypted 진짜 암호화하기
 	_challenge_token_encrypted = new byte[NLIB_CHALLENGE_TOKEN_ENCRYPTED_LENGTH];
 	_created_time = Utility::GetTime();
@@ -23,7 +26,7 @@ NetworkSession::NetworkSession(GameServer* server, uint64_t challenge_token_sequ
 	STATE_CREATE(CONNECTED);
 	TRANSITION_CREATE(CONNECTED, E_SESSION_STATE_ID::DISCONNECTED);
 
-#undef TRANSITIN_CREATE
+#undef TRANSITION_CREATE
 #undef STATE_CREATE
 
 	SetState(E_SESSION_STATE_ID::SENDING_CONNECTION_CHALLENGE);

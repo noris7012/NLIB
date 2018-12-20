@@ -93,8 +93,8 @@ void TransportLayer::HandleReceive(const boost::system::error_code& error, std::
 void TransportLayer::Send(NLIBAddress& address, const byte* data, uint32_t length)
 {
 #ifdef NLIB_LOG_ENABLED
-	std::cout << "[ Send ] " << std::endl;
-	std::cout << Utility::ByteToString(data, length) << std::endl;
+	//std::cout << "[ Send ] " << std::endl;
+	//std::cout << Utility::ByteToString(data, length) << std::endl;
 #endif
 
 	_socket->async_send_to(
@@ -117,8 +117,8 @@ void TransportLayer::Send(NLIBAddress& address, UNLIBData data)
 	NLIBData* tmp = data.get();
 	while (tmp != nullptr)
 	{
-		buffers.push_back(buffer(data->bytes, data->length));
-		tmp = data->next.get();
+		buffers.push_back(buffer(tmp->bytes, tmp->length));
+		tmp = tmp->next.get();
 	}
 
 	_socket->async_send_to(
@@ -134,9 +134,9 @@ void TransportLayer::Send(NLIBAddress& address, UNLIBData data)
 
 void TransportLayer::HandleSend(const boost::system::error_code& error, std::size_t length)
 {
-	assert(!error);
 	if (error)
 	{
 		std::cout << error.message() << std::endl;
 	}
+	assert(!error);
 }

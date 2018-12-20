@@ -1,21 +1,20 @@
-#ifndef NLIB_RELIABLE_CLIENT_H
-#define NLIB_RELIABLE_CLIENT_H
+#ifndef NLIB_RELIABLE_SESSION_H
+#define NLIB_RELIABLE_SESSION_H
 
 #include <cstdint>
 
-#include "NetworkClient.h"
-#include "NetworkDefine.h"
-
+#include "NetworkLayer.h"
+#include "NetworkSession.h"
+#include "NetworkStruct.h"
 #include "ReliablePacket.h"
 
-class ReliableClient
+class NetworkLayer;
+
+class ReliableLayer : public NetworkLayer
 {
 public:
-	bool Send(const byte* data, uint32_t length);
-	void Update(uint64_t time);
-
-private:
-	void Send(ReliablePacket& packet);
+	void Read(UNLIBData data) override;
+	void Write(UNLIBData data) override;
 
 private:
 	uint32_t _sequence_number = 0;

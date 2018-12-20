@@ -25,11 +25,11 @@ public:
 	UNLIBData GetData();
 
 private:
-	uint32_t _sequence_number;
-	uint32_t _ack_sequence_number;
-	uint32_t _ack_bitfield;
-	const byte* _data;
-	uint32_t _data_length;
+	uint32_t _sequence_number = 1;
+	uint32_t _ack_sequence_number = 0;
+	uint32_t _ack_bitfield = 0;
+	const byte* _data = nullptr;
+	uint32_t _data_length = 0;
 };
 
 #endif

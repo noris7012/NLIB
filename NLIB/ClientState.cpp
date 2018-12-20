@@ -181,17 +181,32 @@ void ClientStateConnected::Update(uint64_t time)
 	}
 }
 
-void ClientStateConnected::RecvPacket(ProtocolPacket* packet)
+void ClientStateConnected::RecvPacket(ProtocolPacket* p)
 {
+	if (p->GetID() == E_PACKET_ID::CONNECTION_PAYLOAD)
+	{
+		auto packet = static_cast<ProtocolPacketConnectionPayload*>(p);
 
+		_client->ReadNext(packet->GetPayload());
+	}
 }
 
-void ClientStateConnected::SendPacket(const byte* data, uint32_t length)
+void ClientStateConnected::Write(UNLIBData data)
 {
 	_send_keep_alive_time = Utility::GetTime() + _next_keep_alive_interval;
 
 	ProtocolPacketConnectionPayload packet;
-	packet.Set(_client->GetClientID(), data, length);
-	_client->Send(packet);
+	packet.Set(_client->GetClientID());
+
+	ByteStream stream(1 + 4);
+	stream.Write(packet.GetID());
+	stream.Write(packet.GetClientID());
+
+	auto new_data = NLIBData::Instance();
+	new_data->bytes = stream.Data();
+	new_data->length = stream.Length();
+	new_data->next = std::move(data);
+
+	_client->Send(std::move(new_data));
 }
 

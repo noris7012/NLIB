@@ -1,7 +1,9 @@
 #ifndef NLIB_NETWORK_DEFINE_H
 #define NLIB_NETWORK_DEFINE_H
 
-#include <limits.h>
+#include <memory.h>
+#include <climits>
+#include <memory>
 
 //#define MAX_NETWORK_ENDPOINTS_PER_THREAD 4;
 
@@ -83,5 +85,20 @@ enum class E_READ_RESULT
 };
 
 using byte = unsigned char;
+
+class GameClient;
+using PGameClient = std::shared_ptr<GameClient>;
+
+class GamePacket;
+using PGamePacket = std::shared_ptr<GamePacket>;
+
+class GameSession;
+using PGameSession = std::shared_ptr<GameSession>;
+
+class GameServerHandler;
+using PGameServerHandler = std::shared_ptr<GameServerHandler>;
+
+class GameClientHandler;
+using PGameClientHandler = std::shared_ptr<GameClientHandler>;
 
 #endif

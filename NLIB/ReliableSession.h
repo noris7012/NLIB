@@ -10,7 +10,7 @@
 
 class NetworkLayer;
 
-class ReliableSession : public NetworkLayer
+class ReliableLayer : public NetworkLayer
 {
 public:
 	void Read(UNLIBData data) override;

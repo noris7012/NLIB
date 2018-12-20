@@ -4,7 +4,7 @@
 #include <cassert>
 
 #include "Utility.h"
-#include "ReliableSession.h"
+#include "ReliableLayer.h"
 
 GameServer::GameServer(PGameServerHandler handler)
 	: _handler(handler)
@@ -58,8 +58,7 @@ void GameServer::Send(NLIBAddress& address, UNLIBData data)
 void GameServer::HandleReceive(NLIBRecv* recv)
 {
 #ifdef NLIB_LOG_ENABLED
-	std::cout << "[ Server Receive ] " << std::endl;
-	std::cout << Utility::ByteToString(recv->buffer->data, recv->length) << std::endl;
+	std::cout << "[ Server Receive ] " << Utility::ByteToString(recv->buffer->data, recv->length) << std::endl;
 #endif
 
 	ByteStream stream(recv->buffer->data, recv->length);
@@ -257,7 +256,7 @@ void GameServer::OnConnected(NetworkSession* session)
 		return;
 	}
 
-	auto game_session = new GameSession(_handler, session);
+	auto game_session = std::make_shared<GameSession>(_handler, session);
 	_connected_session[slot_id] = game_session;
 	_connected_session_by_id[client_id] = game_session;
 	_connected_session_by_address_id[session->GetAddressID()] = game_session;
@@ -291,5 +290,5 @@ void GameServer::OnDisconnected(NetworkSession* session)
 	_connected_session_mutex.unlock();
 
 	// TODO delete 가 잘못될 가능성이 있음. mark 만 해놓고 Update 에서 객체 삭제.
-	delete session;
+	//delete session;
 }

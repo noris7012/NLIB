@@ -1,15 +1,17 @@
 #include "GameSession.h"
 
+#include "GamePacket.h"
+
 GameSession::GameSession(PGameServerHandler handler, NetworkSession* network_session)
 	: _handler(handler)
 	, _network_session(network_session)
 {
-	_reliable_session = new ReliableSession();
+	_reliable_session = new ReliableLayer();
 
 	//
 	_network_session->SetReadNext(
 		std::bind(
-			&ReliableSession::Read
+			&ReliableLayer::Read
 			, _reliable_session
 			, std::placeholders::_1
 		)
@@ -25,7 +27,7 @@ GameSession::GameSession(PGameServerHandler handler, NetworkSession* network_ses
 
 	SetWriteNext(
 		std::bind(
-			&ReliableSession::Write
+			&ReliableLayer::Write
 			, _reliable_session
 			, std::placeholders::_1
 		)
@@ -53,7 +55,8 @@ void GameSession::RecvPacket(ProtocolPacket* recv)
 
 void GameSession::Read(UNLIBData data)
 {
-	auto packet = std::make_shared<GamePacket>();
+	auto packet = GamePacket::Instance();
+	packet->Set(data->bytes, data->length);
 
 	_handler->HandlePacket(shared_from_this(), packet);
 }

@@ -2,12 +2,22 @@
 #define NLIB_GAME_PACKET_H
 
 #include <memory>
+#include <cstdint>
+
+#include "NetworkDefine.h"
 
 class GamePacket
 {
-	
-};
+public:
+	static PGamePacket Instance();
 
-using PGamePacket = std::shared_ptr<GamePacket>;
+public:
+	void Set(const byte* bytes, uint32_t length);
+	void Print();
+
+private:
+	const byte* _bytes;
+	uint32_t _length;
+};
 
 #endif

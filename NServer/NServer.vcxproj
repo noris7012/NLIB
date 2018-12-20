@@ -157,11 +157,15 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="NServer.cpp" />
+    <ClCompile Include="NServerHandler.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\NLIB\NLIB.vcxproj">
       <Project>{fc0b1d94-dd37-4fb7-8877-303265443d10}</Project>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="NServerHandler.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

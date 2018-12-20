@@ -45,9 +45,9 @@ private:
 	BufferPool _buffer_pool;
 
 	std::mutex _connected_session_mutex;
-	GameSession* _connected_session[NLIB_MAX_SESSION] = {};
-	std::unordered_map<uint64_t, GameSession*> _connected_session_by_address_id;
-	std::unordered_map<uint64_t, GameSession*> _connected_session_by_id;
+	PGameSession _connected_session[NLIB_MAX_SESSION] = {};
+	std::unordered_map<uint64_t, PGameSession> _connected_session_by_address_id;
+	std::unordered_map<uint64_t, PGameSession> _connected_session_by_id;
 
 	uint64_t _challenge_token_sequence = 0;
 	NetworkSession* _connection_slot[NLIB_MAX_CONNECTION_SLOT] = {};

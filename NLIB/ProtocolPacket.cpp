@@ -199,7 +199,7 @@ E_READ_RESULT ProtocolPacketConnectionKeepAlive::Read(ByteStream& stream)
 
 void ProtocolPacketConnectionKeepAlive::Print()
 {
-	std::cout << "Packet ID : Connection Keyy Alive" << std::endl;
+	//std::cout << "Packet ID : Connection Keep Alive" << std::endl;
 }
 
 void ProtocolPacketConnectionPayload::Write(ByteStream& stream)
@@ -222,7 +222,7 @@ E_READ_RESULT ProtocolPacketConnectionPayload::Read(ByteStream& stream)
 
 void ProtocolPacketConnectionPayload::Print()
 {
-	std::cout << "Packet ID : Connection Payload" << std::endl;
+	//std::cout << "Packet ID : Connection Payload" << std::endl;
 }
 
 UNLIBData ProtocolPacketConnectionPayload::GetPayload()
@@ -250,5 +250,5 @@ E_READ_RESULT ProtocolPacketConnectionDisconnect::Read(ByteStream& stream)
 
 void ProtocolPacketConnectionDisconnect::Print()
 {
-	std::cout << "Packet ID : Connection Disconnect" << std::endl;
+	//std::cout << "Packet ID : Connection Disconnect" << std::endl;
 }

@@ -7,6 +7,7 @@
 #include "ConnectToken.h"
 
 #include "Utility.h"
+#include "NServerHandler.h"
 
 int main()
 {
@@ -17,7 +18,7 @@ int main()
 		std::cout << Utility::Rand64() << std::endl;
 	}*/
 
-	GameServer server;
+	GameServer server(std::make_shared<NServerHandler>());
 
 	server.Listen(7171);
 

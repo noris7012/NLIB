@@ -1,28 +1,32 @@
 ﻿// NClient.cpp : 이 파일에는 'main' 함수가 포함됩니다. 거기서 프로그램 실행이 시작되고 종료됩니다.
 //
 
-#include "ReliableClient.h"
-
 #include <thread>
 #include <chrono>
+#include "GameClient.h"
+#include "NClientHandler.h"
 
 int main()
 {
-	ReliableClient client;
+	auto client = std::make_shared<GameClient>(std::make_shared<NClientHandler>());
 
-	client.Connect("127.0.0.1", 7171);
+	client->Connect("127.0.0.1", 7171);
 
-	while (!client.IsConnected())
+	while (!client->IsConnected())
 	{
 		std::this_thread::sleep_for(std::chrono::milliseconds(100));
 	}
 
 	std::this_thread::sleep_for(std::chrono::milliseconds(10000));
 
-	client.Send((const byte*)"123", 3);
-	client.Send((const byte*)"123456789", 9);
+	auto test = (const byte*)"123";
 
-	client.Disconnect();
+	client->WritePacket(test, 4);
+	client->WritePacket((const byte*)"123456789", 10);
+
+	std::this_thread::sleep_for(std::chrono::milliseconds(10000));
+
+	client->Disconnect();
 
 	while (true)
 	{

@@ -46,6 +46,7 @@ private:
 	std::mutex _recv_queue_mutex;
 	std::queue<NLIBRecv*> _recv_queue;
 
+protected:
 	BufferPool _buffer_pool;
 };
 

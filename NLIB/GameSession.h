@@ -6,12 +6,12 @@
 #include "GameServerHandler.h"
 #include "NetworkStruct.h"
 #include "NetworkSession.h"
-#include "ReliableSession.h"
+#include "ReliableLayer.h"
 #include "NetworkLayer.h"
 
 class GameServerHandler;
 class NetworkSession;
-class ReliableSession;
+class ReliableLayer;
 
 class GameSession : public std::enable_shared_from_this<GameSession>, public NetworkLayer
 {
@@ -29,11 +29,9 @@ public:
 private:
 	std::shared_ptr<GameServerHandler> _handler;
 	NetworkSession* _network_session;
-	ReliableSession* _reliable_session;
+	ReliableLayer* _reliable_session;
 
 	BufferPool _buffer_pool;
 };
-
-using PGameSession = std::shared_ptr<GameSession>;
 
 #endif

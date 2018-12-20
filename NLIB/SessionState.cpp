@@ -161,5 +161,5 @@ void SessionStateConnected::Write(UNLIBData data)
 	new_data->length = stream.Length();
 	new_data->next = std::move(data);
 
-	_session->Send(std::move(data));
+	_session->Send(std::move(new_data));
 }

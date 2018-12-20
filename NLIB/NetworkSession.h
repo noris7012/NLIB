@@ -5,6 +5,7 @@
 #include <map>
 #include <vector>
 
+#include "NetworkLayer.h"
 #include "NetworkDefine.h"
 #include "NetworkStruct.h"
 #include "SessionState.h"

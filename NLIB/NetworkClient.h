@@ -9,10 +9,11 @@
 #include "NetworkEndpoint.h"
 #include "ClientState.h"
 #include "ProtocolPacket.h"
+#include "NetworkLayer.h"
 
 class ClientState;
 
-class NetworkClient : public NetworkEndpoint
+class NetworkClient : public NetworkEndpoint, public NetworkLayer
 {
 public:
 	NetworkClient();
@@ -24,13 +25,12 @@ public:
 
 public:
 	void Update(uint64_t time);
-	void OnRecv(NLIBRecv* recv);
-
-public:
-	void SendPacket(const byte* data, uint32_t length);
+	void HandleReceive(NLIBRecv* recv);
 
 public:
 	void Send(ProtocolPacket& packet);
+	void Send(UNLIBData data);
+	void Write(UNLIBData data) override;
 
 public:
 	bool SetState(E_CLIENT_STATE_ID state_id);

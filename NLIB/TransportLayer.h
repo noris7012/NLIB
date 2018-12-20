@@ -17,9 +17,6 @@ class NetworkEndpoint;
 class TransportLayer
 {
 public:
-	TransportLayer();
-	~TransportLayer();
-
 	void Startup(NetworkConfig& config, NetworkEndpoint* local_endpoint);
 	void Destroy();
 	bool IsConnected();

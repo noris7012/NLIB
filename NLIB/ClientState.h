@@ -20,7 +20,7 @@ public:
 	virtual void Update(uint64_t time) { };
 	virtual void OnExit() { };
 	virtual void RecvPacket(ProtocolPacket* packet) { };
-	virtual void SendPacket(const byte* data, uint32_t length) { };
+	virtual void Write(UNLIBData data) { };
 
 protected:
 	NetworkClient* _client;
@@ -81,7 +81,7 @@ public:
 	void OnEnter();
 	void Update(uint64_t time);
 	void RecvPacket(ProtocolPacket* packet);
-	void SendPacket(const byte* data, uint32_t length);
+	void Write(UNLIBData data) override;
 
 private:
 	uint64_t _send_keep_alive_time;
