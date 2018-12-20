@@ -7,9 +7,8 @@
 #include "NetworkDefine.h"
 
 #include "ReliablePacket.h"
-#include "RUDPLayer.h"
 
-class ReliableClient : public RUDPLayer
+class ReliableClient
 {
 public:
 	bool Send(const byte* data, uint32_t length);

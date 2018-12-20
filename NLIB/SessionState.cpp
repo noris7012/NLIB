@@ -143,6 +143,23 @@ void SessionStateConnected::RecvPacket(ProtocolPacket* p)
 	{
 		auto packet = static_cast<ProtocolPacketConnectionPayload*>(p);
 
-		_session->OnRecvNext(packet->GetPayload());
+		_session->ReadNext(packet->GetPayload());
 	}
+}
+
+void SessionStateConnected::Write(UNLIBData data)
+{
+	ProtocolPacketConnectionPayload packet;
+	packet.Set(_session->GetClientID());
+
+	ByteStream stream(1 + 4);
+	stream.Write(packet.GetID());
+	stream.Write(packet.GetClientID());
+
+	auto new_data = NLIBData::Instance();
+	new_data->bytes = stream.Data();
+	new_data->length = stream.Length();
+	new_data->next = std::move(data);
+
+	_session->Send(std::move(data));
 }

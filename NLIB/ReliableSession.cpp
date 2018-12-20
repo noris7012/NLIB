@@ -1,21 +1,29 @@
 #include "ReliableSession.h"
 #include "ReliablePacket.h"
 
-ReliableSession::ReliableSession()
+void ReliableSession::Read(UNLIBData data)
 {
-
-}
-
-void ReliableSession::OnRecv(NLIBData data)
-{
-	ByteStream stream(const_cast<byte*>(data.data), data.length);
+	ByteStream stream(const_cast<byte*>(data->bytes), data->length);
 	ReliablePacket packet;
 	auto rc = packet.Read(stream);
 
-	// TODO 
 	if (rc != E_READ_RESULT::SUCCESS)
 		return;
 
-	assert(_recv_next != nullptr);
-	_recv_next(packet.GetData());
+	ReadNext(packet.GetData());	
+}
+
+void ReliableSession::Write(UNLIBData data)
+{
+	ReliablePacket packet;
+	packet.Set(_sequence_number++, _ack_sequence_number, _ack_bitfield);
+
+	auto header = packet.GetHeader();
+	
+	auto new_data = NLIBData::Instance();
+	new_data->bytes = header.bytes;
+	new_data->length = header.length;
+	new_data->next = std::move(data);
+
+	WriteNext(std::move(new_data));
 }

@@ -26,7 +26,8 @@ public:
 public:
 	void Update(uint64_t time);
 	void Send(NLIBAddress& address, ProtocolPacket& packet);
-	void OnRecv(NLIBRecv* recv);
+	void Send(NLIBAddress& address, UNLIBData data);
+	void HandleReceive(NLIBRecv* recv);
 
 private:
 	void HandleConnectionRequest(ProtocolPacket*, NLIBRecv*);

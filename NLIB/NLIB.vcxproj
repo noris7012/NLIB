@@ -136,11 +136,15 @@
     <ClInclude Include="ByteStream.h" />
     <ClInclude Include="ClientState.h" />
     <ClInclude Include="ConnectToken.h" />
+    <ClInclude Include="GamePacket.h" />
+    <ClInclude Include="GameServerHandler.h" />
+    <ClInclude Include="GameSession.h" />
     <ClInclude Include="NetworkClient.h" />
     <ClInclude Include="NetworkConfig.h" />
     <ClInclude Include="NetworkDefine.h" />
     <ClInclude Include="NetworkEndpoint.h" />
-    <ClInclude Include="NetworkServer.h" />
+    <ClInclude Include="GameServer.h" />
+    <ClInclude Include="NetworkLayer.h" />
     <ClInclude Include="NetworkSession.h" />
     <ClInclude Include="NetworkStruct.h" />
     <ClInclude Include="ProtocolPacket.h" />
@@ -149,7 +153,6 @@
     <ClInclude Include="ReliableSession.h" />
     <ClInclude Include="SessionState.h" />
     <ClInclude Include="TransportLayer.h" />
-    <ClInclude Include="CUDPLayer.h" />
     <ClInclude Include="Utility.h" />
   </ItemGroup>
   <ItemGroup>
@@ -157,10 +160,11 @@
     <ClCompile Include="ByteStream.cpp" />
     <ClCompile Include="ClientState.cpp" />
     <ClCompile Include="ConnectToken.cpp" />
-    <ClCompile Include="CUDPLayer.cpp" />
+    <ClCompile Include="GameSession.cpp" />
     <ClCompile Include="NetworkClient.cpp" />
     <ClCompile Include="NetworkEndpoint.cpp" />
-    <ClCompile Include="NetworkServer.cpp" />
+    <ClCompile Include="GameServer.cpp" />
+    <ClCompile Include="NetworkLayer.cpp" />
     <ClCompile Include="NetworkSession.cpp" />
     <ClCompile Include="ProtocolPacket.cpp" />
     <ClCompile Include="ReliableClient.cpp" />

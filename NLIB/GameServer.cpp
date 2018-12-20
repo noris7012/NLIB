@@ -50,7 +50,12 @@ void GameServer::Send(NLIBAddress& address, ProtocolPacket& packet)
 	_buffer_pool.Release(buffer);
 }
 
-void GameServer::OnRecv(NLIBRecv* recv)
+void GameServer::Send(NLIBAddress& address, UNLIBData data)
+{
+	NetworkEndpoint::Send(address, std::move(data));
+}
+
+void GameServer::HandleReceive(NLIBRecv* recv)
 {
 #ifdef NLIB_LOG_ENABLED
 	std::cout << "[ Server Receive ] " << std::endl;
@@ -74,7 +79,7 @@ void GameServer::OnRecv(NLIBRecv* recv)
 		assert(session != nullptr);
 		if (session != nullptr)
 		{
-			session->OnRecv(packet);			
+			session->RecvPacket(packet);			
 		}
 	}
 	else

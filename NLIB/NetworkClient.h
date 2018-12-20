@@ -9,11 +9,10 @@
 #include "NetworkEndpoint.h"
 #include "ClientState.h"
 #include "ProtocolPacket.h"
-#include "CUDPLayer.h"
 
 class ClientState;
 
-class NetworkClient : public CUDPLayer
+class NetworkClient : public NetworkEndpoint
 {
 public:
 	NetworkClient();
@@ -24,8 +23,8 @@ public:
 	void Disconnect();
 
 public:
-	void Update(uint64_t time) override;
-	void OnRecv(NLIBRecv* recv) override;
+	void Update(uint64_t time);
+	void OnRecv(NLIBRecv* recv);
 
 public:
 	void SendPacket(const byte* data, uint32_t length);

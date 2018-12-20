@@ -100,6 +100,11 @@ class ProtocolPacketConnectionPayload : public ProtocolPacket
 {
 	PUBLIC_METHOD(E_PACKET_ID::CONNECTION_PAYLOAD);
 
+	void Set(uint32_t client_index)
+	{
+		_client_index = client_index;
+	}
+
 	void Set(uint32_t client_index, const byte* payload, uint32_t payload_length)
 	{
 		_client_index = client_index;
@@ -108,7 +113,7 @@ class ProtocolPacketConnectionPayload : public ProtocolPacket
 	}
 
 	uint32_t GetClientID() override { return _client_index; }
-	NLIBData GetPayload() { return NLIBData{ _payload, _payload_length }; }
+	UNLIBData GetPayload();
 
 private:
 	uint32_t _client_index;

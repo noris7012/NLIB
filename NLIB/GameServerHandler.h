@@ -6,12 +6,14 @@
 #include "GameSession.h"
 #include "GamePacket.h"
 
+class GameSession;
+
 class GameServerHandler
 {
 public:
-	virtual void HandleConnected(PGameSession session) = 0;
-	virtual void HandleReceive(PGameSession session, PGamePacket packet) = 0;
-	virtual void HandleDisconnected(PGameSession session) = 0;
+	virtual void HandleConnected(std::shared_ptr<GameSession> session) = 0;
+	virtual void HandlePacket(std::shared_ptr<GameSession> session, PGamePacket packet) = 0;
+	virtual void HandleDisconnected(std::shared_ptr<GameSession> session) = 0;
 };
 
 using PGameServerHandler = std::shared_ptr<GameServerHandler>;

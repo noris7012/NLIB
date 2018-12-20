@@ -108,6 +108,30 @@ void TransportLayer::Send(NLIBAddress& address, const byte* data, uint32_t lengt
 	);
 }
 
+void TransportLayer::Send(NLIBAddress& address, UNLIBData data)
+{
+	using namespace boost::asio;
+
+	std::vector<const_buffer> buffers;
+
+	NLIBData* tmp = data.get();
+	while (tmp != nullptr)
+	{
+		buffers.push_back(buffer(data->bytes, data->length));
+		tmp = data->next.get();
+	}
+
+	_socket->async_send_to(
+		buffers
+		, udp::endpoint(address::from_string(address.ip_str), address.port)
+		, boost::bind(&TransportLayer::HandleSend
+			, this,
+			placeholders::error,
+			placeholders::bytes_transferred
+		)
+	);
+}
+
 void TransportLayer::HandleSend(const boost::system::error_code& error, std::size_t length)
 {
 	assert(!error);

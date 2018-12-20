@@ -26,6 +26,7 @@ public:
 
 public:
 	void Send(NLIBAddress& address, const byte* data, uint32_t length);
+	void Send(NLIBAddress& address, UNLIBData data);
 
 private:
 	void HandleSend(const boost::system::error_code& error, std::size_t length);

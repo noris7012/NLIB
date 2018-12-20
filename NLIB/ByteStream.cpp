@@ -11,14 +11,14 @@
 //{
 //}
 //
-//ByteStream::ByteStream(uint32_t capacity)
-//{
-//	_buffer = new byte[capacity];
-//	_capacity = capacity;
-//	_idx = 0;
-//
-//	std::cout << "[buffer1]" << static_cast<void*>(_buffer) << std::endl;
-//}
+ByteStream::ByteStream(uint32_t capacity)
+{
+	_buffer = new byte[capacity];
+	_capacity = capacity;
+	_idx = 0;
+
+	//std::cout << "[buffer1]" << static_cast<void*>(_buffer) << std::endl;
+}
 
 ByteStream::ByteStream(byte* data, uint32_t length)
 {

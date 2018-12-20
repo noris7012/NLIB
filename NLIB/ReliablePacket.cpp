@@ -25,6 +25,17 @@ void ReliablePacket::Print()
 
 }
 
+NLIBData ReliablePacket::GetHeader()
+{
+	ByteStream stream(GetHeaderLength());
+
+	stream.Write(_sequence_number);
+	stream.Write(_ack_sequence_number);
+	stream.Write(_ack_bitfield);
+
+	return NLIBData{ stream.Data(), stream.Length(), nullptr };
+}
+
 void ReliablePacket::Set(uint32_t sequence_number, uint32_t ack_sequence_number, uint32_t ack_bitfield)
 {
 	_sequence_number = sequence_number;
@@ -36,4 +47,13 @@ void ReliablePacket::SetData(const byte* data, uint32_t data_length)
 {
 	_data = data;
 	_data_length = data_length;
+}
+
+UNLIBData ReliablePacket::GetData()
+{
+	auto data = NLIBData::Instance();
+	data->bytes = _data;
+	data->length = _data_length;
+
+	return data;
 }

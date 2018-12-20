@@ -52,6 +52,11 @@ void NetworkSession::Send(ProtocolPacket& packet)
 	_server->Send(_address, packet);
 }
 
+void NetworkSession::Send(UNLIBData data)
+{
+	_server->Send(_address, std::move(data));
+}
+
 void NetworkSession::RecvPacket(ProtocolPacket* packet)
 {
 	assert(_state != nullptr);
@@ -120,15 +125,9 @@ NLIBAddress& NetworkSession::GetAddress()
 	return _address;
 }
 
-void NetworkSession::OnRecv(ProtocolPacket* recv)
+void NetworkSession::Write(UNLIBData data)
 {
 	assert(_state != nullptr);
 
-	_state->RecvPacket(recv);
-}
-
-void NetworkSession::OnRecvNext(NLIBData data)
-{
-	if (_recv_next != nullptr)
-		_recv_next(data);
+	_state->Write(std::move(data));
 }

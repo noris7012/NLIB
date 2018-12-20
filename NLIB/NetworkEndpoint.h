@@ -25,6 +25,7 @@ public:
 	void Destroy();
 	void HandleReceive(char* data, std::size_t length, NLIBAddress& address);
 	void Send(NLIBAddress& address, const byte* data, uint32_t length);
+	void Send(NLIBAddress& address, UNLIBData data);
 
 private:
 	void InternalUpdate(uint64_t time);
@@ -34,7 +35,7 @@ private:
 
 public:
 	virtual void Update(uint64_t time) = 0;
-	virtual void OnRecv(NLIBRecv* data) = 0;
+	virtual void HandleReceive(NLIBRecv* data) = 0;
 
 private:
 	std::thread* _thread;

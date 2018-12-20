@@ -21,6 +21,7 @@ public:
 	virtual void Update(uint64_t time) { };
 	virtual void OnExit() { };
 	virtual void RecvPacket(ProtocolPacket* packet) { };
+	virtual void Write(UNLIBData data) { };
 
 protected:
 	NetworkSession* _session;
@@ -61,6 +62,7 @@ public:
 	void OnEnter();
 	void Update(uint64_t time);
 	void RecvPacket(ProtocolPacket* packet);
+	void Write(UNLIBData data) override;
 
 private:
 	uint64_t _send_keep_alive_time;

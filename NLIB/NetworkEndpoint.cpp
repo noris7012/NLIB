@@ -56,7 +56,7 @@ void NetworkEndpoint::InternalUpdate(uint64_t time)
 		if (data == nullptr)
 			break;
 
-		OnRecv(data);
+		HandleReceive(data);
 
 		_buffer_pool.Release(data->buffer);
 		delete data;
@@ -98,4 +98,10 @@ void NetworkEndpoint::Send(NLIBAddress& address, const byte* data, uint32_t leng
 {
 	if (_transport)
 		_transport->Send(address, data, length);
+}
+
+void NetworkEndpoint::Send(NLIBAddress& address, UNLIBData data)
+{
+	if (_transport)
+		_transport->Send(address, std::move(data));
 }

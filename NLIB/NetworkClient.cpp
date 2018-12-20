@@ -54,8 +54,7 @@ bool NetworkClient::Connect(const char* host, unsigned short port)
 	_address.ip = Utility::IPToInt(host);
 	_address.port = port;
 
-	assert(_endpoint != nullptr);
-	_endpoint->Startup(config);
+	Startup(config);
 
 	return SetState(E_CLIENT_STATE_ID::SENDING_CONNECTION_REQUEST);
 }
@@ -115,14 +114,11 @@ void NetworkClient::SendPacket(const byte* data, uint32_t length)
 
 void NetworkClient::Send(ProtocolPacket& packet)
 {
-	if (_endpoint)
-	{
-		auto buffer = _buffer_pool.Acquire();
-		ByteStream stream(buffer);
-		packet.Write(stream);
-		_endpoint->Send(_address, stream.Data(), stream.Length());
-		_buffer_pool.Release(buffer);
-	}
+	auto buffer = _buffer_pool.Acquire();
+	ByteStream stream(buffer);
+	packet.Write(stream);
+	Send(_address, stream.Data(), stream.Length());
+	_buffer_pool.Release(buffer);
 }
 
 bool NetworkClient::SetState(E_CLIENT_STATE_ID state_id)

@@ -225,6 +225,15 @@ void ProtocolPacketConnectionPayload::Print()
 	std::cout << "Packet ID : Connection Payload" << std::endl;
 }
 
+UNLIBData ProtocolPacketConnectionPayload::GetPayload()
+{
+	auto data = NLIBData::Instance();
+	data->bytes = _payload;
+	data->length = _payload_length;
+
+	return data;
+}
+
 void ProtocolPacketConnectionDisconnect::Write(ByteStream& stream)
 {
 	stream.Write(GetID());

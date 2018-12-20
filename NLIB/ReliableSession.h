@@ -3,24 +3,26 @@
 
 #include <cstdint>
 
+#include "NetworkLayer.h"
 #include "NetworkSession.h"
 #include "NetworkStruct.h"
 #include "ReliablePacket.h"
 
-class ReliableSession
+class NetworkLayer;
+
+class ReliableSession : public NetworkLayer
 {
 public:
-	ReliableSession();
-
-	void OnRecv(NLIBData data);
-
-	uint32_t GetHeaderLength() { return ReliablePacket::GetHeaderLength(); }
+	void Read(UNLIBData data) override;
+	void Write(UNLIBData data) override;
 
 private:
-	BufferPool _buffer_pool;
+	uint32_t _sequence_number = 0;
+	uint32_t _ack_sequence_number = 0;
+	uint32_t _ack_bitfield = 0;
 
-public:
-	std::function<void(NLIBData)> _recv_next = nullptr;
+	ReliablePacket* _send_buffer[NLIB_RELIABLE_BUFFER_SIZE] = {};
+	ReliablePacket* _recv_buffer[NLIB_RELIABLE_BUFFER_SIZE] = {};
 };
 
 #endif

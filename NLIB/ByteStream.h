@@ -1,8 +1,8 @@
 #ifndef NLIB_BYTE_STREAM_H
 #define NLIB_BYTE_STREAM_H
 
-#include <stdint.h>
-#include <assert.h>
+#include <cstdint>
+#include <cassert>
 
 #include "NetworkDefine.h"
 #include "NetworkStruct.h"
@@ -11,7 +11,7 @@ class ByteStream
 {
 public:
 	//ByteStream();
-	//ByteStream(uint32_t capacity);
+	ByteStream(uint32_t capacity);
 	ByteStream(byte* data, uint32_t length);
 	ByteStream(Buffer* buffer);
 	~ByteStream();

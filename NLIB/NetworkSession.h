@@ -14,7 +14,7 @@
 class SessionState;
 class GameServer;
 
-class NetworkSession
+class NetworkSession : public NetworkLayer
 {
 public:
 	NetworkSession(GameServer* server, uint64_t challenge_token_sequence, NLIBAddress address);
@@ -23,6 +23,7 @@ public:
 public:
 	void Update(uint64_t time);
 	void Send(ProtocolPacket& packet);
+	void Send(UNLIBData data);
 	void RecvPacket(ProtocolPacket* packet);
 	//void ProcessReceive(NLIBRecv* data);
 
@@ -48,8 +49,7 @@ public:
 		_client_id = client_id; 
 	}
 
-	void OnRecv(ProtocolPacket* recv);
-	void OnRecvNext(NLIBData data);
+	void Write(UNLIBData data) override;
 
 private:
 	GameServer* _server;
@@ -65,9 +65,6 @@ private:
 
 	uint32_t _client_id;
 	uint32_t _slot_id;
-
-public:
-	std::function<void(NLIBData)> _recv_next = nullptr;
 };
 
 #endif

@@ -57,8 +57,16 @@ struct NLIBSend
 
 struct NLIBData
 {
-	const byte* data;
-	uint32_t length;
+	const byte* bytes = nullptr;
+	uint32_t length = 0;
+	std::unique_ptr<NLIBData> next = std::unique_ptr<NLIBData>(nullptr);
+
+	static std::unique_ptr<NLIBData> Instance()
+	{
+		return std::make_unique<NLIBData>();
+	}
 };
+
+using UNLIBData = std::unique_ptr<NLIBData>;
 
 #endif

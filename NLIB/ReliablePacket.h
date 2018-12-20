@@ -17,11 +17,12 @@ public:
 
 public:
 	static uint32_t GetHeaderLength() { return sizeof(_sequence_number) + sizeof(_ack_sequence_number) + sizeof(_ack_bitfield); }
+	NLIBData GetHeader();
 
 public:
 	void Set(uint32_t sequence_number, uint32_t ack_sequence_number, uint32_t ack_bitfield);
 	void SetData(const byte* data, uint32_t data_length);
-	NLIBData GetData() { return NLIBData{ _data, _data_length }; }
+	UNLIBData GetData();
 
 private:
 	uint32_t _sequence_number;

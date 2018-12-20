@@ -6,9 +6,38 @@ GameSession::GameSession(PGameServerHandler handler, NetworkSession* network_ses
 {
 	_reliable_session = new ReliableSession();
 
-	// TODO Refactoring
-	_network_session->_recv_next = std::bind(&ReliableSession::OnRecv, _reliable_session, std::placeholders::_1);
-	_reliable_session->_recv_next = std::bind(&GameSession::OnRecvT, this, std::placeholders::_1);
+	//
+	_network_session->SetReadNext(
+		std::bind(
+			&ReliableSession::Read
+			, _reliable_session
+			, std::placeholders::_1
+		)
+	);
+
+	_reliable_session->SetReadNext(
+		std::bind(
+			&GameSession::Read
+			, this
+			, std::placeholders::_1
+		)
+	);
+
+	SetWriteNext(
+		std::bind(
+			&ReliableSession::Write
+			, _reliable_session
+			, std::placeholders::_1
+		)
+	);
+
+	_reliable_session->SetWriteNext(
+		std::bind(
+			&NetworkSession::Write
+			, _network_session
+			, std::placeholders::_1
+		)
+	);
 }
 
 GameSession::~GameSession()
@@ -17,24 +46,33 @@ GameSession::~GameSession()
 	delete _network_session;
 }
 
-void GameSession::OnRecv(ProtocolPacket* recv)
+void GameSession::RecvPacket(ProtocolPacket* recv)
 {
-	_network_session->OnRecv(recv);
+	_network_session->RecvPacket(recv);
 }
 
-void GameSession::OnRecvT(NLIBData data)
+void GameSession::Read(UNLIBData data)
 {
 	auto packet = std::make_shared<GamePacket>();
 
-	_handler->HandleReceive(shared_from_this(), packet);
+	_handler->HandlePacket(shared_from_this(), packet);
 }
 
-void GameSession::OnSend(NLIBData data)
+void GameSession::Write(UNLIBData data)
 {
-	auto buffer = _buffer_pool.Acquire();
+	WriteNext(std::move(data));
+}
 
-	// TODO Append Header with out memcpy
+void GameSession::Update(uint64_t time)
+{
+	_network_session->Update(time);
+}
 
+void GameSession::WritePacket(const byte* bytes, uint32_t length)
+{
+	auto data = std::make_unique<NLIBData>();
+	data->bytes = bytes;
+	data->length = length;
 
-	_buffer_pool.Release(buffer);
+	Write(std::move(data));
 }
