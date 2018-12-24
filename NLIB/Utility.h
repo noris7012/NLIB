@@ -14,6 +14,7 @@ public:
 	static uint64_t Rand64();
 	static uint32_t Rand32();
 	static uint32_t IPToInt(const char* ip);
+	static std::string TimeInHHMMSSMMM();
 };
 
 #endif

@@ -17,12 +17,18 @@ int main()
 		std::this_thread::sleep_for(std::chrono::milliseconds(100));
 	}
 
-	std::this_thread::sleep_for(std::chrono::milliseconds(10000));
+	std::this_thread::sleep_for(std::chrono::milliseconds(3000));
 
-	auto test = (const byte*)"123";
-
-	client->WritePacket(test, 4);
+	client->WritePacket((const byte*)"123", 4);
 	client->WritePacket((const byte*)"123456789", 10);
+	client->WritePacket((const byte*)"987656789", 10);
+	client->WritePacket((const byte*)"123", 4);
+	client->WritePacket((const byte*)"123456789", 10);
+	client->WritePacket((const byte*)"987656789", 10);
+	client->WritePacket((const byte*)"123", 4);
+	client->WritePacket((const byte*)"123456789", 10);
+	client->WritePacket((const byte*)"987656789", 10);
+	client->WritePacket((const byte*)"123", 4);
 
 	std::this_thread::sleep_for(std::chrono::milliseconds(10000));
 

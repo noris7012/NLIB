@@ -6,7 +6,7 @@ GameSession::GameSession(PGameServerHandler handler, NetworkSession* network_ses
 	: _handler(handler)
 	, _network_session(network_session)
 {
-	_reliable_session = new ReliableLayer();
+	_reliable_session = new ReliableLayer(this);
 
 	//
 	_network_session->SetReadNext(

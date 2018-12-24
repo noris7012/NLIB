@@ -2,12 +2,14 @@
 
 #include "GamePacket.h"
 #include "GameClientHandler.h"
+#include <iostream>
+#include "Utility.h"
 
 GameClient::GameClient(PGameClientHandler handler)
 	: _handler(handler)
 {
 	_network_client = new NetworkClient();
-	_reliable_layer = new ReliableLayer();
+	_reliable_layer = new ReliableLayer(this);
 
 	_network_client->SetReadNext(
 		std::bind(
@@ -73,6 +75,10 @@ void GameClient::Write(UNLIBData data)
 
 void GameClient::WritePacket(const byte* bytes, uint32_t length)
 {
+#ifdef NLIB_LOG_ENABLED
+	std::cout << "[WritePacket] " << Utility::TimeInHHMMSSMMM() << std::endl;
+#endif
+
 	auto data = std::make_unique<NLIBData>();
 	data->bytes = bytes;
 	data->length = length;

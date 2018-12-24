@@ -3,6 +3,7 @@
 
 #include <memory>
 
+#include "GameEndpoint.h"
 #include "GameServerHandler.h"
 #include "NetworkStruct.h"
 #include "NetworkSession.h"
@@ -13,7 +14,7 @@ class GameServerHandler;
 class NetworkSession;
 class ReliableLayer;
 
-class GameSession : public std::enable_shared_from_this<GameSession>, public NetworkLayer
+class GameSession : public std::enable_shared_from_this<GameSession>, public NetworkLayer, public GameEndpoint
 {
 public:
 	GameSession(std::shared_ptr<GameServerHandler> handler, NetworkSession* network_session);

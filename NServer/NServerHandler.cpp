@@ -4,6 +4,7 @@
 
 #include "GamePacket.h"
 #include "GameSession.h"
+#include "Utility.h"
 
 void NServerHandler::HandleConnected(PGameSession session)
 {
@@ -12,8 +13,11 @@ void NServerHandler::HandleConnected(PGameSession session)
 
 void NServerHandler::HandlePacket(PGameSession session, PGamePacket packet)
 {
-	packet->Print();
+#ifdef NLIB_LOG_ENABLED
+	std::cout << "[HandlePacket] " << Utility::TimeInHHMMSSMMM() << std::endl;
 
+	packet->Print();
+#endif
 	session->WritePacket(reinterpret_cast<const byte*>("test"), 5);
 }
 

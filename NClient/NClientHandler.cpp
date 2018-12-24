@@ -11,7 +11,9 @@ void NClientHandler::HandleConnected(PGameClient session)
 
 void NClientHandler::HandlePacket(PGameClient session, PGamePacket packet)
 {
+#ifdef NLIB_LOG_ENABLED
 	packet->Print();
+#endif
 }
 
 void NClientHandler::HandleDisconnected(PGameClient session)

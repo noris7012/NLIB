@@ -5,7 +5,7 @@
 #include "NetworkClient.h"
 #include "ReliableLayer.h"
 
-class GameClient : public std::enable_shared_from_this<GameClient>, public NetworkLayer
+class GameClient : public std::enable_shared_from_this<GameClient>, public NetworkLayer, public GameEndpoint
 {
 public:
 	GameClient(PGameClientHandler handler);

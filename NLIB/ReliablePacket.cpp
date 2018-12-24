@@ -1,4 +1,5 @@
 #include "ReliablePacket.h"
+#include "Utility.h"
 
 void ReliablePacket::Write(ByteStream& stream)
 {
@@ -41,6 +42,8 @@ void ReliablePacket::Set(uint32_t sequence_number, uint32_t ack_sequence_number,
 	_sequence_number = sequence_number;
 	_ack_sequence_number = ack_sequence_number;
 	_ack_bitfield = ack_bitfield;
+
+	_send_time = Utility::GetTime();
 }
 
 void ReliablePacket::SetData(const byte* data, uint32_t data_length)

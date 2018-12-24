@@ -1,12 +1,16 @@
 /.vs
 /Debug
+/Release
 /x64
 /NLIB/x64
 /NLIB/Debug
+/NLIB/Release
 /NClient/Debug
+/NClient/Release
 /NClient/x64
 /NServer/x64
 /NServer/Debug
+/NServer/Release
 /lib/cryptopp/Win32
 /lib/cryptopp/.vs
 /lib/cryptopp/x64

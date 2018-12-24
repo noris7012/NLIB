@@ -2,9 +2,6 @@
 
 #include <iostream>
 
-#include <boost/preprocessor/seq/for_each.hpp>
-#include <boost/preprocessor/variadic/to_seq.hpp>
-
 #include "Utility.h"
 
 NetworkClient::NetworkClient()
@@ -127,8 +124,8 @@ bool NetworkClient::SetState(E_CLIENT_STATE_ID state_id)
 {
 	if (_state == nullptr)
 	{
+		_state_map[state_id]->OnEnter();
 		_state = _state_map[state_id];
-		_state->OnEnter();
 		return true;
 	}
 	else
@@ -139,8 +136,8 @@ bool NetworkClient::SetState(E_CLIENT_STATE_ID state_id)
 			if (*it == state_id)
 			{
 				_state->OnExit();
+				_state_map[state_id]->OnEnter();
 				_state = _state_map[state_id];
-				_state->OnEnter();
 				return true;
 			}
 		}

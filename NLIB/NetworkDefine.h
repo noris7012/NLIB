@@ -22,7 +22,7 @@
 //#define NLIB_CONNECT_TOKEN_ENCRYPTED_LENGTH 896
 #define NLIB_CHALLENGE_TOKEN_ENCRYPTED_LENGTH 300
 
-#define NLIB_LOG_ENABLED
+//#define NLIB_LOG_ENABLED
 
 #define NLIB_STREAM_READ(variable, type) if(!stream.Read<type>(variable)) { return E_READ_RESULT::FAIL; }
 #define NLIB_STREAM_READ_BYTE(variable, length) if(!stream.Read<const byte*>(variable, length)) { return E_READ_RESULT::FAIL; }

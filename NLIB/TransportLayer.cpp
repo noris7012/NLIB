@@ -73,6 +73,10 @@ void TransportLayer::Receive()
 
 void TransportLayer::HandleReceive(const boost::system::error_code& error, std::size_t length)
 {
+#ifdef NLIB_LOG_ENABLED
+	std::cout << "[HandleRecv] " << Utility::TimeInHHMMSSMMM() << std::endl;
+#endif
+
 	assert(!error);
 	if (error)
 	{
@@ -134,6 +138,10 @@ void TransportLayer::Send(NLIBAddress& address, UNLIBData data)
 
 void TransportLayer::HandleSend(const boost::system::error_code& error, std::size_t length)
 {
+#ifdef NLIB_LOG_ENABLED
+	std::cout << "[HandleSend] " << Utility::TimeInHHMMSSMMM() << std::endl;
+#endif
+
 	if (error)
 	{
 		std::cout << error.message() << std::endl;
