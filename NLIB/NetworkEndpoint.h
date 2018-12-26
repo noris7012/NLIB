@@ -60,6 +60,11 @@ private:
 	std::mutex _recv_queue_mutex;
 	std::queue<NLIBRecv*> _recv_queue;
 
+private:
+	// For Test
+	std::vector<bool>* _loss_mask = nullptr;
+	uint32_t _loss_index = 0;
+
 protected:
 	BufferPool _buffer_pool;
 };

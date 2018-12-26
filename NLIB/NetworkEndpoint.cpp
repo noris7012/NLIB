@@ -6,6 +6,7 @@
 
 #include "Utility.h"
 #include <iostream>
+#include "Logger.h"
 
 using namespace boost::asio::ip;
 
@@ -56,6 +57,11 @@ void NetworkEndpoint::Startup(GameConfig& config)
 			std::this_thread::sleep_for(std::chrono::milliseconds(10));
 		}
 	});
+
+	{
+		// Test
+		_loss_mask = config.loss_mask;
+	}
 }
 
 void NetworkEndpoint::Destroy()
@@ -128,6 +134,7 @@ void NetworkEndpoint::HandleReceive(char* data, std::size_t length, NLIBAddress&
 
 void NetworkEndpoint::Send(NLIBAddress& address, const byte* data, uint32_t length)
 {
+	std::cout << "[ Send ] " << Utility::ByteToString(data, length) << std::endl;
 #ifdef NLIB_LOG_ENABLED
 	//std::cout << "[ Send ] " << std::endl;
 	//std::cout << Utility::ByteToString(data, length) << std::endl;
@@ -208,12 +215,24 @@ void NetworkEndpoint::HandleReceive(const boost::system::error_code& error, std:
 		return;
 	}
 
-	NLIBAddress address;
-	address.ip_str = _remote_endpoint.address().to_v4().to_string();
-	address.ip = _remote_endpoint.address().to_v4().to_ulong();
-	address.port = _remote_endpoint.port();
+	if (_loss_mask != nullptr && !_loss_mask->at(_loss_index++))
+	{
+		_loss_index = _loss_index % _loss_mask->size();
 
-	HandleReceive(_recv_buffer.data(), length, address);
+		std::stringstream stream;
+		stream << "[Loss] " << Utility::ByteToString(reinterpret_cast<const byte*>(_recv_buffer.data()), length);
+
+		Logger::GetInstance()->Log(stream.str());
+	}
+	else
+	{
+		NLIBAddress address;
+		address.ip_str = _remote_endpoint.address().to_v4().to_string();
+		address.ip = _remote_endpoint.address().to_v4().to_ulong();
+		address.port = _remote_endpoint.port();
+
+		HandleReceive(_recv_buffer.data(), length, address);		
+	}
 
 	Receive();
 }

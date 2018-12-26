@@ -20,8 +20,12 @@ int main()
 
 	GameServer server(std::make_shared<NServerHandler>());
 
+	auto loss_mask = new std::vector<bool>();
+	loss_mask->insert(loss_mask->end(), { false, false, false, false, true });
+
 	GameConfig config;
 	config.port = 7171;
+	config.loss_mask = loss_mask;
 
 	server.Listen(config);
 
