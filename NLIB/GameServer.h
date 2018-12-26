@@ -6,10 +6,11 @@
 #include <cstdint>
 #include <mutex>
 
+#include "NetworkDefine.h"
 #include "NetworkEndpoint.h"
 #include "NetworkSession.h"
 #include "ProtocolPacket.h"
-#include "GameServerHandler.h"
+#include "GameConfig.h"
 #include "GameSession.h"
 
 class NetworkSession;
@@ -21,7 +22,7 @@ public:
 	GameServer(PGameServerHandler handler);
 
 public:
-	bool Listen(uint32_t port);
+	bool Listen(GameConfig& config);
 
 public:
 	void Update(uint64_t time) override;

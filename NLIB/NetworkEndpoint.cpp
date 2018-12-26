@@ -15,7 +15,7 @@ NetworkEndpoint::NetworkEndpoint()
 {
 }
 
-void NetworkEndpoint::Startup(NetworkConfig& config)
+void NetworkEndpoint::Startup(GameConfig& config)
 {
 	if (config.host != nullptr)
 	{

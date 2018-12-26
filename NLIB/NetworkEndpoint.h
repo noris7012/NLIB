@@ -10,7 +10,7 @@
 #include <boost/asio.hpp>
 
 #include "NetworkStruct.h"
-#include "NetworkConfig.h"
+#include "GameConfig.h"
 #include "ByteStream.h"
 #include "ProtocolPacket.h"
 #include "BufferPool.h"
@@ -23,7 +23,7 @@ class NetworkEndpoint
 public:
 	NetworkEndpoint();
 
-	void Startup(NetworkConfig& config);
+	void Startup(GameConfig& config);
 	void Destroy();
 	void HandleReceive(char* data, std::size_t length, NLIBAddress& address);
 	void Send(NLIBAddress& address, const byte* data, uint32_t length);

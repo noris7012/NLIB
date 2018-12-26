@@ -10,7 +10,7 @@ class GameClient : public std::enable_shared_from_this<GameClient>, public Netwo
 public:
 	GameClient(PGameClientHandler handler);
 
-	bool Connect(const char* host, unsigned short port);
+	bool Connect(GameConfig& config);
 	bool IsConnected();
 	void Disconnect();
 

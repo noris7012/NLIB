@@ -15,9 +15,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="NetworkConfig.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
     <ClInclude Include="NetworkDefine.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
@@ -85,6 +82,9 @@
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="Logger.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="GameConfig.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
   </ItemGroup>

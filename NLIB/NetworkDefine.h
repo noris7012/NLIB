@@ -73,12 +73,6 @@ enum class E_PACKET_ID
 	MAX_PACKET_ID,
 };
 
-enum class E_TRANSPORT_TYPE
-{
-	UDP,
-	TCP,
-};
-
 enum class E_READ_RESULT
 {
 	FAIL = INT_MIN,

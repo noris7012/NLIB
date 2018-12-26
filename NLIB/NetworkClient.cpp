@@ -42,17 +42,13 @@ NetworkClient::~NetworkClient()
 		delete[] _challenge_token_encrypted;
 }
 
-bool NetworkClient::Connect(const char* host, unsigned short port)
+bool NetworkClient::Connect(GameConfig& config)
 {
 	// TODO Check State
-	NetworkConfig config;
-	config.transport_type = E_TRANSPORT_TYPE::UDP;
-	config.host = host;
-	config.port = port;
 
-	_address.ip_str = std::string(host);
-	_address.ip = Utility::IPToInt(host);
-	_address.port = port;
+	_address.ip_str = std::string(config.host);
+	_address.ip = Utility::IPToInt(config.host);
+	_address.port = config.port;
 
 	Startup(config);
 

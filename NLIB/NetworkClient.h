@@ -21,7 +21,7 @@ public:
 	NetworkClient(GameEndpoint* endpoint);
 	~NetworkClient();
 
-	bool Connect(const char* host, unsigned short port);
+	bool Connect(GameConfig& config);
 	bool IsConnected();
 	void Disconnect();
 

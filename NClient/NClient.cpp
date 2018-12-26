@@ -10,7 +10,11 @@ int main()
 {
 	auto client = std::make_shared<GameClient>(std::make_shared<NClientHandler>());
 
-	client->Connect("127.0.0.1", 7171);
+	GameConfig config;
+	config.host = "127.0.0.1";
+	config.port = 7171;
+
+	client->Connect(config);
 
 	while (!client->IsConnected())
 	{

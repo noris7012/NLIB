@@ -11,12 +11,9 @@ GameServer::GameServer(PGameServerHandler handler)
 {
 }
 
-bool GameServer::Listen(uint32_t port)
+bool GameServer::Listen(GameConfig& config)
 {
 	// TODO Check State
-	NetworkConfig config;
-	config.transport_type = E_TRANSPORT_TYPE::UDP;
-	config.port = port;
 
 	assert(config.host == nullptr);
 

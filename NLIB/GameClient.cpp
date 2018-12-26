@@ -45,9 +45,9 @@ GameClient::GameClient(PGameClientHandler handler)
 	);
 }
 
-bool GameClient::Connect(const char* host, unsigned short port)
+bool GameClient::Connect(GameConfig& config)
 {
-	return _network_client->Connect(host, port);
+	return _network_client->Connect(config);
 }
 
 bool GameClient::IsConnected()

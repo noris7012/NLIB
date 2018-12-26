@@ -20,7 +20,10 @@ int main()
 
 	GameServer server(std::make_shared<NServerHandler>());
 
-	server.Listen(7171);
+	GameConfig config;
+	config.port = 7171;
+
+	server.Listen(config);
 
 	while (true)
 	{
