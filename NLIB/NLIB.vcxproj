@@ -162,7 +162,6 @@
     <ClInclude Include="ReliablePacket.h" />
     <ClInclude Include="ReliableLayer.h" />
     <ClInclude Include="SessionState.h" />
-    <ClInclude Include="TransportLayer.h" />
     <ClInclude Include="Utility.h" />
   </ItemGroup>
   <ItemGroup>
@@ -185,7 +184,6 @@
     <ClCompile Include="ReliablePacket.cpp" />
     <ClCompile Include="ReliableLayer.cpp" />
     <ClCompile Include="SessionState.cpp" />
-    <ClCompile Include="TransportLayer.cpp" />
     <ClCompile Include="Utility.cpp" />
   </ItemGroup>
   <ItemGroup>
