@@ -1,6 +1,7 @@
 #include "ReliableLayer.h"
 #include "ReliablePacket.h"
 #include "Utility.h"
+#include "Logger.h"
 
 ReliableLayer::ReliableLayer(GameEndpoint* endpoint)
 	: _endpoint(endpoint)
@@ -10,48 +11,59 @@ ReliableLayer::ReliableLayer(GameEndpoint* endpoint)
 void ReliableLayer::Read(UNLIBData data)
 {
 	ByteStream stream(const_cast<byte*>(data->bytes), data->length);
-	ReliablePacket* packet = new ReliablePacket();
-	auto rc = packet->Read(stream);
+	ReliablePacket* packet = ReliablePacket::Deserialize(stream);
 
-	if (rc != E_READ_RESULT::SUCCESS)
+	assert(packet != nullptr);
+	if (packet == nullptr)
 		return;
 
-	auto ack_sequence_number = packet->GetAckSequenceNumber();
-	auto ack_bitfield = packet->GetAckBitfield();
-
-	for (int i = 0; i < 32; ++i)
+	if (packet->GetID() == E_PACKET_ID::RELIABLE_PAYLOAD)
 	{
-		if (ack_bitfield & 1)
-		{
-			auto send_packet = GetSendBuffer(ack_sequence_number - i);
+		auto payload = static_cast<ReliablePacketPayload*>(packet);
 
-			if (send_packet != nullptr && !send_packet->IsAcked())
-			{
-				float rtt = ( Utility::GetTime() - send_packet->GetSendTime() ) / 1000.0f;
-				assert(rtt >= 0.0);
+		SetRecvBuffer(payload->GetSequenceNumber(), payload);
+		_ack_sequence_number = payload->GetSequenceNumber();
 
-				_endpoint->UpdateRTT(rtt);
-
-				send_packet->Acked();
-			}
-		}
-
-		ack_bitfield >>= 1;
+		ReadNext(payload->GetData());
 	}
+	else if (packet->GetID() == E_PACKET_ID::RELIABLE_ACK)
+	{
+		auto ack = static_cast<ReliablePacketAck*>(packet);
 
-	SetRecvBuffer(packet->GetSequenceNumber(), packet);
-	_ack_sequence_number = packet->GetSequenceNumber();
+		auto ack_sequence_number = ack->GetAckSequenceNumber();
+		auto ack_bitfield = ack->GetAckBitfield();
 
-	ReadNext(packet->GetData());	
+		for (int i = 0; i < 32; ++i)
+		{
+			if (ack_bitfield & 1)
+			{
+				auto sequence_number = ack_sequence_number - i;
+				auto send_packet = GetSendBuffer(sequence_number);
+
+				if (send_packet != nullptr && !send_packet->IsAcked())
+				{
+					float rtt = (Utility::GetTime() - send_packet->GetSendTime()) / 1000.0f;
+					assert(rtt >= 0.0);
+
+					_endpoint->UpdateRTT(rtt);
+
+					send_packet->Acked();
+				}
+			}
+
+			ack_bitfield >>= 1;
+		}
+	}
+	else
+	{
+		assert(false);
+	}
 }
 
 void ReliableLayer::Write(UNLIBData data)
 {
-	GenerateAck();
-
-	ReliablePacket* packet = new ReliablePacket();
-	packet->Set(_sequence_number++, _ack_sequence_number, _ack_bitfield);
-
+	auto packet = new ReliablePacketPayload();
+	packet->Set(_sequence_number++);
 	auto header = packet->GetHeader();
 
 	SetSendBuffer(packet->GetSequenceNumber(), packet);
@@ -64,7 +76,28 @@ void ReliableLayer::Write(UNLIBData data)
 	WriteNext(std::move(new_data));
 }
 
-ReliablePacket* ReliableLayer::GetSendBuffer(uint32_t sequence_number)
+
+void ReliableLayer::Update(uint64_t time)
+{
+	if (_last_ack_sequence_number != _ack_sequence_number)
+	{
+		_last_ack_sequence_number = _ack_sequence_number;
+
+		GenerateAck();
+
+		ReliablePacketAck packet;
+		packet.Set(_ack_sequence_number, _ack_bitfield);
+		auto header = packet.GetHeader();
+
+		auto new_data = NLIBData::Instance();
+		new_data->bytes = header.bytes;
+		new_data->length = header.length;
+
+		WriteNext(std::move(new_data));
+	}
+}
+
+ReliablePacketPayload* ReliableLayer::GetSendBuffer(uint32_t sequence_number)
 {
 	auto packet = _send_buffer[sequence_number % (sizeof(_send_buffer) / sizeof(*_send_buffer))];
 	if (packet != nullptr && packet->GetSequenceNumber() != sequence_number)
@@ -73,7 +106,7 @@ ReliablePacket* ReliableLayer::GetSendBuffer(uint32_t sequence_number)
 	return packet;
 }
 
-void ReliableLayer::SetSendBuffer(uint32_t sequence_number, ReliablePacket* packet)
+void ReliableLayer::SetSendBuffer(uint32_t sequence_number, ReliablePacketPayload* packet)
 {
 	auto old_packet = _send_buffer[sequence_number % (sizeof(_send_buffer) / sizeof(*_send_buffer))];
 	if (old_packet != nullptr && !old_packet->IsAcked())
@@ -85,7 +118,7 @@ void ReliableLayer::SetSendBuffer(uint32_t sequence_number, ReliablePacket* pack
 	_send_buffer[sequence_number % (sizeof(_send_buffer) / sizeof(*_send_buffer))] = packet;
 }
 
-ReliablePacket* ReliableLayer::GetRecvBuffer(uint32_t sequence_number)
+ReliablePacketPayload* ReliableLayer::GetRecvBuffer(uint32_t sequence_number)
 {
 	auto packet = _recv_buffer[sequence_number % (sizeof(_recv_buffer) / sizeof(*_recv_buffer))];
 	if (packet != nullptr && packet->GetSequenceNumber() != sequence_number)
@@ -94,7 +127,7 @@ ReliablePacket* ReliableLayer::GetRecvBuffer(uint32_t sequence_number)
 	return packet;
 }
 
-void ReliableLayer::SetRecvBuffer(uint32_t sequence_number, ReliablePacket* packet)
+void ReliableLayer::SetRecvBuffer(uint32_t sequence_number, ReliablePacketPayload* packet)
 {
 	auto old_packet = _recv_buffer[sequence_number % (sizeof(_recv_buffer) / sizeof(*_recv_buffer))];
 	if (old_packet != nullptr)

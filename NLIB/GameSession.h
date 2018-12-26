@@ -25,7 +25,7 @@ public:
 
 	void Read(UNLIBData data) override;
 	void Write(UNLIBData data) override;
-	void Update(uint64_t time);
+	void Update(uint64_t time) override;
 
 private:
 	std::shared_ptr<GameServerHandler> _handler;

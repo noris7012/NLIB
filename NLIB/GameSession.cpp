@@ -69,6 +69,7 @@ void GameSession::Write(UNLIBData data)
 void GameSession::Update(uint64_t time)
 {
 	_network_session->Update(time);
+	_reliable_session->Update(time);
 }
 
 void GameSession::WritePacket(const byte* bytes, uint32_t length)

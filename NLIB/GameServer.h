@@ -24,10 +24,10 @@ public:
 	bool Listen(uint32_t port);
 
 public:
-	void Update(uint64_t time);
+	void Update(uint64_t time) override;
 	void Send(NLIBAddress& address, ProtocolPacket& packet);
 	void Send(NLIBAddress& address, UNLIBData data);
-	void HandleReceive(NLIBRecv* recv);
+	void HandleReceive(NLIBRecv* recv) override;
 
 private:
 	void HandleConnectionRequest(ProtocolPacket*, NLIBRecv*);

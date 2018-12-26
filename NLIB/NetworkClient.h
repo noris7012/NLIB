@@ -10,13 +10,15 @@
 #include "ClientState.h"
 #include "ProtocolPacket.h"
 #include "NetworkLayer.h"
+#include "GameEndpoint.h"
 
+class GameEndpoint;
 class ClientState;
 
 class NetworkClient : public NetworkEndpoint, public NetworkLayer
 {
 public:
-	NetworkClient();
+	NetworkClient(GameEndpoint* endpoint);
 	~NetworkClient();
 
 	bool Connect(const char* host, unsigned short port);
@@ -44,6 +46,7 @@ public:
 	void SetClientID(uint32_t client_id) { _client_id = client_id; };
 
 private:
+	GameEndpoint* _endpoint;
 	NLIBAddress _address;
 	ClientState* _state;
 	std::map<E_CLIENT_STATE_ID, ClientState*> _state_map;

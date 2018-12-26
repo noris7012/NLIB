@@ -149,6 +149,7 @@
     <ClInclude Include="GamePacket.h" />
     <ClInclude Include="GameServerHandler.h" />
     <ClInclude Include="GameSession.h" />
+    <ClInclude Include="Logger.h" />
     <ClInclude Include="NetworkClient.h" />
     <ClInclude Include="NetworkConfig.h" />
     <ClInclude Include="NetworkDefine.h" />
@@ -174,6 +175,7 @@
     <ClCompile Include="GameEndpoint.cpp" />
     <ClCompile Include="GamePacket.cpp" />
     <ClCompile Include="GameSession.cpp" />
+    <ClCompile Include="Logger.cpp" />
     <ClCompile Include="NetworkClient.cpp" />
     <ClCompile Include="NetworkEndpoint.cpp" />
     <ClCompile Include="GameServer.cpp" />
