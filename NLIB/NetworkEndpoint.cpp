@@ -215,10 +215,8 @@ void NetworkEndpoint::HandleReceive(const boost::system::error_code& error, std:
 		return;
 	}
 
-	if (_loss_mask != nullptr && !_loss_mask->at(_loss_index++))
+	if (_loss_mask != nullptr && !_loss_mask->at(_loss_index = (_loss_index + 1) % _loss_mask->size()))
 	{
-		_loss_index = _loss_index % _loss_mask->size();
-
 		std::stringstream stream;
 		stream << "[Loss] " << Utility::ByteToString(reinterpret_cast<const byte*>(_recv_buffer.data()), length);
 
