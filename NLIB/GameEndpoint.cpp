@@ -16,6 +16,5 @@ void GameEndpoint::UpdateRTT(float rtt)
 		_rtt += (rtt - _rtt) * 0.1f;
 	}
 
-	if (++cnt % 10 == 0)
-		std::cout << "[RTT] : " << _rtt << std::endl;
+	//std::cout << "[RTT] : " << _rtt << " , " << rtt << std::endl;
 }

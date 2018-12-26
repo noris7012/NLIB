@@ -39,6 +39,28 @@ uint32_t Utility::Rand32()
 	return gen();
 }
 
+byte* Utility::RandBytes(uint32_t length)
+{
+	static std::random_device rd;
+	static std::mt19937 gen(rd());
+
+	auto bytes = new byte[length];
+
+	int val = 0;
+
+	for (uint32_t i = 0; i < length; ++i)
+	{
+		if (i % 4 == 0)
+		{
+			val = gen();
+		}
+
+		bytes[i] = byte(val >> 8 * i);
+	}
+
+	return bytes;
+}
+
 uint32_t Utility::IPToInt(const char* ip)
 {
 	uint32_t byte1, byte2, byte3, byte4;

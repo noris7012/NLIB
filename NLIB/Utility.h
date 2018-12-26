@@ -1,7 +1,7 @@
 #ifndef NLIB_UTILITY_H
 #define NLIB_UTILITY_H
 
-#include <stdint.h>
+#include <cstdint>
 #include <string>
 
 #include "NetworkDefine.h"
@@ -13,6 +13,7 @@ public:
 	static std::string ByteToString(const byte* data, uint32_t length);
 	static uint64_t Rand64();
 	static uint32_t Rand32();
+	static byte* RandBytes(uint32_t length);
 	static uint32_t IPToInt(const char* ip);
 	static std::string TimeInHHMMSSMMM();
 };

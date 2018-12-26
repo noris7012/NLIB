@@ -11,7 +11,7 @@ NetworkSession::NetworkSession(GameServer* server, uint64_t challenge_token_sequ
 	std::cout << "[NetworkSession]" << std::endl;
 
 	// TODO challenge_token_encrypted 진짜 암호화하기
-	_challenge_token_encrypted = new byte[NLIB_CHALLENGE_TOKEN_ENCRYPTED_LENGTH];
+	_challenge_token_encrypted = Utility::RandBytes(NLIB_CHALLENGE_TOKEN_ENCRYPTED_LENGTH);
 	_created_time = Utility::GetTime();
 
 #define STATE_CREATE(id) ( _state_map[E_SESSION_STATE_ID::id] = SessionState::Create(E_SESSION_STATE_ID::id, this) )

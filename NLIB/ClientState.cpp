@@ -1,7 +1,7 @@
 #include "ClientState.h"
 
 #include <iostream>
-#include <assert.h>
+#include <cassert>
 
 #include "Utility.h"
 #include "ByteStream.h"
