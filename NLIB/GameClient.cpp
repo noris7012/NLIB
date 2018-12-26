@@ -8,7 +8,7 @@
 GameClient::GameClient(PGameClientHandler handler)
 	: _handler(handler)
 {
-	_network_client = new NetworkClient();
+	_network_client = new NetworkClient(this);
 	_reliable_layer = new ReliableLayer(this);
 
 	_network_client->SetReadNext(
@@ -58,6 +58,13 @@ bool GameClient::IsConnected()
 void GameClient::Disconnect()
 {
 	_network_client->Disconnect();
+}
+
+
+void GameClient::Update(uint64_t time)
+{
+	// Network Client 의 Thread 가 호출해주므로 _network_client->Update() 를 호출하면 무한 재귀
+	_reliable_layer->Update(time);
 }
 
 void GameClient::Read(UNLIBData data)

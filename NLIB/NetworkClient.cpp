@@ -4,8 +4,11 @@
 
 #include "Utility.h"
 
-NetworkClient::NetworkClient()
-	: _state(nullptr), _state_map(), _state_transition_table()
+NetworkClient::NetworkClient(GameEndpoint* endpoint)
+	: _endpoint(endpoint)
+	, _state(nullptr)
+	, _state_map()
+	, _state_transition_table()
 {
 
 #define STATE_CREATE(id) ( _state_map[E_CLIENT_STATE_ID::id] = ClientState::create(E_CLIENT_STATE_ID::id, this) )
@@ -73,6 +76,8 @@ void NetworkClient::Update(uint64_t time)
 	{
 		_state->Update(time);
 	}
+
+	_endpoint->Update(time);
 }
 
 void NetworkClient::HandleReceive(NLIBRecv* recv)

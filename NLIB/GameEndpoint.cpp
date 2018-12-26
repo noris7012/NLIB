@@ -1,6 +1,10 @@
 #include "GameEndpoint.h"
+
 #include <cassert>
 #include <iostream>
+#include <sstream>
+#include "Utility.h"
+#include "Logger.h"
 
 void GameEndpoint::UpdateRTT(float rtt)
 {
@@ -16,5 +20,8 @@ void GameEndpoint::UpdateRTT(float rtt)
 		_rtt += (rtt - _rtt) * 0.1f;
 	}
 
-	//std::cout << "[RTT] : " << _rtt << " , " << rtt << std::endl;
+	std::stringstream stream;
+	stream << "[RTT] : " << _rtt << " , " << rtt;
+
+	Logger::GetInstance()->Log(stream.str());
 }

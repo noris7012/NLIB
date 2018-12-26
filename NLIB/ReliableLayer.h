@@ -20,12 +20,13 @@ public:
 public:
 	void Read(UNLIBData data) override;
 	void Write(UNLIBData data) override;
+	void Update(uint64_t time);
 
-	ReliablePacket* GetSendBuffer(uint32_t sequence_number);
-	void SetSendBuffer(uint32_t sequence_number, ReliablePacket* packet);
+	ReliablePacketPayload* GetSendBuffer(uint32_t sequence_number);
+	void SetSendBuffer(uint32_t sequence_number, ReliablePacketPayload* packet);
 
-	ReliablePacket* GetRecvBuffer(uint32_t sequence_number);
-	void SetRecvBuffer(uint32_t sequence_number, ReliablePacket* packet);
+	ReliablePacketPayload* GetRecvBuffer(uint32_t sequence_number);
+	void SetRecvBuffer(uint32_t sequence_number, ReliablePacketPayload* packet);
 
 	void GenerateAck();
 
@@ -35,8 +36,10 @@ private:
 	uint32_t _ack_sequence_number = 0;
 	uint32_t _ack_bitfield = 0;
 
-	ReliablePacket* _send_buffer[NLIB_RELIABLE_BUFFER_SIZE] = {};
-	ReliablePacket* _recv_buffer[NLIB_RELIABLE_BUFFER_SIZE] = {};
+	uint32_t _last_ack_sequence_number = 0;
+
+	ReliablePacketPayload* _send_buffer[NLIB_RELIABLE_BUFFER_SIZE] = {};
+	ReliablePacketPayload* _recv_buffer[NLIB_RELIABLE_BUFFER_SIZE] = {};
 };
 
 #endif

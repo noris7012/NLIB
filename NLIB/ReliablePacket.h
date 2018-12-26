@@ -11,33 +11,57 @@ class ByteStream;
 class ReliablePacket
 {
 public:
-	void Write(ByteStream& stream);
-	E_READ_RESULT Read(ByteStream& stream);
-	void Print();
+	static ReliablePacket* Deserialize(ByteStream& stream);
 
 public:
-	static uint32_t GetHeaderLength() { return sizeof(_sequence_number) + sizeof(_ack_sequence_number) + sizeof(_ack_bitfield); }
-	NLIBData GetHeader();
+	virtual E_PACKET_ID GetID() = 0;
+
+	virtual NLIBData GetHeader() = 0;
+	virtual E_READ_RESULT Read(ByteStream& stream) = 0;
+	virtual void Print() { };
+};
+
+class ReliablePacketPayload : public ReliablePacket
+{
+public:
+	E_PACKET_ID GetID() override { return E_PACKET_ID::RELIABLE_PAYLOAD; }
+	NLIBData GetHeader() override;
+	E_READ_RESULT Read(ByteStream& stream) override;
+
+public:
+	void Set(uint32_t sequence_number);
+	UNLIBData GetData();
+
 	uint32_t GetSequenceNumber() { return _sequence_number; }
 	void Acked() { _acked = true; }
 	bool IsAcked() { return _acked; }
-	uint32_t GetAckSequenceNumber() { return _ack_sequence_number; }
-	uint32_t GetAckBitfield() { return _ack_bitfield; }
 	uint64_t GetSendTime() { return _send_time; }
-
-public:
-	void Set(uint32_t sequence_number, uint32_t ack_sequence_number, uint32_t ack_bitfield);
-	void SetData(const byte* data, uint32_t data_length);
-	UNLIBData GetData();
+	void SetSendTime(uint64_t send_time) { _send_time = send_time; }
 
 private:
-	uint32_t _sequence_number = 1;
-	uint32_t _ack_sequence_number = 0;
-	uint32_t _ack_bitfield = 0;
-	uint64_t _send_time = 0;
 	const byte* _data = nullptr;
 	uint32_t _data_length = 0;
+
+	uint32_t _sequence_number = 0;
+	uint64_t _send_time = 0;
 	bool _acked = false;
+};
+
+class ReliablePacketAck : public ReliablePacket
+{
+public:
+	E_PACKET_ID GetID() override { return E_PACKET_ID::RELIABLE_ACK; }
+	NLIBData GetHeader() override;
+	E_READ_RESULT Read(ByteStream& stream) override;
+
+public:
+	void Set(uint32_t ack_sequence_number, uint32_t ack_bitfield);
+	uint32_t GetAckSequenceNumber() { return _ack_sequence_number; }
+	uint32_t GetAckBitfield() { return _ack_bitfield; }
+
+private:
+	uint32_t _ack_sequence_number = 0;
+	uint32_t _ack_bitfield = 0;
 };
 
 #endif

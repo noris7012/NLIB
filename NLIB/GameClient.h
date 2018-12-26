@@ -14,6 +14,7 @@ public:
 	bool IsConnected();
 	void Disconnect();
 
+	void Update(uint64_t time) override;
 	void Read(UNLIBData data) override;
 	void Write(UNLIBData data) override;
 	void WritePacket(const byte* bytes, uint32_t length);
