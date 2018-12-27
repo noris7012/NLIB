@@ -5,6 +5,7 @@
 #include <cstdint>
 
 #include "NetworkDefine.h"
+#include <string>
 
 class GamePacket
 {
@@ -14,6 +15,7 @@ public:
 public:
 	void Set(const byte* bytes, uint32_t length);
 	void Print();
+	std::string GetString();
 
 private:
 	const byte* _bytes;

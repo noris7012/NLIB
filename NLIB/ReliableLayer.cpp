@@ -5,6 +5,7 @@
 
 ReliableLayer::ReliableLayer(GameEndpoint* endpoint)
 	: _endpoint(endpoint)
+	, _sequence_number(1)
 {
 }
 
@@ -104,12 +105,17 @@ void ReliableLayer::Update(uint64_t time)
 			continue;
 
 		auto rtt = _endpoint->GetRTT();
-		if (rtt > 0 && time >= buffer->GetSendTime() + 2 * _endpoint->GetRTT() * 1000)
+		if (rtt > 0 && time >= buffer->GetSendTime() + uint64_t(2 * rtt * 1000))
 		{
+			std::stringstream ss;
+			ss << "[Null] " << time << " : " << buffer->GetSendTime() + uint64_t(2 * rtt * 1000) << " (rtt=" << rtt << ") (index=" << buffer->GetSequenceNumber() << ")";
+			Logger::GetInstance()->Log(ss.str());
+
 			buffer->Set(_sequence_number++);
 			auto header = buffer->GetHeader();
 
 			_send_buffer[i] = nullptr;
+			SetSendBuffer(buffer->GetSequenceNumber(), buffer);
 
 			auto new_data = NLIBData::Instance();
 			new_data->bytes = header.bytes;

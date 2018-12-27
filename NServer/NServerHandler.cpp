@@ -5,6 +5,7 @@
 #include "GamePacket.h"
 #include "GameSession.h"
 #include "Utility.h"
+#include "Logger.h"
 
 void NServerHandler::HandleConnected(PGameSession session)
 {
@@ -18,7 +19,10 @@ void NServerHandler::HandlePacket(PGameSession session, PGamePacket packet)
 
 	packet->Print();
 #endif
+
 	session->WritePacket(reinterpret_cast<const byte*>("test"), 5);
+
+	Logger::GetInstance()->Log(packet->GetString());
 }
 
 void NServerHandler::HandleDisconnected(PGameSession session)

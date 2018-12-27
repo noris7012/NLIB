@@ -32,14 +32,14 @@ public:
 
 private:
 	GameEndpoint* _endpoint;
-	uint32_t _sequence_number = 0;
-	uint32_t _ack_sequence_number = 0;
-	uint32_t _ack_bitfield = 0;
+	uint32_t _sequence_number;
+	uint32_t _ack_sequence_number;
+	uint32_t _ack_bitfield;
 
-	uint32_t _last_ack_sequence_number = 0;
+	uint32_t _last_ack_sequence_number;
 
-	ReliablePacketPayload* _send_buffer[NLIB_RELIABLE_BUFFER_SIZE] = {};
-	ReliablePacketPayload* _recv_buffer[NLIB_RELIABLE_BUFFER_SIZE] = {};
+	ReliablePacketPayload* _send_buffer[NLIB_RELIABLE_BUFFER_SIZE];
+	ReliablePacketPayload* _recv_buffer[NLIB_RELIABLE_BUFFER_SIZE];
 };
 
 #endif

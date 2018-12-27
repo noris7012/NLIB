@@ -25,25 +25,25 @@ int main()
 
 	for (int i = 0; i < 1; ++i)
 	{
-		client->WritePacket((const byte*)"123", 4);
+		client->WritePacket((const byte*)"data01", 7);
 		std::this_thread::sleep_for(std::chrono::milliseconds(100));
-		client->WritePacket((const byte*)"123", 4);
+		client->WritePacket((const byte*)"data02", 7);
 		std::this_thread::sleep_for(std::chrono::milliseconds(100));
-		client->WritePacket((const byte*)"123456789", 10);
+		client->WritePacket((const byte*)"data03", 7);
 		std::this_thread::sleep_for(std::chrono::milliseconds(100));
-		client->WritePacket((const byte*)"987656789", 10);
+		client->WritePacket((const byte*)"data04", 7);
 		std::this_thread::sleep_for(std::chrono::milliseconds(100));
-		client->WritePacket((const byte*)"123", 4);
+		client->WritePacket((const byte*)"data05", 7);
 		std::this_thread::sleep_for(std::chrono::milliseconds(100));
-		client->WritePacket((const byte*)"123456789", 10);
+		client->WritePacket((const byte*)"data06", 7);
 		std::this_thread::sleep_for(std::chrono::milliseconds(100));
-		client->WritePacket((const byte*)"987656789", 10);
+		client->WritePacket((const byte*)"data07", 7);
 		std::this_thread::sleep_for(std::chrono::milliseconds(100));
-		client->WritePacket((const byte*)"123", 4);
+		client->WritePacket((const byte*)"data08", 7);
 		std::this_thread::sleep_for(std::chrono::milliseconds(100));
-		client->WritePacket((const byte*)"123456789", 10);
+		client->WritePacket((const byte*)"data09", 7);
 		std::this_thread::sleep_for(std::chrono::milliseconds(100));
-		client->WritePacket((const byte*)"987656789", 10);
+		client->WritePacket((const byte*)"data10", 7);
 		std::this_thread::sleep_for(std::chrono::milliseconds(100));		
 	}
 

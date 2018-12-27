@@ -18,3 +18,8 @@ void GamePacket::Print()
 
 	std::cout << "[GamePacket] " << str.c_str() << std::endl;
 }
+
+std::string GamePacket::GetString()
+{
+	return std::string(reinterpret_cast<const char*>(_bytes), _length);
+}
