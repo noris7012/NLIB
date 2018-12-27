@@ -25,7 +25,7 @@ int main()
 
 	GameConfig config;
 	config.port = 7171;
-	config.loss_mask = loss_mask;
+	//config.loss_mask = loss_mask;
 
 	server.Listen(config);
 

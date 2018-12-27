@@ -22,6 +22,11 @@ void ReliableLayer::Read(PNLIBData data)
 	{
 		auto payload = static_cast<ReliablePacketPayload*>(packet);
 
+		// Ignoring Duplicated Packet
+		auto old_packet = GetRecvBuffer(payload->GetSequenceNumber());
+		if (old_packet != nullptr && old_packet->GetSequenceNumber() == payload->GetSequenceNumber())
+			return;
+
 		SetRecvBuffer(payload->GetSequenceNumber(), payload);
 		_ack_sequence_number = payload->GetSequenceNumber();
 
@@ -75,6 +80,7 @@ void ReliableLayer::Write(PNLIBData data)
 	new_data->length = header.length;
 	new_data->next = data;
 
+	WriteNext(new_data);
 	WriteNext(new_data);
 }
 
