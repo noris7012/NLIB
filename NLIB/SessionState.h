@@ -21,7 +21,7 @@ public:
 	virtual void Update(uint64_t time) { };
 	virtual void OnExit() { };
 	virtual void RecvPacket(ProtocolPacket* packet) { };
-	virtual void Write(PNLIBData data) { };
+	virtual void Write(PNLIBData) { };
 
 protected:
 	NetworkSession* _session;
@@ -30,24 +30,32 @@ protected:
 class SessionStateInit : public SessionState
 {
 public:
-	E_SESSION_STATE_ID GetID() { return E_SESSION_STATE_ID::INIT; }
+	E_SESSION_STATE_ID GetID() override  { return E_SESSION_STATE_ID::INIT; }
+	void OnEnter() override;
 };
 
 class SessionStateDisconnected : public SessionState
 {
 public:
-	E_SESSION_STATE_ID GetID() { return E_SESSION_STATE_ID::DISCONNECTED; }
-	void OnEnter();
-	void Update(uint64_t time);
+	E_SESSION_STATE_ID GetID() override { return E_SESSION_STATE_ID::DISCONNECTED; }
+	void OnEnter() override;
+	void Update(uint64_t time) override;
+	void OnExit() override;
+	void RecvPacket(ProtocolPacket* packet) override;
+
+private:
+	uint64_t _send_request_time;
+	uint64_t _next_request_interval;
+	uint64_t _limit_request_time;
 };
 
 class SessionStateSendingConnectionChallenge : public SessionState
 {
 public:
-	E_SESSION_STATE_ID GetID() { return E_SESSION_STATE_ID::SENDING_CONNECTION_CHALLENGE; }
-	void OnEnter();
-	void Update(uint64_t time);
-	void RecvPacket(ProtocolPacket* packet);
+	E_SESSION_STATE_ID GetID() override  { return E_SESSION_STATE_ID::SENDING_CONNECTION_CHALLENGE; }
+	void OnEnter() override;
+	void Update(uint64_t time) override;
+	void RecvPacket(ProtocolPacket* packet) override;
 
 private:
 	uint64_t _send_request_time;
@@ -58,10 +66,10 @@ private:
 class SessionStateConnected : public SessionState
 {
 public:
-	E_SESSION_STATE_ID GetID() { return E_SESSION_STATE_ID::CONNECTED; }
-	void OnEnter();
-	void Update(uint64_t time);
-	void RecvPacket(ProtocolPacket* packet);
+	E_SESSION_STATE_ID GetID() override { return E_SESSION_STATE_ID::CONNECTED; }
+	void OnEnter() override;
+	void Update(uint64_t time) override;
+	void RecvPacket(ProtocolPacket* packet) override;
 	void Write(PNLIBData data) override;
 
 private:

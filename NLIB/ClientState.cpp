@@ -43,6 +43,11 @@ void ClientState::SetClient(NetworkClient* client)
 	_client = client;
 }
 
+void ClientStateInit::OnEnter()
+{
+	Logger::GetInstance()->Log("--------------------- Init ---------------------");
+}
+
 void ClientStateDisconnected::OnEnter()
 {
 	Logger::GetInstance()->Log("--------------------- Disconnected ---------------------");
@@ -72,6 +77,14 @@ void ClientStateDisconnected::Update(uint64_t time)
 
 void ClientStateDisconnected::OnExit()
 {
+}
+
+void ClientStateDisconnected::RecvPacket(ProtocolPacket* packet)
+{
+	// if (packet->GetID() == E_PACKET_ID::CONNECTION_DISCONNECT)
+	// {
+	// 	_client->SetState(E_CLIENT_STATE_ID::INIT);
+	// }
 }
 
 void ClientStateSendingConnectionRequest::OnEnter()
@@ -190,6 +203,10 @@ void ClientStateConnected::RecvPacket(ProtocolPacket* p)
 		auto packet = static_cast<ProtocolPacketConnectionPayload*>(p);
 
 		_client->ReadNext(packet->GetPayload());
+	}
+	else if (p->GetID() == E_PACKET_ID::CONNECTION_DISCONNECT)
+	{
+		_client->SetState(E_CLIENT_STATE_ID::DISCONNECTED);
 	}
 }
 

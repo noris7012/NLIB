@@ -64,7 +64,10 @@ void GameClient::Disconnect()
 void GameClient::Update(uint64_t time)
 {
 	// Network Client 의 Thread 가 호출해주므로 _network_client->Update() 를 호출하면 무한 재귀
-	_reliable_layer->Update(time);
+
+	// TODO 여기서 처리하는게 맞을지..
+	if (IsConnected())
+		_reliable_layer->Update(time);
 }
 
 void GameClient::Read(PNLIBData data)

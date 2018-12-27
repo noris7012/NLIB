@@ -21,5 +21,5 @@ void GamePacket::Print()
 
 std::string GamePacket::GetString()
 {
-	return std::string(reinterpret_cast<const char*>(_bytes), _length);
+	return std::string(reinterpret_cast<const char*>(_bytes), _length - 1);
 }

@@ -22,6 +22,20 @@ void NServerHandler::HandlePacket(PGameSession session, PGamePacket packet)
 
 	session->WritePacket(reinterpret_cast<const byte*>("test"), 5);
 
+	std::string str("data07");
+
+	std::stringstream ss;
+	ss << "[Comp] " << str << " , " << packet->GetString() << " = " << str.compare(packet->GetString());
+
+	Logger::GetInstance()->Log(ss.str());
+
+	if (str.compare(packet->GetString()) == 0)
+	{
+		Logger::GetInstance()->Log("Quit");
+		session->Close();
+		return;
+	}
+
 	Logger::GetInstance()->Log(packet->GetString());
 }
 

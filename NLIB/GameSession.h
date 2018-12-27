@@ -26,6 +26,9 @@ public:
 	void Read(PNLIBData data) override;
 	void Write(PNLIBData data) override;
 	void Update(uint64_t time) override;
+	bool IsConnected();
+
+	void Close();
 
 private:
 	std::shared_ptr<GameServerHandler> _handler;

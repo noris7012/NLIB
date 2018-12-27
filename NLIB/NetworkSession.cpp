@@ -15,8 +15,10 @@ NetworkSession::NetworkSession(GameServer* server, uint64_t challenge_token_sequ
 #define STATE_CREATE(id) ( _state_map[E_SESSION_STATE_ID::id] = SessionState::Create(E_SESSION_STATE_ID::id, this) )
 #define TRANSITION_CREATE(id, ...) ( _state_transition_table[E_SESSION_STATE_ID::id] = new std::vector<E_SESSION_STATE_ID>{ ##__VA_ARGS__ } )
 
+	STATE_CREATE(INIT);
+
 	STATE_CREATE(DISCONNECTED);
-	TRANSITION_CREATE(DISCONNECTED, E_SESSION_STATE_ID::SENDING_CONNECTION_CHALLENGE);
+	TRANSITION_CREATE(DISCONNECTED, E_SESSION_STATE_ID::SENDING_CONNECTION_CHALLENGE, E_SESSION_STATE_ID::INIT);
 
 	STATE_CREATE(SENDING_CONNECTION_CHALLENGE);
 	TRANSITION_CREATE(SENDING_CONNECTION_CHALLENGE, E_SESSION_STATE_ID::DISCONNECTED, E_SESSION_STATE_ID::CONNECTED);
@@ -77,12 +79,23 @@ void NetworkSession::OnDisconnected()
 	_server->OnDisconnected(this);
 }
 
+void NetworkSession::Close()
+{
+	SetState(E_SESSION_STATE_ID::DISCONNECTED);
+}
+
+bool NetworkSession::IsConnected()
+{
+	assert(_state != nullptr);
+	return _state->GetID() == E_SESSION_STATE_ID::CONNECTED;
+}
+
 bool NetworkSession::SetState(E_SESSION_STATE_ID state_id)
 {
 	if (_state == nullptr)
 	{
+		_state_map[state_id]->OnEnter();
 		_state = _state_map[state_id];
-		_state->OnEnter();
 		return true;
 	}
 	else
@@ -93,8 +106,8 @@ bool NetworkSession::SetState(E_SESSION_STATE_ID state_id)
 			if (*it == state_id)
 			{
 				_state->OnExit();
+				_state_map[state_id]->OnEnter();
 				_state = _state_map[state_id];
-				_state->OnEnter();
 				return true;
 			}
 		}

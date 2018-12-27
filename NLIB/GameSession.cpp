@@ -69,7 +69,20 @@ void GameSession::Write(PNLIBData data)
 void GameSession::Update(uint64_t time)
 {
 	_network_session->Update(time);
-	_reliable_session->Update(time);
+
+	// TODO 여기서 처리하는게 맞을지..
+	if (IsConnected())
+		_reliable_session->Update(time);
+}
+
+bool GameSession::IsConnected()
+{
+	return _network_session->IsConnected();
+}
+
+void GameSession::Close()
+{
+	_network_session->Close();
 }
 
 void GameSession::WritePacket(const byte* bytes, uint32_t length)

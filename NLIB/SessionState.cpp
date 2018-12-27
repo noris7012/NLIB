@@ -38,18 +38,49 @@ void SessionState::SetSession(NetworkSession* session)
 	_session = session;
 }
 
+void SessionStateInit::OnEnter()
+{
+	Logger::GetInstance()->Log("------------------------ Init ------------------------ ");
+}
+
 void SessionStateDisconnected::OnEnter()
 {
 	Logger::GetInstance()->Log("-------------------- Disconnected -------------------- ");
 #ifdef NLIB_LOG_ENABLED
 #endif // NLIB_LOG_ENABLED
 
-	_session->OnDisconnected();
+	_send_request_time = Utility::GetTime();
+	_next_request_interval = 1000;
+	_limit_request_time = _send_request_time + NLIB_CONNECT_TIMEOUT;
 }
 
 void SessionStateDisconnected::Update(uint64_t time)
 {
+	if (time >= _limit_request_time)
+	{
+		_session->SetState(E_SESSION_STATE_ID::INIT);
+	}
+	else if (time >= _send_request_time)
+	{
+		_send_request_time += _next_request_interval;
 
+		ProtocolPacketConnectionDisconnect packet;
+		packet.Set(_session->GetClientID());
+		_session->Send(packet);
+	}
+}
+
+void SessionStateDisconnected::OnExit()
+{
+	_session->OnDisconnected();
+}
+
+void SessionStateDisconnected::RecvPacket(ProtocolPacket* packet)
+{
+	if (packet->GetID() == E_PACKET_ID::CONNECTION_DISCONNECT)
+	{
+		_session->SetState(E_SESSION_STATE_ID::INIT);
+	}
 }
 
 void SessionStateSendingConnectionChallenge::OnEnter() 
@@ -146,6 +177,10 @@ void SessionStateConnected::RecvPacket(ProtocolPacket* p)
 		auto packet = static_cast<ProtocolPacketConnectionPayload*>(p);
 
 		_session->ReadNext(packet->GetPayload());
+	}
+	else if (p->GetID() == E_PACKET_ID::CONNECTION_DISCONNECT)
+	{
+		_session->SetState(E_SESSION_STATE_ID::DISCONNECTED);
 	}
 }
 

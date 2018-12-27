@@ -31,6 +31,9 @@ public:
 	void OnConnected();
 	void OnDisconnected();
 
+	void Close();
+	bool IsConnected();
+
 public:
 	bool SetState(E_SESSION_STATE_ID state_id);
 	E_SESSION_STATE_ID GetStateID();

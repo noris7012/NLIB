@@ -81,7 +81,6 @@ void ReliableLayer::Write(PNLIBData data)
 	new_data->next = data;
 
 	WriteNext(new_data);
-	WriteNext(new_data);
 }
 
 

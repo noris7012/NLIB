@@ -29,16 +29,18 @@ protected:
 class ClientStateInit : public ClientState
 {
 public:
-	E_CLIENT_STATE_ID getID() { return E_CLIENT_STATE_ID::INIT; }
+	E_CLIENT_STATE_ID getID() override  { return E_CLIENT_STATE_ID::INIT; }
+	void OnEnter() override;
 };
 
 class ClientStateDisconnected : public ClientState
 {
 public:
-	E_CLIENT_STATE_ID getID() { return E_CLIENT_STATE_ID::DISCONNECTED; }
-	void OnEnter();
-	void Update(uint64_t time);
-	void OnExit();
+	E_CLIENT_STATE_ID getID() override  { return E_CLIENT_STATE_ID::DISCONNECTED; }
+	void OnEnter() override;
+	void Update(uint64_t time) override;
+	void OnExit() override;
+	void RecvPacket(ProtocolPacket* packet) override;
 
 private:
 	uint64_t _send_request_time;
@@ -49,10 +51,10 @@ private:
 class ClientStateSendingConnectionRequest : public ClientState
 {
 public:
-	E_CLIENT_STATE_ID getID() { return E_CLIENT_STATE_ID::SENDING_CONNECTION_REQUEST; }
-	void OnEnter();
-	void Update(uint64_t time);
-	void RecvPacket(ProtocolPacket* packet);
+	E_CLIENT_STATE_ID getID() override  { return E_CLIENT_STATE_ID::SENDING_CONNECTION_REQUEST; }
+	void OnEnter() override;
+	void Update(uint64_t time) override;
+	void RecvPacket(ProtocolPacket* packet) override;
 
 private:
 	uint64_t _send_request_time;
@@ -63,10 +65,10 @@ private:
 class ClientStateSendingConnectionResponse : public ClientState
 {
 public:
-	E_CLIENT_STATE_ID getID() { return E_CLIENT_STATE_ID::SENDING_CONNECTION_RESPONSE; }
-	void OnEnter();
-	void Update(uint64_t time);
-	void RecvPacket(ProtocolPacket* packet);
+	E_CLIENT_STATE_ID getID() override  { return E_CLIENT_STATE_ID::SENDING_CONNECTION_RESPONSE; }
+	void OnEnter() override;
+	void Update(uint64_t time) override;
+	void RecvPacket(ProtocolPacket* packet) override;
 
 private:
 	uint64_t _send_response_time;
@@ -77,10 +79,10 @@ private:
 class ClientStateConnected : public ClientState
 {
 public:
-	E_CLIENT_STATE_ID getID() { return E_CLIENT_STATE_ID::CONNECTED; }
-	void OnEnter();
-	void Update(uint64_t time);
-	void RecvPacket(ProtocolPacket* packet);
+	E_CLIENT_STATE_ID getID() override  { return E_CLIENT_STATE_ID::CONNECTED; }
+	void OnEnter() override;
+	void Update(uint64_t time) override;
+	void RecvPacket(ProtocolPacket* packet) override;
 	void Write(PNLIBData data) override;
 
 private:
