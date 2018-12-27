@@ -9,18 +9,18 @@
 class NetworkLayer
 {
 public:
-	void ReadNext(UNLIBData data);
-	void WriteNext(UNLIBData data);
+	void ReadNext(PNLIBData data);
+	void WriteNext(PNLIBData data);
 
-	void SetReadNext(std::function<void(UNLIBData)> func);
-	void SetWriteNext(std::function<void(UNLIBData)> func);
+	void SetReadNext(std::function<void(PNLIBData)> func);
+	void SetWriteNext(std::function<void(PNLIBData)> func);
 
-	virtual void Write(UNLIBData data) { assert(false); }
-	virtual void Read(UNLIBData data) { assert(false); }
+	virtual void Write(PNLIBData data) { assert(false); }
+	virtual void Read(PNLIBData data) { assert(false); }
 
 private:
-	std::function<void(UNLIBData)> _read_next = nullptr;
-	std::function<void(UNLIBData)> _write_next = nullptr;
+	std::function<void(PNLIBData)> _read_next = nullptr;
+	std::function<void(PNLIBData)> _write_next = nullptr;
 };
 
 #endif

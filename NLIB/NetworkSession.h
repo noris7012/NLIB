@@ -24,7 +24,7 @@ public:
 public:
 	void Update(uint64_t time);
 	void Send(ProtocolPacket& packet);
-	void Send(UNLIBData data);
+	void Send(PNLIBData data);
 	void RecvPacket(ProtocolPacket* packet);
 	//void ProcessReceive(NLIBRecv* data);
 
@@ -50,7 +50,7 @@ public:
 		_client_id = client_id; 
 	}
 
-	void Write(UNLIBData data) override;
+	void Write(PNLIBData data) override;
 
 private:
 	GameServer* _server;

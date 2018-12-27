@@ -113,7 +113,7 @@ class ProtocolPacketConnectionPayload : public ProtocolPacket
 	}
 
 	uint32_t GetClientID() override { return _client_index; }
-	UNLIBData GetPayload();
+	PNLIBData GetPayload();
 
 private:
 	uint32_t _client_index;

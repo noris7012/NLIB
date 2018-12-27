@@ -53,13 +53,18 @@ void ReliablePacketPayload::Set(uint32_t sequence_number)
 	_send_time = Utility::GetTime();
 }
 
-UNLIBData ReliablePacketPayload::GetData()
+PNLIBData ReliablePacketPayload::GetData()
 {
 	auto data = NLIBData::Instance();
 	data->bytes = _data;
 	data->length = _data_length;
 
 	return data;
+}
+
+void ReliablePacketPayload::SetSendData(PNLIBData send_data)
+{
+	_send_data = send_data;
 }
 
 NLIBData ReliablePacketAck::GetHeader()

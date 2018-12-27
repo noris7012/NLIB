@@ -47,9 +47,9 @@ void GameServer::Send(NLIBAddress& address, ProtocolPacket& packet)
 	_buffer_pool.Release(buffer);
 }
 
-void GameServer::Send(NLIBAddress& address, UNLIBData data)
+void GameServer::Send(NLIBAddress& address, PNLIBData data)
 {
-	NetworkEndpoint::Send(address, std::move(data));
+	NetworkEndpoint::Send(address, data);
 }
 
 void GameServer::HandleReceive(NLIBRecv* recv)

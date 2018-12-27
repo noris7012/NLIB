@@ -98,7 +98,7 @@ E_READ_RESULT ProtocolPacketConnectionRequest::Read(ByteStream& stream)
 
 void ProtocolPacketConnectionRequest::Print()
 {
-	std::cout << "Packet ID : Connection Request" << std::endl;
+	//std::cout << "Packet ID : Connection Request" << std::endl;
 }
 
 void ProtocolPacketConnectionDenied::Write(ByteStream& stream)
@@ -114,7 +114,7 @@ E_READ_RESULT ProtocolPacketConnectionDenied::Read(ByteStream& stream)
 
 void ProtocolPacketConnectionDenied::Print()
 {
-	std::cout << "Packet ID : Connection Denied" << std::endl;
+	//std::cout << "Packet ID : Connection Denied" << std::endl;
 }
 
 ProtocolPacketConnectionChallenge::~ProtocolPacketConnectionChallenge()
@@ -151,7 +151,7 @@ E_READ_RESULT ProtocolPacketConnectionChallenge::Read(ByteStream& stream)
 
 void ProtocolPacketConnectionChallenge::Print()
 {
-	std::cout << "Packet ID : Connection Challenge" << std::endl;
+	//std::cout << "Packet ID : Connection Challenge" << std::endl;
 }
 
 void ProtocolPacketConnectionResponse::Write(ByteStream& stream)
@@ -178,7 +178,7 @@ E_READ_RESULT ProtocolPacketConnectionResponse::Read(ByteStream& stream)
 
 void ProtocolPacketConnectionResponse::Print()
 {
-	std::cout << "Packet ID : Connection Response" << std::endl;
+	//std::cout << "Packet ID : Connection Response" << std::endl;
 }
 
 void ProtocolPacketConnectionKeepAlive::Write(ByteStream& stream)
@@ -225,7 +225,7 @@ void ProtocolPacketConnectionPayload::Print()
 	//std::cout << "Packet ID : Connection Payload" << std::endl;
 }
 
-UNLIBData ProtocolPacketConnectionPayload::GetPayload()
+PNLIBData ProtocolPacketConnectionPayload::GetPayload()
 {
 	auto data = NLIBData::Instance();
 	data->bytes = _payload;

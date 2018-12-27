@@ -3,9 +3,10 @@
 #include <boost/bind.hpp>
 #include <chrono>
 #include <cstdlib>
+#include <iostream>
+#include <algorithm>
 
 #include "Utility.h"
-#include <iostream>
 #include "Logger.h"
 
 using namespace boost::asio::ip;
@@ -134,10 +135,8 @@ void NetworkEndpoint::HandleReceive(char* data, std::size_t length, NLIBAddress&
 
 void NetworkEndpoint::Send(NLIBAddress& address, const byte* data, uint32_t length)
 {
-	std::cout << "[ Send ] " << Utility::ByteToString(data, length) << std::endl;
 #ifdef NLIB_LOG_ENABLED
-	//std::cout << "[ Send ] " << std::endl;
-	//std::cout << Utility::ByteToString(data, length) << std::endl;
+	std::cout << "[ Send ] " << Utility::ByteToString(data, length) << std::endl;
 #endif
 
 	_socket->async_send_to(
@@ -151,7 +150,7 @@ void NetworkEndpoint::Send(NLIBAddress& address, const byte* data, uint32_t leng
 	);
 }
 
-void NetworkEndpoint::Send(NLIBAddress& address, UNLIBData data)
+void NetworkEndpoint::Send(NLIBAddress& address, PNLIBData data)
 {
 	using namespace boost::asio;
 
@@ -215,15 +214,19 @@ void NetworkEndpoint::HandleReceive(const boost::system::error_code& error, std:
 		return;
 	}
 
+
 	if (_loss_mask != nullptr && !_loss_mask->at(_loss_index = (_loss_index + 1) % _loss_mask->size()))
 	{
 		std::stringstream stream;
-		stream << "[Loss] " << Utility::ByteToString(reinterpret_cast<const byte*>(_recv_buffer.data()), length);
-
+		stream << "[Loss] " << Utility::ByteToString(reinterpret_cast<const byte*>(_recv_buffer.data()), std::min(length, size_t(30)));
 		Logger::GetInstance()->Log(stream.str());
 	}
 	else
 	{
+		std::stringstream stream;
+		stream << "[Recv] " << Utility::ByteToString(reinterpret_cast<const byte*>(_recv_buffer.data()), std::min(length, size_t(30)));
+		Logger::GetInstance()->Log(stream.str());
+
 		NLIBAddress address;
 		address.ip_str = _remote_endpoint.address().to_v4().to_string();
 		address.ip = _remote_endpoint.address().to_v4().to_ulong();

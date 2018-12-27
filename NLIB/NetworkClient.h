@@ -31,8 +31,8 @@ public:
 
 public:
 	void Send(ProtocolPacket& packet);
-	void Send(UNLIBData data);
-	void Write(UNLIBData data) override;
+	void Send(PNLIBData data);
+	void Write(PNLIBData data) override;
 
 public:
 	bool SetState(E_CLIENT_STATE_ID state_id);

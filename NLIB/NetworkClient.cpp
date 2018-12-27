@@ -109,16 +109,16 @@ void NetworkClient::Send(ProtocolPacket& packet)
 	_buffer_pool.Release(buffer);
 }
 
-void NetworkClient::Send(UNLIBData data)
+void NetworkClient::Send(PNLIBData data)
 {
-	NetworkEndpoint::Send(_address, std::move(data));
+	NetworkEndpoint::Send(_address, data);
 }
 
-void NetworkClient::Write(UNLIBData data)
+void NetworkClient::Write(PNLIBData data)
 {
 	assert(_state != nullptr);
 
-	_state->Write(std::move(data));
+	_state->Write(data);
 }
 
 bool NetworkClient::SetState(E_CLIENT_STATE_ID state_id)

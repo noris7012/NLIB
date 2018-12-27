@@ -16,6 +16,7 @@ public:
 	static byte* RandBytes(uint32_t length);
 	static uint32_t IPToInt(const char* ip);
 	static std::string TimeInHHMMSSMMM();
+	static std::string TimeToString(uint64_t time);
 };
 
 #endif

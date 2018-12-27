@@ -59,14 +59,16 @@ struct NLIBData
 {
 	const byte* bytes = nullptr;
 	uint32_t length = 0;
-	std::unique_ptr<NLIBData> next = std::unique_ptr<NLIBData>(nullptr);
+	std::shared_ptr<NLIBData> next;
 
-	static std::unique_ptr<NLIBData> Instance()
+	static std::shared_ptr<NLIBData> Instance()
 	{
-		return std::make_unique<NLIBData>();
+		// TODO Delete bytes
+		return std::make_shared<NLIBData>();
 	}
 };
 
 using UNLIBData = std::unique_ptr<NLIBData>;
+using PNLIBData = std::shared_ptr<NLIBData>;
 
 #endif

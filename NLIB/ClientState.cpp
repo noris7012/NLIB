@@ -6,6 +6,7 @@
 #include "Utility.h"
 #include "ByteStream.h"
 #include "ProtocolPacket.h"
+#include "Logger.h"
 
 ClientState* ClientState::create(E_CLIENT_STATE_ID state_id, NetworkClient* client)
 {
@@ -44,8 +45,8 @@ void ClientState::SetClient(NetworkClient* client)
 
 void ClientStateDisconnected::OnEnter()
 {
+	Logger::GetInstance()->Log("--------------------- Disconnected ---------------------");
 #ifdef NLIB_LOG_ENABLED
-	std::cout << "[OnEnter] Disconnected" << std::endl;
 #endif // NLIB_LOG_ENABLED
 
 	_send_request_time = Utility::GetTime();
@@ -75,8 +76,8 @@ void ClientStateDisconnected::OnExit()
 
 void ClientStateSendingConnectionRequest::OnEnter()
 {
+	Logger::GetInstance()->Log("---------------- Sending Connection Request ----------------");
 #ifdef NLIB_LOG_ENABLED
-	std::cout << "[OnEnter] Sending Connection Request" << std::endl;
 #endif // NLIB_LOG_ENABLED
 
 	_send_request_time = Utility::GetTime();
@@ -109,9 +110,10 @@ void ClientStateSendingConnectionRequest::RecvPacket(ProtocolPacket* p)
 	{
 		ProtocolPacketConnectionChallenge* packet = static_cast<ProtocolPacketConnectionChallenge*>(p);
 
+#ifdef NLIB_LOG_ENABLED
 		std::cout << "[ Client Challenge Token ] " << std::endl;
 		std::cout << Utility::ByteToString(packet->GetChallengeTokenEncrypted(), NLIB_CHALLENGE_TOKEN_ENCRYPTED_LENGTH) << std::endl;
-
+#endif
 		_client->SetChallengeToken(packet->GetChallengeTokenSequence(), packet->GetChallengeTokenEncrypted());
 		_client->SetState(E_CLIENT_STATE_ID::SENDING_CONNECTION_RESPONSE);
 	}
@@ -119,8 +121,8 @@ void ClientStateSendingConnectionRequest::RecvPacket(ProtocolPacket* p)
 
 void ClientStateSendingConnectionResponse::OnEnter()
 {
+	Logger::GetInstance()->Log("---------------- Sending Connection Response ----------------");
 #ifdef NLIB_LOG_ENABLED
-	std::cout << "[OnEnter] Response" << std::endl;
 #endif // NLIB_LOG_ENABLED
 
 	_send_response_time = Utility::GetTime();
@@ -161,8 +163,8 @@ void ClientStateSendingConnectionResponse::RecvPacket(ProtocolPacket* p)
 
 void ClientStateConnected::OnEnter()
 {
+	Logger::GetInstance()->Log("--------------------- Connected ---------------------");
 #ifdef NLIB_LOG_ENABLED
-	std::cout << "[OnEnter] Connected" << std::endl;
 #endif // NLIB_LOG_ENABLED
 
 	_send_keep_alive_time = Utility::GetTime();
@@ -191,7 +193,7 @@ void ClientStateConnected::RecvPacket(ProtocolPacket* p)
 	}
 }
 
-void ClientStateConnected::Write(UNLIBData data)
+void ClientStateConnected::Write(PNLIBData data)
 {
 	_send_keep_alive_time = Utility::GetTime() + _next_keep_alive_interval;
 
@@ -205,8 +207,8 @@ void ClientStateConnected::Write(UNLIBData data)
 	auto new_data = NLIBData::Instance();
 	new_data->bytes = stream.Data();
 	new_data->length = stream.Length();
-	new_data->next = std::move(data);
+	new_data->next = data;
 
-	_client->Send(std::move(new_data));
+	_client->Send(new_data);
 }
 

@@ -8,7 +8,7 @@ ReliableLayer::ReliableLayer(GameEndpoint* endpoint)
 {
 }
 
-void ReliableLayer::Read(UNLIBData data)
+void ReliableLayer::Read(PNLIBData data)
 {
 	ByteStream stream(const_cast<byte*>(data->bytes), data->length);
 	ReliablePacket* packet = ReliablePacket::Deserialize(stream);
@@ -60,20 +60,21 @@ void ReliableLayer::Read(UNLIBData data)
 	}
 }
 
-void ReliableLayer::Write(UNLIBData data)
+void ReliableLayer::Write(PNLIBData data)
 {
 	auto packet = new ReliablePacketPayload();
 	packet->Set(_sequence_number++);
 	auto header = packet->GetHeader();
 
+	packet->SetSendData(data);
 	SetSendBuffer(packet->GetSequenceNumber(), packet);
 	
 	auto new_data = NLIBData::Instance();
 	new_data->bytes = header.bytes;
 	new_data->length = header.length;
-	new_data->next = std::move(data);
+	new_data->next = data;
 
-	WriteNext(std::move(new_data));
+	WriteNext(new_data);
 }
 
 
@@ -93,7 +94,30 @@ void ReliableLayer::Update(uint64_t time)
 		new_data->bytes = header.bytes;
 		new_data->length = header.length;
 
-		WriteNext(std::move(new_data));
+		WriteNext(new_data);
+	}
+
+	for (uint32_t i = 0; i < NLIB_RELIABLE_BUFFER_SIZE; ++i)
+	{
+		auto buffer = _send_buffer[i];
+		if (buffer == nullptr || buffer->IsAcked())
+			continue;
+
+		auto rtt = _endpoint->GetRTT();
+		if (rtt > 0 && time >= buffer->GetSendTime() + 2 * _endpoint->GetRTT() * 1000)
+		{
+			buffer->Set(_sequence_number++);
+			auto header = buffer->GetHeader();
+
+			_send_buffer[i] = nullptr;
+
+			auto new_data = NLIBData::Instance();
+			new_data->bytes = header.bytes;
+			new_data->length = header.length;
+			new_data->next = buffer->GetSendData();
+
+			WriteNext(new_data);
+		}
 	}
 }
 

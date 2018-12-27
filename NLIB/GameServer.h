@@ -27,7 +27,7 @@ public:
 public:
 	void Update(uint64_t time) override;
 	void Send(NLIBAddress& address, ProtocolPacket& packet);
-	void Send(NLIBAddress& address, UNLIBData data);
+	void Send(NLIBAddress& address, PNLIBData data);
 	void HandleReceive(NLIBRecv* recv) override;
 
 private:

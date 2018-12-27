@@ -27,7 +27,7 @@ public:
 	void Destroy();
 	void HandleReceive(char* data, std::size_t length, NLIBAddress& address);
 	void Send(NLIBAddress& address, const byte* data, uint32_t length);
-	void Send(NLIBAddress& address, UNLIBData data);
+	void Send(NLIBAddress& address, PNLIBData data);
 
 private:
 	void InternalUpdate(uint64_t time);

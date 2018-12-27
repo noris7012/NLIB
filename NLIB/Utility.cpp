@@ -4,6 +4,7 @@
 #include <sstream>
 #include <iomanip>
 #include <random>
+#include <ctime>
 
 uint64_t Utility::GetTime()
 {
@@ -100,6 +101,21 @@ std::string Utility::TimeInHHMMSSMMM()
 
 	oss << std::put_time(&bt, "%H:%M:%S"); // HH:MM:SS
 	oss << '.' << std::setfill('0') << std::setw(3) << ms.count();
+
+	return oss.str();
+}
+
+std::string Utility::TimeToString(uint64_t time)
+{
+	auto timer = time_t(time / 1000);
+
+	// convert to broken time
+	std::tm bt = *std::localtime(&timer);
+
+	std::ostringstream oss;
+
+	oss << std::put_time(&bt, "%H:%M:%S"); // HH:MM:SS
+	oss << '.' << std::setfill('0') << std::setw(3) << time % 1000;
 
 	return oss.str();
 }

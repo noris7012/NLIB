@@ -4,6 +4,7 @@
 
 #include "Utility.h"
 #include "ProtocolPacket.h"
+#include "Logger.h"
 
 SessionState* SessionState::Create(E_SESSION_STATE_ID state_id, NetworkSession* session)
 {
@@ -39,8 +40,8 @@ void SessionState::SetSession(NetworkSession* session)
 
 void SessionStateDisconnected::OnEnter()
 {
+	Logger::GetInstance()->Log("-------------------- Disconnected -------------------- ");
 #ifdef NLIB_LOG_ENABLED
-	std::cout << "[OnEnter] Disconnected" << std::endl;
 #endif // NLIB_LOG_ENABLED
 
 	_session->OnDisconnected();
@@ -53,8 +54,8 @@ void SessionStateDisconnected::Update(uint64_t time)
 
 void SessionStateSendingConnectionChallenge::OnEnter() 
 {
+	Logger::GetInstance()->Log("--------------- Sending Connection Challenge ---------------");
 #ifdef NLIB_LOG_ENABLED
-	std::cout << "[OnEnter] Sending Connection Challenge" << std::endl;
 #endif // NLIB_LOG_ENABLED
 
 	_send_request_time = Utility::GetTime();
@@ -72,9 +73,10 @@ void SessionStateSendingConnectionChallenge::Update(uint64_t time)
 	{
 		_send_request_time += _next_request_interval;
 
+#ifdef NLIB_LOG_ENABLED
 		std::cout << "[ Server Challenge Token ] " << std::endl;
 		std::cout << Utility::ByteToString(_session->GetChallengeTokenEncrypted(), NLIB_CHALLENGE_TOKEN_ENCRYPTED_LENGTH) << std::endl;
-
+#endif
 		ProtocolPacketConnectionChallenge packet;
 		packet.Set(_session->GetChallengeTokenSequence(), _session->GetChallengeTokenEncrypted());
 		_session->Send(packet);
@@ -103,8 +105,8 @@ void SessionStateSendingConnectionChallenge::RecvPacket(ProtocolPacket* p)
 
 void SessionStateConnected::OnEnter()
 {
+	Logger::GetInstance()->Log("-------------------- Connected --------------------");
 #ifdef NLIB_LOG_ENABLED
-	std::cout << "[OnEnter] Connected" << std::endl;
 #endif // NLIB_LOG_ENABLED
 
 	_send_keep_alive_time =	_last_recv_time = Utility::GetTime();
@@ -147,7 +149,7 @@ void SessionStateConnected::RecvPacket(ProtocolPacket* p)
 	}
 }
 
-void SessionStateConnected::Write(UNLIBData data)
+void SessionStateConnected::Write(PNLIBData data)
 {
 	ProtocolPacketConnectionPayload packet;
 	packet.Set(_session->GetClientID());
@@ -159,7 +161,7 @@ void SessionStateConnected::Write(UNLIBData data)
 	auto new_data = NLIBData::Instance();
 	new_data->bytes = stream.Data();
 	new_data->length = stream.Length();
-	new_data->next = std::move(data);
+	new_data->next = data;
 
-	_session->Send(std::move(new_data));
+	_session->Send(new_data);
 }

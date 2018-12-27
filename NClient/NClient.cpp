@@ -23,7 +23,7 @@ int main()
 
 	std::this_thread::sleep_for(std::chrono::milliseconds(3000));
 
-	for (int i = 0; i < 10; ++i)
+	for (int i = 0; i < 1; ++i)
 	{
 		client->WritePacket((const byte*)"123", 4);
 		std::this_thread::sleep_for(std::chrono::milliseconds(100));

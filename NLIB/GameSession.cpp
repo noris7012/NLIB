@@ -53,7 +53,7 @@ void GameSession::RecvPacket(ProtocolPacket* recv)
 	_network_session->RecvPacket(recv);
 }
 
-void GameSession::Read(UNLIBData data)
+void GameSession::Read(PNLIBData data)
 {
 	auto packet = GamePacket::Instance();
 	packet->Set(data->bytes, data->length);
@@ -61,9 +61,9 @@ void GameSession::Read(UNLIBData data)
 	_handler->HandlePacket(shared_from_this(), packet);
 }
 
-void GameSession::Write(UNLIBData data)
+void GameSession::Write(PNLIBData data)
 {
-	WriteNext(std::move(data));
+	WriteNext(data);
 }
 
 void GameSession::Update(uint64_t time)
@@ -74,9 +74,9 @@ void GameSession::Update(uint64_t time)
 
 void GameSession::WritePacket(const byte* bytes, uint32_t length)
 {
-	auto data = std::make_unique<NLIBData>();
+	auto data = NLIBData::Instance();
 	data->bytes = bytes;
 	data->length = length;
 
-	Write(std::move(data));
+	Write(data);
 }

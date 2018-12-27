@@ -67,7 +67,7 @@ void GameClient::Update(uint64_t time)
 	_reliable_layer->Update(time);
 }
 
-void GameClient::Read(UNLIBData data)
+void GameClient::Read(PNLIBData data)
 {
 	auto packet = GamePacket::Instance();
 	packet->Set(data->bytes, data->length);
@@ -75,9 +75,9 @@ void GameClient::Read(UNLIBData data)
 	_handler->HandlePacket(shared_from_this(), packet);
 }
 
-void GameClient::Write(UNLIBData data)
+void GameClient::Write(PNLIBData data)
 {
-	WriteNext(std::move(data));
+	WriteNext(data);
 }
 
 void GameClient::WritePacket(const byte* bytes, uint32_t length)
@@ -86,9 +86,9 @@ void GameClient::WritePacket(const byte* bytes, uint32_t length)
 	std::cout << "[WritePacket] " << Utility::TimeInHHMMSSMMM() << std::endl;
 #endif
 
-	auto data = std::make_unique<NLIBData>();
+	auto data = NLIBData::Instance();
 	data->bytes = bytes;
 	data->length = length;
 
-	Write(std::move(data));
+	Write(data);
 }

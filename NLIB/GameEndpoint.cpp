@@ -21,7 +21,7 @@ void GameEndpoint::UpdateRTT(float rtt)
 	}
 
 	std::stringstream stream;
-	stream << "[RTT] : " << _rtt << " , " << rtt;
+	stream << "[RTT ] : " << _rtt << " , " << rtt;
 
 	Logger::GetInstance()->Log(stream.str());
 }

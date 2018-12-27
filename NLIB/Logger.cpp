@@ -1,7 +1,9 @@
 #include "Logger.h"
 
+#include <sstream>
 #include <iostream>
 #include <string>
+#include "Utility.h"
 
 Logger* Logger::GetInstance()
 {
@@ -34,14 +36,26 @@ Logger::Logger()
 
 void Logger::Log(const char* msg)
 {
+	std::string str(msg);
+
+	auto now = Utility::GetTime();
+
+	std::stringstream ss;
+	ss << "[" << Utility::TimeToString(now) << "] " << str;
+
 	_lock.lock();
-	_queue.push(std::string(msg));
+	_queue.push(ss.str());
 	_lock.unlock();
 }
 
 void Logger::Log(std::string&& msg)
 {
+	auto now = Utility::GetTime();
+
+	std::stringstream ss;
+	ss << "[" << Utility::TimeToString(now) << "] " << msg;
+
 	_lock.lock();
-	_queue.push(msg);
+	_queue.push(ss.str());
 	_lock.unlock();
 }

@@ -30,7 +30,10 @@ public:
 
 public:
 	void Set(uint32_t sequence_number);
-	UNLIBData GetData();
+	PNLIBData GetData();
+
+	void SetSendData(PNLIBData send_data);
+	PNLIBData GetSendData() { return _send_data; }
 
 	uint32_t GetSequenceNumber() { return _sequence_number; }
 	void Acked() { _acked = true; }
@@ -39,8 +42,12 @@ public:
 	void SetSendTime(uint64_t send_time) { _send_time = send_time; }
 
 private:
+	// Read 용 데이터
 	const byte* _data = nullptr;
 	uint32_t _data_length = 0;
+
+	// Write 용 데이터
+	PNLIBData _send_data;
 
 	uint32_t _sequence_number = 0;
 	uint64_t _send_time = 0;

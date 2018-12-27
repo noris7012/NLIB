@@ -8,8 +8,6 @@ NetworkSession::NetworkSession(GameServer* server, uint64_t challenge_token_sequ
 	, _challenge_token_sequence(challenge_token_sequence)
 	, _address(address)
 {
-	std::cout << "[NetworkSession]" << std::endl;
-
 	// TODO challenge_token_encrypted 진짜 암호화하기
 	_challenge_token_encrypted = Utility::RandBytes(NLIB_CHALLENGE_TOKEN_ENCRYPTED_LENGTH);
 	_created_time = Utility::GetTime();
@@ -55,9 +53,9 @@ void NetworkSession::Send(ProtocolPacket& packet)
 	_server->Send(_address, packet);
 }
 
-void NetworkSession::Send(UNLIBData data)
+void NetworkSession::Send(PNLIBData data)
 {
-	_server->Send(_address, std::move(data));
+	_server->Send(_address, data);
 }
 
 void NetworkSession::RecvPacket(ProtocolPacket* packet)
@@ -128,9 +126,9 @@ NLIBAddress& NetworkSession::GetAddress()
 	return _address;
 }
 
-void NetworkSession::Write(UNLIBData data)
+void NetworkSession::Write(PNLIBData data)
 {
 	assert(_state != nullptr);
 
-	_state->Write(std::move(data));
+	_state->Write(data);
 }
