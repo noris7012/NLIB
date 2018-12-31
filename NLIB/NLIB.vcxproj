@@ -141,6 +141,9 @@
   <ItemGroup>
     <ClInclude Include="BufferPool.h" />
     <ClInclude Include="ByteStream.h" />
+    <ClInclude Include="ChunkHolder.h" />
+    <ClInclude Include="ChunkLayer.h" />
+    <ClInclude Include="ChunkPacket.h" />
     <ClInclude Include="ClientState.h" />
     <ClInclude Include="ConnectToken.h" />
     <ClInclude Include="GameClient.h" />
@@ -167,6 +170,8 @@
   <ItemGroup>
     <ClCompile Include="BufferPool.cpp" />
     <ClCompile Include="ByteStream.cpp" />
+    <ClCompile Include="ChunkLayer.cpp" />
+    <ClCompile Include="ChunkPacket.cpp" />
     <ClCompile Include="ClientState.cpp" />
     <ClCompile Include="ConnectToken.cpp" />
     <ClCompile Include="GameClient.cpp" />
