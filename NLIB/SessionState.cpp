@@ -77,10 +77,10 @@ void SessionStateDisconnected::OnExit()
 
 void SessionStateDisconnected::RecvPacket(ProtocolPacket* packet)
 {
-	if (packet->GetID() == E_PACKET_ID::CONNECTION_DISCONNECT)
-	{
-		_session->SetState(E_SESSION_STATE_ID::INIT);
-	}
+	// if (packet->GetID() == E_PACKET_ID::CONNECTION_DISCONNECT)
+	// {
+	// 	_session->SetState(E_SESSION_STATE_ID::INIT);
+	// }
 }
 
 void SessionStateSendingConnectionChallenge::OnEnter() 
