@@ -25,3 +25,9 @@ void NetworkLayer::SetWriteNext(std::function<void(PNLIBData)> func)
 	assert(_write_next == nullptr);
 	_write_next = func;
 }
+
+void NetworkLayer::SetFailNext(std::function<void(PNLIBData)> func)
+{
+	assert(_fail_next == nullptr);
+	_fail_next = func;
+}

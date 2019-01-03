@@ -20,6 +20,7 @@ public:
 public:
 	void Read(PNLIBData data) override;
 	void Write(PNLIBData data) override;
+	void Fail(PNLIBData data) override;
 	void Update(uint64_t time);
 
 	ReliablePacketPayload* GetSendBuffer(uint32_t sequence_number);

@@ -7,6 +7,7 @@ GameSession::GameSession(PGameServerHandler handler, NetworkSession* network_ses
 	, _network_session(network_session)
 {
 	_reliable_session = new ReliableLayer(this);
+	_chunk_layer = new ChunkLayer(this);
 
 	//
 	_network_session->SetReadNext(
@@ -19,13 +20,30 @@ GameSession::GameSession(PGameServerHandler handler, NetworkSession* network_ses
 
 	_reliable_session->SetReadNext(
 		std::bind(
+			&ChunkLayer::Read
+			, _chunk_layer
+			, std::placeholders::_1
+		)
+	);
+
+	_chunk_layer->SetReadNext(
+		std::bind(
 			&GameSession::Read
 			, this
 			, std::placeholders::_1
 		)
 	);
 
+	//
 	SetWriteNext(
+		std::bind(
+			&ChunkLayer::Write
+			, _chunk_layer
+			, std::placeholders::_1
+		)
+	);
+
+	_chunk_layer->SetWriteNext(
 		std::bind(
 			&ReliableLayer::Write
 			, _reliable_session
@@ -37,6 +55,31 @@ GameSession::GameSession(PGameServerHandler handler, NetworkSession* network_ses
 		std::bind(
 			&NetworkSession::Write
 			, _network_session
+			, std::placeholders::_1
+		)
+	);
+
+	//
+	_network_session->SetFailNext(
+		std::bind(
+			&ReliableLayer::Fail
+			, _reliable_session
+			, std::placeholders::_1
+		)
+	);
+
+	_reliable_session->SetFailNext(
+		std::bind(
+			&ChunkLayer::Fail
+			, _chunk_layer
+			, std::placeholders::_1
+		)
+	);
+
+	_chunk_layer->SetFailNext(
+		std::bind(
+			&GameSession::Fail
+			, this
 			, std::placeholders::_1
 		)
 	);
@@ -64,6 +107,10 @@ void GameSession::Read(PNLIBData data)
 void GameSession::Write(PNLIBData data)
 {
 	WriteNext(data);
+}
+
+void GameSession::Fail(PNLIBData data)
+{
 }
 
 void GameSession::Update(uint64_t time)

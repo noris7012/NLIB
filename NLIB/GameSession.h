@@ -9,10 +9,12 @@
 #include "NetworkSession.h"
 #include "ReliableLayer.h"
 #include "NetworkLayer.h"
+#include "ChunkLayer.h"
 
 class GameServerHandler;
 class NetworkSession;
 class ReliableLayer;
+class ChunkLayer;
 
 class GameSession : public std::enable_shared_from_this<GameSession>, public NetworkLayer, public GameEndpoint
 {
@@ -25,6 +27,7 @@ public:
 
 	void Read(PNLIBData data) override;
 	void Write(PNLIBData data) override;
+	void Fail(PNLIBData data) override;
 	void Update(uint64_t time) override;
 	bool IsConnected();
 
@@ -34,6 +37,7 @@ private:
 	std::shared_ptr<GameServerHandler> _handler;
 	NetworkSession* _network_session;
 	ReliableLayer* _reliable_session;
+	ChunkLayer* _chunk_layer;
 
 	BufferPool _buffer_pool;
 };

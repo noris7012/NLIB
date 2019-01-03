@@ -6,11 +6,33 @@
 class ChunkHolder
 {
 public:
+	ChunkHolder();
 
+public:
+	void Set(uint16_t chunk_id);
+
+	void Read(ChunkPacketSome* packet);
+	bool IsReadCompleted();
+
+	uint32_t Split(PNLIBData data);
+	PNLIBData GetData();
+
+	ChunkPacketSome* GetPacket(uint32_t slice_id);
+
+	uint16_t GetChunkId() { return _chunk_id; }
+
+	bool IsAcked() { return _acked; }
+	bool IsTimeout(float rtt);
 private:
 	uint16_t _chunk_id;
+	uint16_t _slice_length;
 
-	ChunkPacket* _buffer[NLIB_CHUNK_BUFFER_SIZE];
+	uint16_t _read_slice_count;
+
+	bool _acked;
+	uint64_t _create_time;
+
+	ChunkPacketSome* _buffer[NLIB_CHUNK_BUFFER_SIZE];
 };
 
 #endif

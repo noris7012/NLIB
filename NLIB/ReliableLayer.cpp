@@ -83,6 +83,9 @@ void ReliableLayer::Write(PNLIBData data)
 	WriteNext(new_data);
 }
 
+void ReliableLayer::Fail(PNLIBData data)
+{
+}
 
 void ReliableLayer::Update(uint64_t time)
 {
@@ -108,6 +111,8 @@ void ReliableLayer::Update(uint64_t time)
 		auto buffer = _send_buffer[i];
 		if (buffer == nullptr || buffer->IsAcked())
 			continue;
+
+		// TODO acked 패킷은 메모리 Release
 
 		auto rtt = _endpoint->GetRTT();
 		if (rtt > 0 && time >= buffer->GetSendTime() + uint64_t(2 * rtt * 1000))
@@ -146,8 +151,7 @@ void ReliableLayer::SetSendBuffer(uint32_t sequence_number, ReliablePacketPayloa
 	auto old_packet = _send_buffer[sequence_number % (sizeof(_send_buffer) / sizeof(*_send_buffer))];
 	if (old_packet != nullptr && !old_packet->IsAcked())
 	{
-		assert(false);
-		// TODO Handle Fail
+		FailNext(old_packet->GetData());
 	}
 
 	_send_buffer[sequence_number % (sizeof(_send_buffer) / sizeof(*_send_buffer))] = packet;
@@ -167,6 +171,7 @@ void ReliableLayer::SetRecvBuffer(uint32_t sequence_number, ReliablePacketPayloa
 	auto old_packet = _recv_buffer[sequence_number % (sizeof(_recv_buffer) / sizeof(*_recv_buffer))];
 	if (old_packet != nullptr)
 	{
+		// TODO
 		delete old_packet;
 	}
 

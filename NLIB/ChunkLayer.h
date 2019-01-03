@@ -5,19 +5,28 @@
 
 #include "NetworkLayer.h"
 #include "ChunkHolder.h"
+#include "GameEndpoint.h"
 
 class ChunkLayer : public NetworkLayer
 {
 public:
-	ChunkLayer();
+	ChunkLayer(GameEndpoint* endpoint);
 
 public:
 	void Read(PNLIBData data) override;
 	void Write(PNLIBData data) override;
+	void Fail(PNLIBData data) override;
+	void Update(uint64_t time);
 
-	ChunkHolder* GetChunkHolder(uint32_t chunk_id);
+	ChunkHolder* GetRecvBuffer(uint16_t chunk_id);
+	void SetRecvBuffer(uint16_t chunk_id, ChunkHolder* holder);
+
+	ChunkHolder* GetSendBuffer(uint16_t chunk_id);
+	void SetSendBuffer(uint16_t chunk_id, ChunkHolder* holder);
 
 private:
+	GameEndpoint * _endpoint;
+
 	uint16_t _chunk_id;
 
 	ChunkHolder* _send_buffer[NLIB_CHUNK_BUFFER_SIZE];

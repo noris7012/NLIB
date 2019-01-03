@@ -170,6 +170,7 @@
   <ItemGroup>
     <ClCompile Include="BufferPool.cpp" />
     <ClCompile Include="ByteStream.cpp" />
+    <ClCompile Include="ChunkHolder.cpp" />
     <ClCompile Include="ChunkLayer.cpp" />
     <ClCompile Include="ChunkPacket.cpp" />
     <ClCompile Include="ClientState.cpp" />
