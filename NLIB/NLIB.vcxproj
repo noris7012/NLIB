@@ -186,7 +186,6 @@
     <ClCompile Include="NetworkClient.cpp" />
     <ClCompile Include="NetworkEndpoint.cpp" />
     <ClCompile Include="GameServer.cpp" />
-    <ClCompile Include="NetworkLayer.cpp" />
     <ClCompile Include="NetworkSession.cpp" />
     <ClCompile Include="ProtocolPacket.cpp" />
     <ClCompile Include="ReliablePacket.cpp" />

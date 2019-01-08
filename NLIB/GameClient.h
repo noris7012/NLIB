@@ -23,6 +23,7 @@ private:
 
 	NetworkClient* _network_client;
 	ReliableLayer* _reliable_layer;
+	ChunkLayer* _chunk_layer;
 };
 
 #endif

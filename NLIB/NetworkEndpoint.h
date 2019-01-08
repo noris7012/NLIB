@@ -48,6 +48,7 @@ private:
 	boost::asio::io_context _io_context;
 	boost::asio::ip::udp::socket* _socket;
 	boost::array<byte, 2048> _recv_buffer;
+	ByteArrayPtr _send_buffer;
 	boost::asio::ip::udp::endpoint _remote_endpoint;
 	std::thread* _io_thread;
 

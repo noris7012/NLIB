@@ -27,7 +27,6 @@ public:
 
 private:
 	ByteArrayPtr _data;
-	byte* _buffer;
 	unsigned int _capacity;
 	unsigned int _idx;
 
@@ -43,7 +42,7 @@ public:
 		if (_idx + 1 > _capacity)
 			return false;
 
-		val = (E_PACKET_ID)_buffer[_idx++];
+		val = (E_PACKET_ID)_data->Get(_idx++);
 
 		return true;
 	}
@@ -54,10 +53,10 @@ public:
 			return false;
 
 		val = 0;
-		val += _buffer[_idx++] << 8 * 0;
-		val += _buffer[_idx++] << 8 * 1;
-		val += _buffer[_idx++] << 8 * 2;
-		val += _buffer[_idx++] << 8 * 3;
+		val += _data->Get(_idx++) << 8 * 0;
+		val += _data->Get(_idx++) << 8 * 1;
+		val += _data->Get(_idx++) << 8 * 2;
+		val += _data->Get(_idx++) << 8 * 3;
 
 		return true;
 	}
@@ -68,14 +67,14 @@ public:
 			return false;
 
 		val = 0;
-		val += ((uint64_t)_buffer[_idx++]) << 8 * 0;
-		val += ((uint64_t)_buffer[_idx++]) << 8 * 1;
-		val += ((uint64_t)_buffer[_idx++]) << 8 * 2;
-		val += ((uint64_t)_buffer[_idx++]) << 8 * 3;
-		val += ((uint64_t)_buffer[_idx++]) << 8 * 4;
-		val += ((uint64_t)_buffer[_idx++]) << 8 * 5;
-		val += ((uint64_t)_buffer[_idx++]) << 8 * 6;
-		val += ((uint64_t)_buffer[_idx++]) << 8 * 7;
+		val += static_cast<uint64_t>(_data->Get(_idx++)) << 8 * 0;
+		val += static_cast<uint64_t>(_data->Get(_idx++)) << 8 * 1;
+		val += static_cast<uint64_t>(_data->Get(_idx++)) << 8 * 2;
+		val += static_cast<uint64_t>(_data->Get(_idx++)) << 8 * 3;
+		val += static_cast<uint64_t>(_data->Get(_idx++)) << 8 * 4;
+		val += static_cast<uint64_t>(_data->Get(_idx++)) << 8 * 5;
+		val += static_cast<uint64_t>(_data->Get(_idx++)) << 8 * 6;
+		val += static_cast<uint64_t>(_data->Get(_idx++)) << 8 * 7;
 
 		return true;
 	}
@@ -96,7 +95,7 @@ public:
 			return false;
 
 		byte* tmp = new byte[length];
-		memcpy(tmp, _buffer + _idx, length);
+		memcpy(tmp, _data->Bytes() + _idx, length);
 		_idx += length;
 
 		val = tmp;

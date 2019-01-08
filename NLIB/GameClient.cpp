@@ -10,6 +10,7 @@ GameClient::GameClient(PGameClientHandler handler)
 {
 	_network_client = new NetworkClient(this);
 	_reliable_layer = new ReliableLayer(this);
+	_chunk_layer = new ChunkLayer(this);
 
 	_network_client->SetReadNext(
 		std::bind(
@@ -21,6 +22,14 @@ GameClient::GameClient(PGameClientHandler handler)
 
 	_reliable_layer->SetReadNext(
 		std::bind(
+			&ChunkLayer::Read
+			, _chunk_layer
+			, std::placeholders::_1
+		)
+	);
+
+	_chunk_layer->SetReadNext(
+		std::bind(
 			&GameClient::Read
 			, this
 			, std::placeholders::_1
@@ -29,12 +38,19 @@ GameClient::GameClient(PGameClientHandler handler)
 
 	SetWriteNext(
 		std::bind(
+			&ChunkLayer::Write
+			, _chunk_layer
+			, std::placeholders::_1
+		)
+	);
+
+	_chunk_layer->SetWriteNext(
+		std::bind(
 			&ReliableLayer::Write
 			, _reliable_layer
 			, std::placeholders::_1
 		)
 	);
-
 
 	_reliable_layer->SetWriteNext(
 		std::bind(
@@ -72,8 +88,16 @@ void GameClient::Update(uint64_t time)
 
 void GameClient::Read(ByteArrayPtr data)
 {
+	if (data->Length() <= NLIB_OFFSET_PAYLOAD)
+		return;
+
+	int length = data->Length() - NLIB_OFFSET_PAYLOAD;
+
+	auto new_data = new byte[length];
+	memcpy(new_data, data->Bytes() + NLIB_OFFSET_PAYLOAD, length);
+
 	auto packet = GamePacket::Instance();
-	packet->Set(data->Bytes(), data->Length());
+	packet->Set(new_data, length);
 
 	_handler->HandlePacket(shared_from_this(), packet);
 }

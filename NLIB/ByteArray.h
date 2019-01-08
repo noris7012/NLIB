@@ -17,12 +17,16 @@ public:
 	byte* Bytes() { return _bytes; }
 
 public:
+	byte Get(uint32_t index);
 
 public:
 	void Set(uint32_t index, E_PACKET_ID packet_id);
+	void Set(uint32_t index, byte value);
 	void Set(uint32_t index, uint32_t value);
 	void Set(uint32_t index, const ByteArrayPtr& data);
-	void Set(uint32_t index, byte* bytes, uint32_t length);
+	void Set(uint32_t index, const byte* bytes, uint32_t length);
+
+	void SetZero(uint32_t index, uint32_t length);
 
 private:
 	byte* _bytes;

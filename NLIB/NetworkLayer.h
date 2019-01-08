@@ -10,13 +10,44 @@
 class NetworkLayer
 {
 public:
-	inline void ReadNext(ByteArrayPtr data);
-	inline void WriteNext(ByteArrayPtr data);
-	inline void FailNext(ByteArrayPtr data);
+	void ReadNext(ByteArrayPtr data)
+	{
+		assert(_read_next != nullptr);
+		if (_read_next != nullptr)
+			_read_next(data);
+	}
 
-	inline void SetReadNext(std::function<void(ByteArrayPtr)> func);
-	inline void SetWriteNext(std::function<void(ByteArrayPtr)> func);
-	inline void SetFailNext(std::function<void(ByteArrayPtr)> func);
+	void WriteNext(ByteArrayPtr data)
+	{
+		assert(_write_next != nullptr);
+		if (_write_next != nullptr)
+			_write_next(data);
+	}
+
+	void FailNext(ByteArrayPtr data)
+	{
+		assert(_fail_next != nullptr);
+		if (_fail_next != nullptr)
+			_fail_next(data);
+	}
+
+	void SetReadNext(std::function<void(ByteArrayPtr)> func)
+	{
+		assert(_read_next == nullptr);
+		_read_next = func;
+	}
+
+	void SetWriteNext(std::function<void(ByteArrayPtr)> func)
+	{
+		assert(_write_next == nullptr);
+		_write_next = func;
+	}
+
+	void SetFailNext(std::function<void(ByteArrayPtr)> func)
+	{
+		assert(_fail_next == nullptr);
+		_fail_next = func;
+	}
 
 	virtual void Write(ByteArrayPtr data) { assert(false); }
 	virtual void Read(ByteArrayPtr data) { assert(false); }

@@ -23,12 +23,33 @@ ByteArray::~ByteArray()
 		delete[] _bytes;
 }
 
+byte ByteArray::Get(uint32_t index)
+{
+	assert(index >= 0 && index < _capacity);
+	if (index >= 0 && index < _capacity)
+	{
+		return _bytes[index];
+	}
+
+	return 0;
+}
+
 void ByteArray::Set(uint32_t index, E_PACKET_ID packet_id)
 {
 	assert(index >= 0 && index + 1 <= _capacity);
 	if (index >= 0 && index + 1 <= _capacity)
 	{
 		_bytes[index] = static_cast<byte>(packet_id);
+		_length = std::max(_length, index + 1);
+	}
+}
+
+void ByteArray::Set(uint32_t index, byte value)
+{
+	assert(index >= 0 && index + 1 <= _capacity);
+	if (index >= 0 && index + 1 <= _capacity)
+	{
+		_bytes[index] = value;
 		_length = std::max(_length, index + 1);
 	}
 }
@@ -51,7 +72,7 @@ void ByteArray::Set(uint32_t index, const ByteArrayPtr& data)
 	Set(index, data->Bytes(), data->Length());
 }
 
-void ByteArray::Set(uint32_t index, byte* bytes, uint32_t length)
+void ByteArray::Set(uint32_t index, const byte* bytes, uint32_t length)
 {
 	if (length == 0)
 		return;
@@ -60,6 +81,19 @@ void ByteArray::Set(uint32_t index, byte* bytes, uint32_t length)
 	if (index >= 0 && index + length <= _capacity)
 	{
 		memcpy(_bytes + index, bytes, length);
+		_length = std::max(_length, index + length);
+	}
+}
+
+void ByteArray::SetZero(uint32_t index, uint32_t length)
+{
+	if (length == 0)
+		return;
+
+	assert(index >= 0 && index + length <= _capacity);
+	if (index >= 0 && index + length <= _capacity)
+	{
+		memset(_bytes + index, 0, length);
 		_length = std::max(_length, index + length);
 	}
 }

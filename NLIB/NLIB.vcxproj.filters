@@ -134,9 +134,6 @@
     <ClCompile Include="ReliablePacket.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="NetworkLayer.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
     <ClCompile Include="GameServer.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>

@@ -142,10 +142,15 @@ void NetworkEndpoint::Send(NLIBAddress& address, const byte* data, uint32_t leng
 
 void NetworkEndpoint::Send(NLIBAddress& address, ByteArrayPtr data)
 {
+#ifdef NLIB_LOG_ENABLED
+	std::cout << "[ Send ] " << Utility::ByteToString(data->Bytes(), data->Length()) << std::endl;
+#endif
+	_send_buffer = data;
+
 	using namespace boost::asio;
 
 	_socket->async_send_to(
-		buffer(data->Bytes(), data->Length())
+		buffer(_send_buffer->Bytes(), _send_buffer->Length())
 		, udp::endpoint(address::from_string(address.ip_str), address.port)
 		, boost::bind(&NetworkEndpoint::HandleSend
 			, this,
@@ -194,7 +199,6 @@ void NetworkEndpoint::HandleReceive(const boost::system::error_code& error, std:
 		std::cout << error.message() << std::endl;
 		return;
 	}
-
 
 	if (_loss_mask != nullptr && !_loss_mask->at(_loss_index = (_loss_index + 1) % _loss_mask->size()))
 	{

@@ -28,8 +28,8 @@ ReliablePacket* ReliablePacket::Deserialize(ByteStream& stream)
 
 void ReliablePacketPayload::WriteHeader(ByteArrayPtr data)
 {
-	data->Set(NLIB_OFFSET_PAYLOAD, GetID());
-	data->Set(NLIB_OFFSET_PAYLOAD + 1, _sequence_number);
+	data->Set(NLIB_OFFSET_RELIABLE, GetID());
+	data->Set(NLIB_OFFSET_RELIABLE+ 1, _sequence_number);
 }
 
 E_READ_RESULT ReliablePacketPayload::Read(ByteStream& stream)

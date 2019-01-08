@@ -98,8 +98,16 @@ void GameSession::RecvPacket(ProtocolPacket* recv)
 
 void GameSession::Read(ByteArrayPtr data)
 {
+	if (data->Length() <= NLIB_OFFSET_PAYLOAD)
+		return;
+
+	int length = data->Length() - NLIB_OFFSET_PAYLOAD;
+
+	auto new_data = new byte[length];
+	memcpy(new_data, data->Bytes() + NLIB_OFFSET_PAYLOAD, length);
+
 	auto packet = GamePacket::Instance();
-	packet->Set(data->Bytes(), data->Length());
+	packet->Set(new_data, length);
 
 	_handler->HandlePacket(shared_from_this(), packet);
 }
