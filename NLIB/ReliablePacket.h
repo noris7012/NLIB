@@ -4,6 +4,7 @@
 #include <cstdint>
 
 #include "NetworkDefine.h"
+#include "ByteArray.h"
 #include "ByteStream.h"
 
 class ByteStream;
@@ -16,7 +17,7 @@ public:
 public:
 	virtual E_PACKET_ID GetID() = 0;
 
-	virtual NLIBData GetHeader() = 0;
+	virtual void WriteHeader(ByteArrayPtr data) = 0;
 	virtual E_READ_RESULT Read(ByteStream& stream) = 0;
 	virtual void Print() { };
 };
@@ -25,15 +26,14 @@ class ReliablePacketPayload : public ReliablePacket
 {
 public:
 	E_PACKET_ID GetID() override { return E_PACKET_ID::RELIABLE_PAYLOAD; }
-	NLIBData GetHeader() override;
+	void WriteHeader(ByteArrayPtr data) override;
 	E_READ_RESULT Read(ByteStream& stream) override;
 
 public:
 	void Set(uint32_t sequence_number);
-	PNLIBData GetData();
 
-	void SetSendData(PNLIBData send_data);
-	PNLIBData GetSendData() { return _send_data; }
+	void SetData(ByteArrayPtr data) { _data = data; }
+	ByteArrayPtr GetData() { return _data; }
 
 	uint32_t GetSequenceNumber() { return _sequence_number; }
 	void Acked() { _acked = true; }
@@ -42,12 +42,7 @@ public:
 	void SetSendTime(uint64_t send_time) { _send_time = send_time; }
 
 private:
-	// Read 용 데이터
-	const byte* _data = nullptr;
-	uint32_t _data_length = 0;
-
-	// Write 용 데이터
-	PNLIBData _send_data;
+	ByteArrayPtr _data;
 
 	uint32_t _sequence_number = 0;
 	uint64_t _send_time = 0;
@@ -58,7 +53,7 @@ class ReliablePacketAck : public ReliablePacket
 {
 public:
 	E_PACKET_ID GetID() override { return E_PACKET_ID::RELIABLE_ACK; }
-	NLIBData GetHeader() override;
+	void WriteHeader(ByteArrayPtr data) override;
 	E_READ_RESULT Read(ByteStream& stream) override;
 
 public:

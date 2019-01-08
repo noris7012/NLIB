@@ -96,6 +96,9 @@
     <ClInclude Include="ChunkHolder.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
+    <ClInclude Include="ByteArray.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ByteStream.cpp">
@@ -165,6 +168,9 @@
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="ChunkHolder.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="ByteArray.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>

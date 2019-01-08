@@ -6,15 +6,12 @@
 
 #include "NetworkDefine.h"
 #include "NetworkStruct.h"
+#include "ByteArray.h"
 
 class ByteStream
 {
 public:
-	//ByteStream();
-	ByteStream(uint32_t capacity);
-	ByteStream(byte* data, uint32_t length);
-	ByteStream(Buffer* buffer);
-	~ByteStream();
+	ByteStream(const ByteArrayPtr& data, uint32_t offset);
 
 public:
 	void Write(E_PACKET_ID packet_id);
@@ -24,11 +21,12 @@ public:
 
 	void PadWithZero();
 
-	const byte* Data() const;
+	ByteArrayPtr GetData() { return _data; }
 	uint32_t Length();
 	uint32_t Remain();
 
 private:
+	ByteArrayPtr _data;
 	byte* _buffer;
 	unsigned int _capacity;
 	unsigned int _idx;

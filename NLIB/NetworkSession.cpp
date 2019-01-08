@@ -55,7 +55,7 @@ void NetworkSession::Send(ProtocolPacket& packet)
 	_server->Send(_address, packet);
 }
 
-void NetworkSession::Send(PNLIBData data)
+void NetworkSession::Send(ByteArrayPtr data)
 {
 	_server->Send(_address, data);
 }
@@ -139,7 +139,7 @@ NLIBAddress& NetworkSession::GetAddress()
 	return _address;
 }
 
-void NetworkSession::Write(PNLIBData data)
+void NetworkSession::Write(ByteArrayPtr data)
 {
 	assert(_state != nullptr);
 

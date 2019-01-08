@@ -29,55 +29,26 @@ ChunkPacket::ChunkPacket()
 {
 }
 
-NLIBData ChunkPacketNone::GetHeader()
+void ChunkPacketNone::WriteHeader(ByteArrayPtr data)
 {
-	ByteStream stream(1);
-
-	stream.Write(GetID());
-
-	return NLIBData{ stream.Data(), stream.Length(), nullptr };
+	data->Set(NLIB_OFFSET_CHUNK, GetID());
 }
 
 E_READ_RESULT ChunkPacketNone::Read(ByteStream& stream)
 {
-	_data_length = stream.Remain();
-	NLIB_STREAM_READ_BYTE(_data, _data_length);
+	_data = stream.GetData();
 
 	return E_READ_RESULT::SUCCESS;
 }
 
-PNLIBData ChunkPacketNone::GetData()
+void ChunkPacketSome::WriteHeader(ByteArrayPtr data)
 {
-	auto data = NLIBData::Instance();
-	data->bytes = _data;
-	data->length = _data_length;
-
-	return data;
-}
-
-NLIBData ChunkPacketSome::GetHeader()
-{
-	ByteStream stream(1);
-
-	stream.Write(GetID());
-
-	return NLIBData{ stream.Data(), stream.Length(), nullptr };
+	data->Set(NLIB_OFFSET_CHUNK, GetID());
 }
 
 E_READ_RESULT ChunkPacketSome::Read(ByteStream& stream)
 {
-	_data_length = stream.Remain();
-	NLIB_STREAM_READ_BYTE(_data, _data_length);
+	_data = stream.GetData();
 
 	return E_READ_RESULT::SUCCESS;
-}
-
-PNLIBData ChunkPacketSome::GetSendData()
-{
-	return _send_data;
-}
-
-void ChunkPacketSome::SetSendData(PNLIBData send_data)
-{
-	_send_data = send_data;
 }

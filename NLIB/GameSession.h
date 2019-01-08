@@ -25,9 +25,9 @@ public:
 	void RecvPacket(ProtocolPacket* recv);
 	void WritePacket(const byte* bytes, uint32_t length);
 
-	void Read(PNLIBData data) override;
-	void Write(PNLIBData data) override;
-	void Fail(PNLIBData data) override;
+	void Read(ByteArrayPtr data) override;
+	void Write(ByteArrayPtr data) override;
+	void Fail(ByteArrayPtr data) override;
 	void Update(uint64_t time) override;
 	bool IsConnected();
 

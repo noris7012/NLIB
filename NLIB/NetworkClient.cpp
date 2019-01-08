@@ -76,7 +76,7 @@ void NetworkClient::Update(uint64_t time)
 	_endpoint->Update(time);
 }
 
-void NetworkClient::HandleReceive(NLIBRecv* recv)
+void NetworkClient::HandleReceive(NLIBRecv recv)
 {
 	assert(_state != nullptr);
 	if (_state == nullptr)
@@ -86,7 +86,7 @@ void NetworkClient::HandleReceive(NLIBRecv* recv)
 	std::cout << "[ Client Receive ] " << Utility::ByteToString(recv->buffer->data, recv->length) << std::endl;
 #endif
 
-	ByteStream stream(recv->buffer->data, recv->length);
+	ByteStream stream(recv.data, NLIB_OFFSET_NETWORK);
 	ProtocolPacket* packet = ProtocolPacket::Deserialize(stream);
 
 	assert(packet != nullptr);
@@ -102,19 +102,18 @@ void NetworkClient::HandleReceive(NLIBRecv* recv)
 
 void NetworkClient::Send(ProtocolPacket& packet)
 {
-	auto buffer = _buffer_pool.Acquire();
-	ByteStream stream(buffer);
+	auto data = std::make_shared<ByteArray>(MAX_MTU_SIZE);
+	ByteStream stream(data, NLIB_OFFSET_NETWORK);
 	packet.Write(stream);
-	NetworkEndpoint::Send(_address, stream.Data(), stream.Length());
-	_buffer_pool.Release(buffer);
+	NetworkEndpoint::Send(_address, data);
 }
 
-void NetworkClient::Send(PNLIBData data)
+void NetworkClient::Send(ByteArrayPtr data)
 {
 	NetworkEndpoint::Send(_address, data);
 }
 
-void NetworkClient::Write(PNLIBData data)
+void NetworkClient::Write(ByteArrayPtr data)
 {
 	assert(_state != nullptr);
 

@@ -14,8 +14,8 @@ public:
 	void Read(ChunkPacketSome* packet);
 	bool IsReadCompleted();
 
-	uint32_t Split(PNLIBData data);
-	PNLIBData GetData();
+	uint32_t Split(const ByteArrayPtr& data);
+	ByteArrayPtr GetData();
 
 	ChunkPacketSome* GetPacket(uint32_t slice_id);
 

@@ -202,7 +202,7 @@ void ClientStateConnected::RecvPacket(ProtocolPacket* p)
 	{
 		auto packet = static_cast<ProtocolPacketConnectionPayload*>(p);
 
-		_client->ReadNext(packet->GetPayload());
+		_client->ReadNext(packet->GetData());
 	}
 	else if (p->GetID() == E_PACKET_ID::CONNECTION_DISCONNECT)
 	{
@@ -210,22 +210,14 @@ void ClientStateConnected::RecvPacket(ProtocolPacket* p)
 	}
 }
 
-void ClientStateConnected::Write(PNLIBData data)
+void ClientStateConnected::Write(ByteArrayPtr data)
 {
 	_send_keep_alive_time = Utility::GetTime() + _next_keep_alive_interval;
 
 	ProtocolPacketConnectionPayload packet;
 	packet.Set(_client->GetClientID());
+	packet.WriteHeader(data);
 
-	ByteStream stream(1 + 4);
-	stream.Write(packet.GetID());
-	stream.Write(packet.GetClientID());
-
-	auto new_data = NLIBData::Instance();
-	new_data->bytes = stream.Data();
-	new_data->length = stream.Length();
-	new_data->next = data;
-
-	_client->Send(new_data);
+	_client->Send(data);
 }
 

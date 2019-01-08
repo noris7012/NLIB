@@ -91,45 +91,35 @@ void NetworkEndpoint::InternalUpdate(uint64_t time)
 {
 	while (true)
 	{
-		auto data = Pop();
-		if (data == nullptr)
-			break;
+		// TODO Implement Synchronized Queue
+		_recv_queue_mutex.lock();
+		if (_recv_queue.empty())
+		{
+			_recv_queue_mutex.unlock();
+			break;			
+		}
 
-		HandleReceive(data);
-
-		_buffer_pool.Release(data->buffer);
-		delete data;
-	}
-}
-
-NLIBRecv* NetworkEndpoint::Pop()
-{
-	// TODO Implement Synchronized Queue
-	_recv_queue_mutex.lock();
-	NLIBRecv* data = nullptr;
-	if (!_recv_queue.empty())
-	{
-		data = _recv_queue.front();
+		auto data = std::move(_recv_queue.front());
 		_recv_queue.pop();
-	}
-	_recv_queue_mutex.unlock();
+		_recv_queue_mutex.unlock();
 
-	return data;
+		HandleReceive(std::move(data));
+	}
 }
 
-void NetworkEndpoint::HandleReceive(char* data, std::size_t length, NLIBAddress& address)
+void NetworkEndpoint::HandleReceive(byte* data, std::size_t length, NLIBAddress& address)
 {
-	auto buffer = _buffer_pool.Acquire();
-	memcpy_s(buffer->data, sizeof(buffer->data), data, length);
+	// TODO Get ByteArrayPtr from Pool
+	auto new_data = std::make_shared<ByteArray>(length);
+	new_data->Set(NLIB_OFFSET_NETWORK, data, length);
 
-	NLIBRecv* recv = new NLIBRecv();
-	recv->buffer = buffer;
-	recv->length = length;
-	recv->address = address;
+	NLIBRecv recv;
+	recv.data = new_data;
+	recv.address = address;
 
 	// TODO Implement Synchronized Queue
 	_recv_queue_mutex.lock();
-	_recv_queue.push(recv);
+	_recv_queue.push(std::move(recv));
 	_recv_queue_mutex.unlock();
 }
 
@@ -150,21 +140,12 @@ void NetworkEndpoint::Send(NLIBAddress& address, const byte* data, uint32_t leng
 	);
 }
 
-void NetworkEndpoint::Send(NLIBAddress& address, PNLIBData data)
+void NetworkEndpoint::Send(NLIBAddress& address, ByteArrayPtr data)
 {
 	using namespace boost::asio;
 
-	std::vector<const_buffer> buffers;
-
-	NLIBData* tmp = data.get();
-	while (tmp != nullptr)
-	{
-		buffers.push_back(buffer(tmp->bytes, tmp->length));
-		tmp = tmp->next.get();
-}
-
 	_socket->async_send_to(
-		buffers
+		buffer(data->Bytes(), data->Length())
 		, udp::endpoint(address::from_string(address.ip_str), address.port)
 		, boost::bind(&NetworkEndpoint::HandleSend
 			, this,

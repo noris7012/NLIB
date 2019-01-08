@@ -26,22 +26,17 @@ ReliablePacket* ReliablePacket::Deserialize(ByteStream& stream)
 	return packet;
 }
 
-NLIBData ReliablePacketPayload::GetHeader()
+void ReliablePacketPayload::WriteHeader(ByteArrayPtr data)
 {
-	ByteStream stream(1 + sizeof(_sequence_number));
-
-	stream.Write(GetID());
-	stream.Write(_sequence_number);
-
-	return NLIBData{ stream.Data(), stream.Length(), nullptr };
+	data->Set(NLIB_OFFSET_PAYLOAD, GetID());
+	data->Set(NLIB_OFFSET_PAYLOAD + 1, _sequence_number);
 }
 
 E_READ_RESULT ReliablePacketPayload::Read(ByteStream& stream)
 {
 	NLIB_STREAM_READ(_sequence_number, uint32_t);
 
-	_data_length = stream.Remain();
-	NLIB_STREAM_READ_BYTE(_data, _data_length);
+	_data = stream.GetData();
 
 	return E_READ_RESULT::SUCCESS;
 }
@@ -53,29 +48,11 @@ void ReliablePacketPayload::Set(uint32_t sequence_number)
 	_send_time = Utility::GetTime();
 }
 
-PNLIBData ReliablePacketPayload::GetData()
+void ReliablePacketAck::WriteHeader(ByteArrayPtr data)
 {
-	auto data = NLIBData::Instance();
-	data->bytes = _data;
-	data->length = _data_length;
-
-	return data;
-}
-
-void ReliablePacketPayload::SetSendData(PNLIBData send_data)
-{
-	_send_data = send_data;
-}
-
-NLIBData ReliablePacketAck::GetHeader()
-{
-	ByteStream stream(1 + sizeof(_ack_sequence_number) + sizeof(_ack_bitfield));
-
-	stream.Write(GetID());
-	stream.Write(_ack_sequence_number);
-	stream.Write(_ack_bitfield);
-
-	return NLIBData{ stream.Data(), stream.Length(), nullptr };
+	data->Set(NLIB_OFFSET_RELIABLE + 0, GetID());
+	data->Set(NLIB_OFFSET_RELIABLE + 1, _ack_sequence_number);
+	data->Set(NLIB_OFFSET_RELIABLE + 5, _ack_bitfield);
 }
 
 E_READ_RESULT ReliablePacketAck::Read(ByteStream& stream)

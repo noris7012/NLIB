@@ -1,8 +1,9 @@
 #ifndef NLIB_PROTOCOL_PACKET_H
 #define NLIB_PROTOCOL_PACKET_H
 
-#include "ByteStream.h"
 #include "NetworkDefine.h"
+#include "ByteStream.h"
+#include "ByteArray.h"
 #include "ConnectToken.h"
 
 class ProtocolPacket
@@ -105,20 +106,14 @@ class ProtocolPacketConnectionPayload : public ProtocolPacket
 		_client_index = client_index;
 	}
 
-	void Set(uint32_t client_index, const byte* payload, uint32_t payload_length)
-	{
-		_client_index = client_index;
-		_payload = payload;
-		_payload_length = payload_length;
-	}
-
 	uint32_t GetClientID() override { return _client_index; }
-	PNLIBData GetPayload();
+
+	ByteArrayPtr GetData() { return _data; }
+	void WriteHeader(ByteArrayPtr data);
 
 private:
 	uint32_t _client_index;
-	const byte* _payload;
-	uint32_t _payload_length;
+	ByteArrayPtr _data;
 };
 
 class ProtocolPacketConnectionDisconnect : public ProtocolPacket

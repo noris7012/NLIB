@@ -7,9 +7,9 @@ ChunkLayer::ChunkLayer(GameEndpoint* endpoint)
 {
 }
 
-void ChunkLayer::Read(PNLIBData data)
+void ChunkLayer::Read(ByteArrayPtr data)
 {
-	ByteStream stream(const_cast<byte*>(data->bytes), data->length);
+	ByteStream stream(data, NLIB_OFFSET_CHUNK);
 	ChunkPacket* packet = ChunkPacket::Deserialize(stream);
 
 	assert(packet != nullptr);
@@ -44,18 +44,16 @@ void ChunkLayer::Read(PNLIBData data)
 	}
 }
 
-void ChunkLayer::Write(PNLIBData data)
+void ChunkLayer::Write(ByteArrayPtr data)
 {
-	// TODO length 는 전체 데이터 길이가 아님. Recursive한 구조이기 때문에.
-	if (data->length <= NLIB_SLICE_MAX_SIZE)
+	if (data->Length() <= NLIB_SLICE_MAX_SIZE)
 	{
-		ChunkPacketNone packet;
-		auto header = packet.GetHeader();
+		auto new_data = std::make_shared<ByteArray>(MAX_MTU_SIZE);
 
-		auto new_data = NLIBData::Instance();
-		new_data->bytes = header.bytes;
-		new_data->length = header.length;
-		new_data->next = data;
+		ChunkPacketNone packet;
+		packet.WriteHeader(new_data);
+
+		new_data->Set(NLIB_OFFSET_PAYLOAD, data);
 
 		WriteNext(new_data);
 	}
@@ -73,21 +71,14 @@ void ChunkLayer::Write(PNLIBData data)
 			if (packet == nullptr)
 				continue;
 
-			auto header = packet->GetHeader();
-
-			auto new_data = NLIBData::Instance();
-			new_data->bytes = header.bytes;
-			new_data->length = header.length;
-			new_data->next = packet->GetSendData();
-
-			WriteNext(new_data);
+			WriteNext(packet->GetData());
 		}
 	}
 }
 
-void ChunkLayer::Fail(PNLIBData data)
+void ChunkLayer::Fail(ByteArrayPtr data)
 {
-	ByteStream stream(const_cast<byte*>(data->bytes), data->length);
+	ByteStream stream(data, NLIB_OFFSET_CHUNK);
 	ChunkPacket* packet = ChunkPacket::Deserialize(stream);
 
 	assert(packet != nullptr);

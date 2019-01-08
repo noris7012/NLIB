@@ -27,12 +27,12 @@ public:
 public:
 	void Update(uint64_t time) override;
 	void Send(NLIBAddress& address, ProtocolPacket& packet);
-	void Send(NLIBAddress& address, PNLIBData data);
-	void HandleReceive(NLIBRecv* recv) override;
+	void Send(NLIBAddress& address, ByteArrayPtr data);
+	void HandleReceive(NLIBRecv recv) override;
 
 private:
-	void HandleConnectionRequest(ProtocolPacket*, NLIBRecv*);
-	void HandleConnectionResponse(ProtocolPacket*, NLIBRecv*);
+	void HandleConnectionRequest(ProtocolPacket*, NLIBRecv&);
+	void HandleConnectionResponse(ProtocolPacket*, NLIBRecv&);
 	//void HandleConnectionKeepAlive(ProtocolPacket*, NLIBRecv*);
 	//void HandleConnectionPayload(ProtocolPacket*, NLIBRecv*);
 	//void HandleConnectionDisconnect(ProtocolPacket*, NLIBRecv*);

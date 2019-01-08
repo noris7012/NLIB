@@ -40,25 +40,24 @@ void GameServer::Update(uint64_t time)
 
 void GameServer::Send(NLIBAddress& address, ProtocolPacket& packet)
 {
-	auto buffer = _buffer_pool.Acquire();
-	ByteStream stream(buffer);
+	auto data = std::make_shared<ByteArray>(MAX_MTU_SIZE);
+	ByteStream stream(data, NLIB_OFFSET_NETWORK);
 	packet.Write(stream);
-	NetworkEndpoint::Send(address, stream.Data(), stream.Length());
-	_buffer_pool.Release(buffer);
+	NetworkEndpoint::Send(address, data);
 }
 
-void GameServer::Send(NLIBAddress& address, PNLIBData data)
+void GameServer::Send(NLIBAddress& address, ByteArrayPtr data)
 {
 	NetworkEndpoint::Send(address, data);
 }
 
-void GameServer::HandleReceive(NLIBRecv* recv)
+void GameServer::HandleReceive(NLIBRecv recv)
 {
 #ifdef NLIB_LOG_ENABLED
 	std::cout << "[ Server Receive ] " << Utility::ByteToString(recv->buffer->data, recv->length) << std::endl;
 #endif
 
-	ByteStream stream(recv->buffer->data, recv->length);
+	ByteStream stream(recv.data, NLIB_OFFSET_NETWORK);
 	ProtocolPacket* packet = ProtocolPacket::Deserialize(stream);
 
 	assert(packet != nullptr);
@@ -68,7 +67,7 @@ void GameServer::HandleReceive(NLIBRecv* recv)
 
 	packet->Print();
 
-	auto address_id = recv->address.id();
+	auto address_id = recv.address.id();
 	if (_connected_session_by_address_id.find(address_id) != _connected_session_by_address_id.end())
 	{
 		auto session = _connected_session_by_id[packet->GetClientID()];
@@ -119,13 +118,13 @@ void GameServer::HandleReceive(NLIBRecv* recv)
 */
 
 
-void GameServer::HandleConnectionRequest(ProtocolPacket* p, NLIBRecv* r)
+void GameServer::HandleConnectionRequest(ProtocolPacket* p, NLIBRecv& r)
 {
 	// Check Session Full
 	if (_connected_session_by_id.size() >= NLIB_MAX_SESSION)
 	{
 		ProtocolPacketConnectionDenied packet;
-		Send(r->address, packet);
+		Send(r.address, packet);
 		return;
 	}
 
@@ -144,7 +143,7 @@ void GameServer::HandleConnectionRequest(ProtocolPacket* p, NLIBRecv* r)
 	if (idx < 0)
 	{
 		ProtocolPacketConnectionDenied packet;
-		Send(r->address, packet);
+		Send(r.address, packet);
 		return;
 	}
 
@@ -154,16 +153,16 @@ void GameServer::HandleConnectionRequest(ProtocolPacket* p, NLIBRecv* r)
 		if (session == nullptr)
 			continue;
 
-		if (session->IsSameAddress(r->address))
+		if (session->IsSameAddress(r.address))
 		{
 			return;
 		}
 	}
 
-	_connection_slot[idx] = new NetworkSession(this, _challenge_token_sequence++, r->address);
+	_connection_slot[idx] = new NetworkSession(this, _challenge_token_sequence++, r.address);
 }
 
-void GameServer::HandleConnectionResponse(ProtocolPacket* p, NLIBRecv* r)
+void GameServer::HandleConnectionResponse(ProtocolPacket* p, NLIBRecv& r)
 {
 	NetworkSession* session = nullptr;
 	for (auto tmp_session : _connection_slot)
@@ -171,7 +170,7 @@ void GameServer::HandleConnectionResponse(ProtocolPacket* p, NLIBRecv* r)
 		if (tmp_session == nullptr)
 			continue;
 
-		if (tmp_session->IsSameAddress(r->address))
+		if (tmp_session->IsSameAddress(r.address))
 		{
 			session = tmp_session;
 			break;

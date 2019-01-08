@@ -25,19 +25,16 @@ public:
 
 	void Startup(GameConfig& config);
 	void Destroy();
-	void HandleReceive(char* data, std::size_t length, NLIBAddress& address);
+	void HandleReceive(byte* data, std::size_t length, NLIBAddress& address);
 	void Send(NLIBAddress& address, const byte* data, uint32_t length);
-	void Send(NLIBAddress& address, PNLIBData data);
+	void Send(NLIBAddress& address, ByteArrayPtr data);
 
 private:
 	void InternalUpdate(uint64_t time);
 
-private:
-	NLIBRecv* Pop();
-
 public:
 	virtual void Update(uint64_t time) = 0;
-	virtual void HandleReceive(NLIBRecv* data) = 0;
+	virtual void HandleReceive(NLIBRecv data) = 0;
 
 	
 private:
@@ -50,7 +47,7 @@ private:
 private:
 	boost::asio::io_context _io_context;
 	boost::asio::ip::udp::socket* _socket;
-	boost::array<char, 2048> _recv_buffer;
+	boost::array<byte, 2048> _recv_buffer;
 	boost::asio::ip::udp::endpoint _remote_endpoint;
 	std::thread* _io_thread;
 
@@ -58,7 +55,7 @@ private:
 	bool _running;
 
 	std::mutex _recv_queue_mutex;
-	std::queue<NLIBRecv*> _recv_queue;
+	std::queue<NLIBRecv> _recv_queue;
 
 private:
 	// For Test

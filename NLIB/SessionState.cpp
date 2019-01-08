@@ -176,7 +176,7 @@ void SessionStateConnected::RecvPacket(ProtocolPacket* p)
 	{
 		auto packet = static_cast<ProtocolPacketConnectionPayload*>(p);
 
-		_session->ReadNext(packet->GetPayload());
+		_session->ReadNext(packet->GetData());
 	}
 	else if (p->GetID() == E_PACKET_ID::CONNECTION_DISCONNECT)
 	{
@@ -184,19 +184,11 @@ void SessionStateConnected::RecvPacket(ProtocolPacket* p)
 	}
 }
 
-void SessionStateConnected::Write(PNLIBData data)
+void SessionStateConnected::Write(ByteArrayPtr data)
 {
 	ProtocolPacketConnectionPayload packet;
 	packet.Set(_session->GetClientID());
+	packet.WriteHeader(data);
 
-	ByteStream stream(1 + 4);
-	stream.Write(packet.GetID());
-	stream.Write(packet.GetClientID());
-
-	auto new_data = NLIBData::Instance();
-	new_data->bytes = stream.Data();
-	new_data->length = stream.Length();
-	new_data->next = data;
-
-	_session->Send(new_data);
+	_session->Send(data);
 }

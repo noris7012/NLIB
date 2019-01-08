@@ -20,7 +20,7 @@ public:
 	virtual void Update(uint64_t time) { };
 	virtual void OnExit() { };
 	virtual void RecvPacket(ProtocolPacket* packet) { };
-	virtual void Write(PNLIBData data) { };
+	virtual void Write(ByteArrayPtr data) { };
 
 protected:
 	NetworkClient* _client;
@@ -83,7 +83,7 @@ public:
 	void OnEnter() override;
 	void Update(uint64_t time) override;
 	void RecvPacket(ProtocolPacket* packet) override;
-	void Write(PNLIBData data) override;
+	void Write(ByteArrayPtr data) override;
 
 private:
 	uint64_t _send_keep_alive_time;

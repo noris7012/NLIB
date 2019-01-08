@@ -38,6 +38,11 @@
 #define NLIB_CHUNK_BUFFER_SIZE 256
 #define NLIB_SLICE_MAX_SIZE 896
 
+#define NLIB_OFFSET_NETWORK 0
+#define NLIB_OFFSET_RELIABLE 5
+#define NLIB_OFFSET_CHUNK 10
+#define NLIB_OFFSET_PAYLOAD 11
+
 enum class E_CLIENT_STATE_ID
 {
 	INIT = 0,
@@ -102,5 +107,8 @@ using PGameServerHandler = std::shared_ptr<GameServerHandler>;
 
 class GameClientHandler;
 using PGameClientHandler = std::shared_ptr<GameClientHandler>;
+
+class ByteArray;
+using ByteArrayPtr = std::shared_ptr<ByteArray>;
 
 #endif

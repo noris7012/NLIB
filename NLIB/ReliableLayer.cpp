@@ -9,9 +9,9 @@ ReliableLayer::ReliableLayer(GameEndpoint* endpoint)
 {
 }
 
-void ReliableLayer::Read(PNLIBData data)
+void ReliableLayer::Read(ByteArrayPtr data)
 {
-	ByteStream stream(const_cast<byte*>(data->bytes), data->length);
+	ByteStream stream(data, NLIB_OFFSET_RELIABLE);
 	ReliablePacket* packet = ReliablePacket::Deserialize(stream);
 
 	assert(packet != nullptr);
@@ -66,24 +66,19 @@ void ReliableLayer::Read(PNLIBData data)
 	}
 }
 
-void ReliableLayer::Write(PNLIBData data)
+void ReliableLayer::Write(ByteArrayPtr data)
 {
 	auto packet = new ReliablePacketPayload();
 	packet->Set(_sequence_number++);
-	auto header = packet->GetHeader();
+	packet->SetData(data);
+	packet->WriteHeader(data);
 
-	packet->SetSendData(data);
 	SetSendBuffer(packet->GetSequenceNumber(), packet);
-	
-	auto new_data = NLIBData::Instance();
-	new_data->bytes = header.bytes;
-	new_data->length = header.length;
-	new_data->next = data;
 
-	WriteNext(new_data);
+	WriteNext(data);
 }
 
-void ReliableLayer::Fail(PNLIBData data)
+void ReliableLayer::Fail(ByteArrayPtr data)
 {
 }
 
@@ -95,15 +90,13 @@ void ReliableLayer::Update(uint64_t time)
 
 		GenerateAck();
 
+		auto data = std::make_shared<ByteArray>(MAX_MTU_SIZE);
+
 		ReliablePacketAck packet;
 		packet.Set(_ack_sequence_number, _ack_bitfield);
-		auto header = packet.GetHeader();
+		packet.WriteHeader(data);
 
-		auto new_data = NLIBData::Instance();
-		new_data->bytes = header.bytes;
-		new_data->length = header.length;
-
-		WriteNext(new_data);
+		WriteNext(data);
 	}
 
 	for (uint32_t i = 0; i < NLIB_RELIABLE_BUFFER_SIZE; ++i)
@@ -121,18 +114,15 @@ void ReliableLayer::Update(uint64_t time)
 			ss << "[Null] " << time << " : " << buffer->GetSendTime() + uint64_t(2 * rtt * 1000) << " (rtt=" << rtt << ") (index=" << buffer->GetSequenceNumber() << ")";
 			Logger::GetInstance()->Log(ss.str());
 
+			auto data = buffer->GetData();
+
 			buffer->Set(_sequence_number++);
-			auto header = buffer->GetHeader();
+			buffer->WriteHeader(data);
 
 			_send_buffer[i] = nullptr;
 			SetSendBuffer(buffer->GetSequenceNumber(), buffer);
 
-			auto new_data = NLIBData::Instance();
-			new_data->bytes = header.bytes;
-			new_data->length = header.length;
-			new_data->next = buffer->GetSendData();
-
-			WriteNext(new_data);
+			WriteNext(data);
 		}
 	}
 }

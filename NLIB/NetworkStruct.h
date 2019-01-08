@@ -44,8 +44,7 @@ struct NLIBAddress
 
 struct NLIBRecv
 {
-	Buffer* buffer;
-	uint32_t length;
+	ByteArrayPtr data;
 	NLIBAddress address;
 };
 

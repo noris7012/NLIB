@@ -15,8 +15,7 @@ public:
 	void Disconnect();
 
 	void Update(uint64_t time) override;
-	void Read(PNLIBData data) override;
-	void Write(PNLIBData data) override;
+	void Read(ByteArrayPtr data) override;
 	void WritePacket(const byte* bytes, uint32_t length);
 
 private:

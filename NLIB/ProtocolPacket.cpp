@@ -6,7 +6,7 @@
 
 // TODO FAST FAIL : 현재 상태에 유효하지 않은 패킷 ID는 바로 리턴할 수 있게
 
-ProtocolPacket* ProtocolPacket::Deserialize(ByteStream & stream)
+ProtocolPacket* ProtocolPacket::Deserialize(ByteStream& stream)
 {
 	E_PACKET_ID packet_id;
 	if (!stream.Read<E_PACKET_ID>(packet_id)) return nullptr;
@@ -204,18 +204,17 @@ void ProtocolPacketConnectionKeepAlive::Print()
 
 void ProtocolPacketConnectionPayload::Write(ByteStream& stream)
 {
-	stream.Write(GetID());
-
-	stream.Write(_client_index);
-	stream.Write(_payload, _payload_length);
+	// stream.Write(GetID());
+	//
+	// stream.Write(_client_index);
+	// stream.Write(_payload, _payload_length);
 }
 
 E_READ_RESULT ProtocolPacketConnectionPayload::Read(ByteStream& stream)
 {
 	NLIB_STREAM_READ(_client_index, uint32_t);
 
-	_payload_length = stream.Remain();
-	NLIB_STREAM_READ_BYTE(_payload, _payload_length);
+	_data = stream.GetData();
 
 	return E_READ_RESULT::SUCCESS;
 }
@@ -225,13 +224,10 @@ void ProtocolPacketConnectionPayload::Print()
 	//std::cout << "Packet ID : Connection Payload" << std::endl;
 }
 
-PNLIBData ProtocolPacketConnectionPayload::GetPayload()
+void ProtocolPacketConnectionPayload::WriteHeader(ByteArrayPtr data)
 {
-	auto data = NLIBData::Instance();
-	data->bytes = _payload;
-	data->length = _payload_length;
-
-	return data;
+	data->Set(NLIB_OFFSET_NETWORK, GetID());
+	data->Set(NLIB_OFFSET_NETWORK + 1, GetClientID());
 }
 
 void ProtocolPacketConnectionDisconnect::Write(ByteStream& stream)

@@ -38,24 +38,21 @@ bool ChunkHolder::IsReadCompleted()
 	return _slice_length > 0 && _read_slice_count == _slice_length;
 }
 
-uint32_t ChunkHolder::Split(PNLIBData data)
+uint32_t ChunkHolder::Split(const ByteArrayPtr& data)
 {
-	// TODO data ´Â recursiveÇÔ.
-	auto cnt = data->length % NLIB_SLICE_MAX_SIZE == 0 ? data->length / NLIB_SLICE_MAX_SIZE : data->length / NLIB_SLICE_MAX_SIZE + 1;
+	auto cnt = data->Length() % NLIB_SLICE_MAX_SIZE == 0 ? data->Length() / NLIB_SLICE_MAX_SIZE : data->Length() / NLIB_SLICE_MAX_SIZE + 1;
 
 	for (uint32_t i = 0; i < cnt; ++i)
 	{
+		auto new_data = std::make_shared<ByteArray>(MAX_MTU_SIZE);
+
 		auto buffer = new ChunkPacketSome();
+		buffer->SetData(new_data);
 
-		auto length = i == cnt - 1 ? data->length % NLIB_SLICE_MAX_SIZE : NLIB_SLICE_MAX_SIZE;
-		auto bytes = new byte[length];
-		memcpy_s(bytes, length, data->bytes + i * NLIB_SLICE_MAX_SIZE, length);
+		buffer->WriteHeader(new_data);
 
-		auto new_data = NLIBData::Instance();
-		new_data->bytes = const_cast<const byte*>(bytes);
-		new_data->length = length;
-
-		buffer->SetSendData(new_data);
+		auto length = i == cnt - 1 ? data->Length() % NLIB_SLICE_MAX_SIZE : NLIB_SLICE_MAX_SIZE;
+		new_data->Set(NLIB_OFFSET_PAYLOAD, data->Bytes() + i * NLIB_SLICE_MAX_SIZE, length);
 		
 		_buffer[i] = buffer;
 	}
@@ -65,7 +62,7 @@ uint32_t ChunkHolder::Split(PNLIBData data)
 	return cnt;
 }
 
-PNLIBData ChunkHolder::GetData()
+ByteArrayPtr ChunkHolder::GetData()
 {
 	if (_slice_length == 0)
 		return nullptr;
@@ -86,18 +83,14 @@ PNLIBData ChunkHolder::GetData()
 		}
 	}
 
-	auto bytes = new byte[length];
+	auto data = std::make_shared<ByteArray>(length);
 	for (uint32_t i = 0; i < _slice_length; ++i)
 	{
 		auto buffer = _buffer[i];
-		memcpy_s(bytes + i * NLIB_SLICE_MAX_SIZE, length, buffer->GetData(), buffer->GetDataLength());
+		data->Set(i * NLIB_SLICE_MAX_SIZE, buffer->GetData());
 	}
 
-	auto new_data = NLIBData::Instance();
-	new_data->bytes = const_cast<const byte*>(bytes);
-	new_data->length = length;
-
-	return new_data;
+	return data;
 }
 
 ChunkPacketSome* ChunkHolder::GetPacket(uint32_t slice_id)

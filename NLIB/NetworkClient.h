@@ -27,12 +27,12 @@ public:
 
 public:
 	void Update(uint64_t time);
-	void HandleReceive(NLIBRecv* recv);
+	void HandleReceive(NLIBRecv recv);
 
 public:
 	void Send(ProtocolPacket& packet);
-	void Send(PNLIBData data);
-	void Write(PNLIBData data) override;
+	void Send(ByteArrayPtr data);
+	void Write(ByteArrayPtr data) override;
 
 public:
 	bool SetState(E_CLIENT_STATE_ID state_id);

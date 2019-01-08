@@ -1,51 +1,16 @@
 #include "ByteStream.h"
 
-#include <assert.h>
-#include <stdio.h>
-#include <string.h>
+#include <cassert>
+#include <cstring>
 
 #include <iostream>
 
-//ByteStream::ByteStream()
-//	: ByteStream(1024)
-//{
-//}
-//
-ByteStream::ByteStream(uint32_t capacity)
+ByteStream::ByteStream(const ByteArrayPtr& data, uint32_t offset)
 {
-	_buffer = new byte[capacity];
-	_capacity = capacity;
-	_idx = 0;
-
-	//std::cout << "[buffer1]" << static_cast<void*>(_buffer) << std::endl;
-}
-
-ByteStream::ByteStream(byte* data, uint32_t length)
-{
-	//_buffer = new byte[length];
-	_buffer = data;
-	_capacity = length;
-	_idx = 0;
-
-	memcpy_s(_buffer, length, data, length);
-
-	//std::cout << "[buffer2]" << static_cast<void*>(_buffer) << std::endl;
-}
-
-ByteStream::ByteStream(Buffer* buffer)
-{
-	_buffer = buffer->data;
-	_capacity = sizeof(buffer->data);
-	_idx = 0;
-
-	//std::cout << "[buffer3]" << static_cast<void*>(_buffer) << std::endl;
-}
-
-ByteStream::~ByteStream()
-{
-	//static int cnt = 0;
-	//std::cout << "[~buffer] " << ++cnt << " : " << static_cast<void*>(_buffer) << std::endl;
-	//delete[] _buffer;
+	_data = data;
+	_buffer = data->Bytes();
+	_capacity = data->Capacity();
+	_idx = offset;
 }
 
 void ByteStream::Write(E_PACKET_ID packet_id)
@@ -106,11 +71,6 @@ void ByteStream::PadWithZero()
 		memset(_buffer + _idx, 0, _capacity - _idx);
 		_idx = _capacity;
 	}
-}
-
-const byte* ByteStream::Data() const
-{
-	return _buffer;
 }
 
 uint32_t ByteStream::Length()

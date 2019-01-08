@@ -140,6 +140,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="BufferPool.h" />
+    <ClInclude Include="ByteArray.h" />
     <ClInclude Include="ByteStream.h" />
     <ClInclude Include="ChunkHolder.h" />
     <ClInclude Include="ChunkLayer.h" />
@@ -169,6 +170,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="BufferPool.cpp" />
+    <ClCompile Include="ByteArray.cpp" />
     <ClCompile Include="ByteStream.cpp" />
     <ClCompile Include="ChunkHolder.cpp" />
     <ClCompile Include="ChunkLayer.cpp" />
