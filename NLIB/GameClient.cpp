@@ -86,8 +86,10 @@ void GameClient::Update(uint64_t time)
 		_reliable_layer->Update(time);
 }
 
-void GameClient::Read(ByteArrayPtr data)
+void GameClient::Read(const ReadParam& param)
 {
+	auto data = param.data;
+
 	if (data->Length() <= NLIB_OFFSET_PAYLOAD)
 		return;
 
@@ -108,7 +110,9 @@ void GameClient::WritePacket(const byte* bytes, uint32_t length)
 	std::cout << "[WritePacket] " << Utility::TimeInHHMMSSMMM() << std::endl;
 #endif
 
-	auto data = std::make_shared<ByteArray>(const_cast<byte*>(bytes), length);
+	WriteParam param {
+		std::make_shared<ByteArray>(const_cast<byte*>(bytes), length)
+	};
 
-	WriteNext(data);
+	WriteNext(param);
 }

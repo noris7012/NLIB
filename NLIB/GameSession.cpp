@@ -96,8 +96,10 @@ void GameSession::RecvPacket(ProtocolPacket* recv)
 	_network_session->RecvPacket(recv);
 }
 
-void GameSession::Read(ByteArrayPtr data)
+void GameSession::Read(const ReadParam& param)
 {
+	auto data = param.data;
+
 	if (data->Length() <= NLIB_OFFSET_PAYLOAD)
 		return;
 
@@ -112,12 +114,12 @@ void GameSession::Read(ByteArrayPtr data)
 	_handler->HandlePacket(shared_from_this(), packet);
 }
 
-void GameSession::Write(ByteArrayPtr data)
+void GameSession::Write(const WriteParam& param)
 {
-	WriteNext(data);
+	WriteNext(param);
 }
 
-void GameSession::Fail(ByteArrayPtr data)
+void GameSession::Fail(const FailParam& param)
 {
 }
 
@@ -142,7 +144,9 @@ void GameSession::Close()
 
 void GameSession::WritePacket(const byte* bytes, uint32_t length)
 {
-	auto data = std::make_shared<ByteArray>(bytes, length);
+	WriteParam param {
+		std::make_shared<ByteArray>(bytes, length)
+	};
 
-	Write(data);
+	Write(param);
 }

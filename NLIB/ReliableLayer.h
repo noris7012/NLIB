@@ -18,9 +18,9 @@ public:
 	ReliableLayer(GameEndpoint* endpoint);
 
 public:
-	void Read(ByteArrayPtr data) override;
-	void Write(ByteArrayPtr data) override;
-	void Fail(ByteArrayPtr data) override;
+	void Read(const ReadParam& param) override;
+	void Write(const WriteParam& param) override;
+	void Fail(const FailParam& param) override;
 	void Update(uint64_t time);
 
 	ReliablePacketPayload* GetSendBuffer(uint32_t sequence_number);

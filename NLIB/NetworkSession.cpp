@@ -139,9 +139,9 @@ NLIBAddress& NetworkSession::GetAddress()
 	return _address;
 }
 
-void NetworkSession::Write(ByteArrayPtr data)
+void NetworkSession::Write(const WriteParam& param)
 {
 	assert(_state != nullptr);
 
-	_state->Write(data);
+	_state->Write(param);
 }

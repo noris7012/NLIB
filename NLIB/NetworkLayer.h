@@ -10,53 +10,53 @@
 class NetworkLayer
 {
 public:
-	void ReadNext(ByteArrayPtr data)
+	void ReadNext(const ReadParam& param)
 	{
 		assert(_read_next != nullptr);
 		if (_read_next != nullptr)
-			_read_next(data);
+			_read_next(param);
 	}
 
-	void WriteNext(ByteArrayPtr data)
+	void WriteNext(const WriteParam& param)
 	{
 		assert(_write_next != nullptr);
 		if (_write_next != nullptr)
-			_write_next(data);
+			_write_next(param);
 	}
 
-	void FailNext(ByteArrayPtr data)
+	void FailNext(const FailParam& param)
 	{
 		assert(_fail_next != nullptr);
 		if (_fail_next != nullptr)
-			_fail_next(data);
+			_fail_next(param);
 	}
 
-	void SetReadNext(std::function<void(ByteArrayPtr)> func)
+	void SetReadNext(std::function<void(const ReadParam&)> func)
 	{
 		assert(_read_next == nullptr);
 		_read_next = func;
 	}
 
-	void SetWriteNext(std::function<void(ByteArrayPtr)> func)
+	void SetWriteNext(std::function<void(const WriteParam&)> func)
 	{
 		assert(_write_next == nullptr);
 		_write_next = func;
 	}
 
-	void SetFailNext(std::function<void(ByteArrayPtr)> func)
+	void SetFailNext(std::function<void(const FailParam&)> func)
 	{
 		assert(_fail_next == nullptr);
 		_fail_next = func;
 	}
 
-	virtual void Write(ByteArrayPtr data) { assert(false); }
-	virtual void Read(ByteArrayPtr data) { assert(false); }
-	virtual void Fail(ByteArrayPtr data) { assert(false); }
+	virtual void Write(const WriteParam& param) { assert(false); }
+	virtual void Read(const ReadParam& param) { assert(false); }
+	virtual void Fail(const FailParam& param) { assert(false); }
 
 private:
-	std::function<void(ByteArrayPtr)> _read_next = nullptr;
-	std::function<void(ByteArrayPtr)> _write_next = nullptr;
-	std::function<void(ByteArrayPtr)> _fail_next = nullptr;
+	std::function<void(const ReadParam&)> _read_next = nullptr;
+	std::function<void(const WriteParam&)> _write_next = nullptr;
+	std::function<void(const FailParam&)> _fail_next = nullptr;
 };
 
 #endif

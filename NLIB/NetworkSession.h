@@ -53,7 +53,7 @@ public:
 		_client_id = client_id; 
 	}
 
-	void Write(ByteArrayPtr data) override;
+	void Write(const WriteParam& param) override;
 
 private:
 	GameServer* _server;

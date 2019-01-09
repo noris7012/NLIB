@@ -113,11 +113,11 @@ void NetworkClient::Send(ByteArrayPtr data)
 	NetworkEndpoint::Send(_address, data);
 }
 
-void NetworkClient::Write(ByteArrayPtr data)
+void NetworkClient::Write(const WriteParam& param)
 {
 	assert(_state != nullptr);
 
-	_state->Write(data);
+	_state->Write(param);
 }
 
 bool NetworkClient::SetState(E_CLIENT_STATE_ID state_id)

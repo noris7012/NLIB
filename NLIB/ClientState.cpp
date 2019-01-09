@@ -202,7 +202,7 @@ void ClientStateConnected::RecvPacket(ProtocolPacket* p)
 	{
 		auto packet = static_cast<ProtocolPacketConnectionPayload*>(p);
 
-		_client->ReadNext(packet->GetData());
+		_client->ReadNext(ReadParam{ packet->GetData() });
 	}
 	else if (p->GetID() == E_PACKET_ID::CONNECTION_DISCONNECT)
 	{
@@ -210,8 +210,10 @@ void ClientStateConnected::RecvPacket(ProtocolPacket* p)
 	}
 }
 
-void ClientStateConnected::Write(ByteArrayPtr data)
+void ClientStateConnected::Write(const WriteParam& param)
 {
+	auto data = param.data;
+
 	_send_keep_alive_time = Utility::GetTime() + _next_keep_alive_interval;
 
 	ProtocolPacketConnectionPayload packet;

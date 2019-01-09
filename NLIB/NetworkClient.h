@@ -32,7 +32,7 @@ public:
 public:
 	void Send(ProtocolPacket& packet);
 	void Send(ByteArrayPtr data);
-	void Write(ByteArrayPtr data) override;
+	void Write(const WriteParam& param) override;
 
 public:
 	bool SetState(E_CLIENT_STATE_ID state_id);

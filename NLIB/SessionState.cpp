@@ -176,7 +176,7 @@ void SessionStateConnected::RecvPacket(ProtocolPacket* p)
 	{
 		auto packet = static_cast<ProtocolPacketConnectionPayload*>(p);
 
-		_session->ReadNext(packet->GetData());
+		_session->ReadNext(ReadParam{ packet->GetData() });
 	}
 	else if (p->GetID() == E_PACKET_ID::CONNECTION_DISCONNECT)
 	{
@@ -184,8 +184,10 @@ void SessionStateConnected::RecvPacket(ProtocolPacket* p)
 	}
 }
 
-void SessionStateConnected::Write(ByteArrayPtr data)
+void SessionStateConnected::Write(const WriteParam& param)
 {
+	auto data = param.data;
+
 	ProtocolPacketConnectionPayload packet;
 	packet.Set(_session->GetClientID());
 	packet.WriteHeader(data);

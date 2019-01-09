@@ -54,20 +54,19 @@ struct NLIBSend
 	uint32_t length;
 };
 
-struct NLIBData
+struct WriteParam
 {
-	const byte* bytes = nullptr;
-	uint32_t length = 0;
-	std::shared_ptr<NLIBData> next;
-
-	static std::shared_ptr<NLIBData> Instance()
-	{
-		// TODO Delete bytes
-		return std::make_shared<NLIBData>();
-	}
+	ByteArrayPtr data;
 };
 
-using UNLIBData = std::unique_ptr<NLIBData>;
-using PNLIBData = std::shared_ptr<NLIBData>;
+struct ReadParam
+{
+	ByteArrayPtr data;	
+};
+
+struct FailParam
+{
+	ByteArrayPtr data;	
+};
 
 #endif

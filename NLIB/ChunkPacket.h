@@ -44,7 +44,6 @@ public:
 	E_READ_RESULT Read(ByteStream& stream) override;
 
 	uint16_t GetChunkId() { return _chunk_id; }
-	PNLIBData GetSendData();
 
 	void SetData(ByteArrayPtr data)
 	{

@@ -62,6 +62,7 @@ void NetworkEndpoint::Startup(GameConfig& config)
 	{
 		// Test
 		_loss_mask = config.loss_mask;
+		_loss_rate = static_cast<double>(config.loss_rate);
 	}
 }
 
@@ -166,6 +167,8 @@ void NetworkEndpoint::HandleSend(const boost::system::error_code& error, std::si
 	std::cout << "[HandleSend] " << Utility::TimeInHHMMSSMMM() << std::endl;
 #endif
 
+	_send_buffer = nullptr;
+
 	if (error)
 	{
 		std::cout << error.message() << std::endl;
@@ -201,6 +204,12 @@ void NetworkEndpoint::HandleReceive(const boost::system::error_code& error, std:
 	}
 
 	if (_loss_mask != nullptr && !_loss_mask->at(_loss_index = (_loss_index + 1) % _loss_mask->size()))
+	{
+		std::stringstream stream;
+		stream << "[Loss] " << Utility::ByteToString(reinterpret_cast<const byte*>(_recv_buffer.data()), std::min(length, size_t(30)));
+		Logger::GetInstance()->Log(stream.str());
+	}
+	else if (_loss_rate > 0.0f && Utility::Rand() <= _loss_rate)
 	{
 		std::stringstream stream;
 		stream << "[Loss] " << Utility::ByteToString(reinterpret_cast<const byte*>(_recv_buffer.data()), std::min(length, size_t(30)));

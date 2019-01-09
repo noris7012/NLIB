@@ -10,6 +10,7 @@ struct GameConfig
 	const char* host = nullptr;
 	uint32_t port = 0;
 	std::vector<bool>* loss_mask = nullptr;
+	float loss_rate = 0.0f;
 };
 
 #endif

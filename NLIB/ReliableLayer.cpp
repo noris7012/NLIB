@@ -9,8 +9,10 @@ ReliableLayer::ReliableLayer(GameEndpoint* endpoint)
 {
 }
 
-void ReliableLayer::Read(ByteArrayPtr data)
+void ReliableLayer::Read(const ReadParam& param)
 {
+	auto data = param.data;
+
 	ByteStream stream(data, NLIB_OFFSET_RELIABLE);
 	ReliablePacket* packet = ReliablePacket::Deserialize(stream);
 
@@ -30,7 +32,7 @@ void ReliableLayer::Read(ByteArrayPtr data)
 		SetRecvBuffer(payload->GetSequenceNumber(), payload);
 		_ack_sequence_number = payload->GetSequenceNumber();
 
-		ReadNext(payload->GetData());
+		ReadNext(ReadParam{ payload->GetData() });
 	}
 	else if (packet->GetID() == E_PACKET_ID::RELIABLE_ACK)
 	{
@@ -66,8 +68,10 @@ void ReliableLayer::Read(ByteArrayPtr data)
 	}
 }
 
-void ReliableLayer::Write(ByteArrayPtr data)
+void ReliableLayer::Write(const WriteParam& param)
 {
+	auto data = param.data;
+
 	auto packet = new ReliablePacketPayload();
 	packet->Set(_sequence_number++);
 	packet->SetData(data);
@@ -75,10 +79,10 @@ void ReliableLayer::Write(ByteArrayPtr data)
 
 	SetSendBuffer(packet->GetSequenceNumber(), packet);
 
-	WriteNext(data);
+	WriteNext(param);
 }
 
-void ReliableLayer::Fail(ByteArrayPtr data)
+void ReliableLayer::Fail(const FailParam& param)
 {
 }
 
@@ -96,7 +100,7 @@ void ReliableLayer::Update(uint64_t time)
 		packet.Set(_ack_sequence_number, _ack_bitfield);
 		packet.WriteHeader(data);
 
-		WriteNext(data);
+		WriteNext(WriteParam{ data });
 	}
 
 	for (uint32_t i = 0; i < NLIB_RELIABLE_BUFFER_SIZE; ++i)
@@ -122,7 +126,7 @@ void ReliableLayer::Update(uint64_t time)
 			_send_buffer[i] = nullptr;
 			SetSendBuffer(buffer->GetSequenceNumber(), buffer);
 
-			WriteNext(data);
+			WriteNext(WriteParam{ data });
 		}
 	}
 }
@@ -141,7 +145,7 @@ void ReliableLayer::SetSendBuffer(uint32_t sequence_number, ReliablePacketPayloa
 	auto old_packet = _send_buffer[sequence_number % (sizeof(_send_buffer) / sizeof(*_send_buffer))];
 	if (old_packet != nullptr && !old_packet->IsAcked())
 	{
-		FailNext(old_packet->GetData());
+		FailNext(FailParam{ old_packet->GetData() });
 	}
 
 	_send_buffer[sequence_number % (sizeof(_send_buffer) / sizeof(*_send_buffer))] = packet;

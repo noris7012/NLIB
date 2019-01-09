@@ -63,6 +63,8 @@ private:
 	std::vector<bool>* _loss_mask = nullptr;
 	uint32_t _loss_index = 0;
 
+	double _loss_rate = 0.0;
+
 protected:
 	BufferPool _buffer_pool;
 };

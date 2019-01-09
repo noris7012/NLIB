@@ -7,8 +7,10 @@ ChunkLayer::ChunkLayer(GameEndpoint* endpoint)
 {
 }
 
-void ChunkLayer::Read(ByteArrayPtr data)
+void ChunkLayer::Read(const ReadParam& param)
 {
+	auto data = param.data;
+
 	ByteStream stream(data, NLIB_OFFSET_CHUNK);
 	ChunkPacket* packet = ChunkPacket::Deserialize(stream);
 
@@ -20,7 +22,7 @@ void ChunkLayer::Read(ByteArrayPtr data)
 	{
 		auto p = static_cast<ChunkPacketNone*>(packet);
 
-		ReadNext(p->GetData());
+		ReadNext(ReadParam{ p->GetData() });
 	}
 	else
 	{
@@ -39,13 +41,15 @@ void ChunkLayer::Read(ByteArrayPtr data)
 
 		if (holder->IsReadCompleted())
 		{
-			ReadNext(holder->GetData());
+			ReadNext(ReadParam{ holder->GetData() });
 		}
 	}
 }
 
-void ChunkLayer::Write(ByteArrayPtr data)
+void ChunkLayer::Write(const WriteParam& param)
 {
+	auto data = param.data;
+
 	if (data->Length() <= NLIB_SLICE_MAX_SIZE)
 	{
 		auto new_data = std::make_shared<ByteArray>(MAX_MTU_SIZE);
@@ -55,7 +59,7 @@ void ChunkLayer::Write(ByteArrayPtr data)
 
 		new_data->Set(NLIB_OFFSET_PAYLOAD, data);
 
-		WriteNext(new_data);
+		WriteNext(WriteParam{ new_data });
 	}
 	else
 	{
@@ -71,13 +75,15 @@ void ChunkLayer::Write(ByteArrayPtr data)
 			if (packet == nullptr)
 				continue;
 
-			WriteNext(packet->GetData());
+			WriteNext(WriteParam{ packet->GetData() });
 		}
 	}
 }
 
-void ChunkLayer::Fail(ByteArrayPtr data)
+void ChunkLayer::Fail(const FailParam& param)
 {
+	auto data = param.data;
+
 	ByteStream stream(data, NLIB_OFFSET_CHUNK);
 	ChunkPacket* packet = ChunkPacket::Deserialize(stream);
 
@@ -89,7 +95,7 @@ void ChunkLayer::Fail(ByteArrayPtr data)
 	{
 		auto p = static_cast<ChunkPacketNone*>(packet);
 
-		FailNext(p->GetData());
+		FailNext(FailParam{ p->GetData() });
 	}
 	else
 	{
@@ -97,7 +103,7 @@ void ChunkLayer::Fail(ByteArrayPtr data)
 		auto holder = GetSendBuffer(p->GetChunkId());
 
 		assert(holder != nullptr);
-		FailNext(holder->GetData());
+		FailNext(FailParam{ holder->GetData() });
 	}
 }
 
@@ -114,7 +120,7 @@ void ChunkLayer::Update(uint64_t time)
 		if (buffer->IsTimeout(_endpoint->GetRTT()))
 		{
 			_send_buffer[i] = nullptr;
-			FailNext(buffer->GetData());
+			FailNext(FailParam{ buffer->GetData() });
 		}
 	}
 
@@ -170,7 +176,7 @@ void ChunkLayer::SetSendBuffer(uint16_t chunk_id, ChunkHolder* holder)
 	if (old_packet != nullptr)
 	{
 		// TODO
-		FailNext(old_packet->GetData());
+		FailNext(FailParam{ old_packet->GetData() });
 	}
 
 	_recv_buffer[chunk_id % NLIB_CHUNK_BUFFER_SIZE] = holder;

@@ -40,6 +40,14 @@ uint32_t Utility::Rand32()
 	return gen();
 }
 
+double Utility::Rand()
+{
+	static std::random_device rd;
+	static std::mt19937 gen(rd());
+
+	return static_cast<double>(gen()) / static_cast<double>(UINT32_MAX);
+}
+
 byte* Utility::RandBytes(uint32_t length)
 {
 	static std::random_device rd;
