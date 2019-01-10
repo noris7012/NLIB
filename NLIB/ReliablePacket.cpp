@@ -26,6 +26,11 @@ ReliablePacket* ReliablePacket::Deserialize(ByteStream& stream)
 	return packet;
 }
 
+ReliablePacketPayload::~ReliablePacketPayload()
+{
+	_data = nullptr;
+}
+
 void ReliablePacketPayload::WriteHeader(ByteArrayPtr data)
 {
 	data->Set(NLIB_OFFSET_RELIABLE, GetID());

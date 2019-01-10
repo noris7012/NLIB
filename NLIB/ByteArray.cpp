@@ -54,6 +54,17 @@ void ByteArray::Set(uint32_t index, byte value)
 	}
 }
 
+void ByteArray::Set(uint32_t index, uint16_t value)
+{
+	assert(index >= 0 && index + 2 <= _capacity);
+	if (index >= 0 && index + 2 <= _capacity)
+	{
+		_bytes[index + 0] = value >> 8 * 0;
+		_bytes[index + 1] = value >> 8 * 1;
+		_length = std::max(_length, index + 2);
+	}
+}
+
 void ByteArray::Set(uint32_t index, uint32_t value)
 {
 	assert(index >= 0 && index + 4 <= _capacity);
@@ -67,9 +78,12 @@ void ByteArray::Set(uint32_t index, uint32_t value)
 	}
 }
 
-void ByteArray::Set(uint32_t index, const ByteArrayPtr& data)
+void ByteArray::Set(uint32_t index, const ByteArrayPtr& data, uint32_t offset)
 {
-	Set(index, data->Bytes(), data->Length());
+	if (offset >= data->Length())
+		return;
+
+	Set(index, data->Bytes() + offset, data->Length() - offset);
 }
 
 void ByteArray::Set(uint32_t index, const byte* bytes, uint32_t length)

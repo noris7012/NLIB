@@ -24,11 +24,12 @@ public:
 	ByteArrayPtr GetData() { return _data; }
 	uint32_t Length();
 	uint32_t Remain();
+	uint32_t Index() { return _idx; }
 
 private:
 	ByteArrayPtr _data;
-	unsigned int _capacity;
-	unsigned int _idx;
+	uint32_t _capacity;
+	uint32_t _idx;
 
 public:
 	template<class T> bool Read(T&)
@@ -43,6 +44,18 @@ public:
 			return false;
 
 		val = (E_PACKET_ID)_data->Get(_idx++);
+
+		return true;
+	}
+
+	template<> bool Read<uint16_t>(uint16_t& val)
+	{
+		if (_idx + 2 > _capacity)
+			return false;
+
+		val = 0;
+		val += _data->Get(_idx++) << 8 * 0;
+		val += _data->Get(_idx++) << 8 * 1;
 
 		return true;
 	}

@@ -9,11 +9,9 @@ ReliableLayer::ReliableLayer(GameEndpoint* endpoint)
 {
 }
 
-void ReliableLayer::Read(const ReadParam& param)
+void ReliableLayer::Read(ReadParam& param)
 {
-	auto data = param.data;
-
-	ByteStream stream(data, NLIB_OFFSET_RELIABLE);
+	ByteStream stream(param.data, param.offset);
 	ReliablePacket* packet = ReliablePacket::Deserialize(stream);
 
 	assert(packet != nullptr);
@@ -32,7 +30,8 @@ void ReliableLayer::Read(const ReadParam& param)
 		SetRecvBuffer(payload->GetSequenceNumber(), payload);
 		_ack_sequence_number = payload->GetSequenceNumber();
 
-		ReadNext(ReadParam{ payload->GetData() });
+		param.offset += NLIB_HEADER_SIZE_RELIABLE;
+		ReadNext(param);
 	}
 	else if (packet->GetID() == E_PACKET_ID::RELIABLE_ACK)
 	{
@@ -77,6 +76,8 @@ void ReliableLayer::Write(const WriteParam& param)
 	packet->SetData(data);
 	packet->WriteHeader(data);
 
+	packet->SetRetryLimit(param.retry_limit);
+
 	SetSendBuffer(packet->GetSequenceNumber(), packet);
 
 	WriteNext(param);
@@ -106,27 +107,48 @@ void ReliableLayer::Update(uint64_t time)
 	for (uint32_t i = 0; i < NLIB_RELIABLE_BUFFER_SIZE; ++i)
 	{
 		auto buffer = _send_buffer[i];
-		if (buffer == nullptr || buffer->IsAcked())
+		if (buffer == nullptr)
 			continue;
 
-		// TODO acked 패킷은 메모리 Release
+		if (buffer->IsAcked())
+		{
+			delete buffer;
+			_send_buffer[i] = nullptr;
+			
+			continue;
+		}
 
 		auto rtt = _endpoint->GetRTT();
 		if (rtt > 0 && time >= buffer->GetSendTime() + uint64_t(2 * rtt * 1000))
 		{
-			std::stringstream ss;
-			ss << "[Null] " << time << " : " << buffer->GetSendTime() + uint64_t(2 * rtt * 1000) << " (rtt=" << rtt << ") (index=" << buffer->GetSequenceNumber() << ")";
-			Logger::GetInstance()->Log(ss.str());
+			if (buffer->NeedRetry())
+			{
+				buffer->IncRetryCount();
 
-			auto data = buffer->GetData();
+				std::stringstream ss;
+				ss << "[Retry ] " << time << " : " << buffer->GetSendTime() + uint64_t(2 * rtt * 1000) << " (rtt=" << rtt << ") (index=" << buffer->GetSequenceNumber() << ")";
+				Logger::GetInstance()->Log(ss.str());
 
-			buffer->Set(_sequence_number++);
-			buffer->WriteHeader(data);
+				auto data = buffer->GetData();
 
-			_send_buffer[i] = nullptr;
-			SetSendBuffer(buffer->GetSequenceNumber(), buffer);
+				buffer->Set(_sequence_number++);
+				buffer->WriteHeader(data);
 
-			WriteNext(WriteParam{ data });
+				_send_buffer[i] = nullptr;
+				SetSendBuffer(buffer->GetSequenceNumber(), buffer);
+
+				WriteNext(WriteParam{ data });
+			}
+			else
+			{
+				auto data = buffer->GetData();
+
+				std::stringstream ss;
+				ss << "[Fail  ] " << time << " : " << buffer->GetSendTime() + uint64_t(2 * rtt * 1000) << " (rtt=" << rtt << ") (index=" << buffer->GetSequenceNumber() << ")";
+				Logger::GetInstance()->Log(ss.str());
+
+				FailNext(FailParam{ data });
+			}
 		}
 	}
 }

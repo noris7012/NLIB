@@ -45,6 +45,13 @@ public:
 
 	uint16_t GetChunkId() { return _chunk_id; }
 
+	void Init(uint16_t chunk_id, uint16_t slice_length, uint16_t slice_id)
+	{
+		_chunk_id = chunk_id;
+		_slice_length = slice_length;
+		_slice_id = slice_id;
+	}
+
 	void SetData(ByteArrayPtr data)
 	{
 		_data = data;
@@ -55,13 +62,16 @@ public:
 
 	ByteArrayPtr GetData() { return _data; }
 	uint32_t GetDataLength() { return _data->Length(); }
+	uint32_t GetPayloadOffset() { return _payload_offset; }
 
 private:
 	ByteArrayPtr _data;
 	uint16_t _chunk_id;
 	uint16_t _slice_length;
 	uint16_t _slice_id;
+
 	bool _acked;
+	uint32_t _payload_offset;
 };
 
 #endif

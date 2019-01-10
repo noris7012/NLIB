@@ -59,6 +59,30 @@ GameClient::GameClient(PGameClientHandler handler)
 			, std::placeholders::_1
 		)
 	);
+
+	_network_client->SetFailNext(
+		std::bind(
+			&ReliableLayer::Fail
+			, _reliable_layer
+			, std::placeholders::_1
+		)
+	);
+
+	_reliable_layer->SetFailNext(
+		std::bind(
+			&ChunkLayer::Fail
+			, _chunk_layer
+			, std::placeholders::_1
+		)
+	);
+
+	_chunk_layer->SetFailNext(
+		std::bind(
+			&GameClient::Fail
+			, this
+			, std::placeholders::_1
+		)
+	);
 }
 
 bool GameClient::Connect(GameConfig& config)
@@ -86,17 +110,18 @@ void GameClient::Update(uint64_t time)
 		_reliable_layer->Update(time);
 }
 
-void GameClient::Read(const ReadParam& param)
+void GameClient::Read(ReadParam& param)
 {
 	auto data = param.data;
+	auto offset = param.offset;
 
-	if (data->Length() <= NLIB_OFFSET_PAYLOAD)
+	if (data->Length() <= offset)
 		return;
 
-	int length = data->Length() - NLIB_OFFSET_PAYLOAD;
+	int length = data->Length() - offset;
 
 	auto new_data = new byte[length];
-	memcpy(new_data, data->Bytes() + NLIB_OFFSET_PAYLOAD, length);
+	memcpy(new_data, data->Bytes() + offset, length);
 
 	auto packet = GamePacket::Instance();
 	packet->Set(new_data, length);

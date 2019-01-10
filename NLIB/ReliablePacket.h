@@ -25,6 +25,9 @@ public:
 class ReliablePacketPayload : public ReliablePacket
 {
 public:
+	~ReliablePacketPayload();
+
+public:
 	E_PACKET_ID GetID() override { return E_PACKET_ID::RELIABLE_PAYLOAD; }
 	void WriteHeader(ByteArrayPtr data) override;
 	E_READ_RESULT Read(ByteStream& stream) override;
@@ -40,6 +43,10 @@ public:
 	bool IsAcked() { return _acked; }
 	uint64_t GetSendTime() { return _send_time; }
 	void SetSendTime(uint64_t send_time) { _send_time = send_time; }
+	void SetRetryLimit(uint32_t retry_limit) { _retry_limit = retry_limit; }
+
+	bool NeedRetry() { return _retry_count < _retry_limit; }
+	void IncRetryCount() { ++_retry_count; }
 
 private:
 	ByteArrayPtr _data;
@@ -47,6 +54,9 @@ private:
 	uint32_t _sequence_number = 0;
 	uint64_t _send_time = 0;
 	bool _acked = false;
+
+	uint32_t _retry_limit = 0;
+	uint32_t _retry_count = 0;
 };
 
 class ReliablePacketAck : public ReliablePacket

@@ -40,19 +40,21 @@ bool ChunkHolder::IsReadCompleted()
 
 uint32_t ChunkHolder::Split(const ByteArrayPtr& data)
 {
-	auto cnt = data->Length() % NLIB_SLICE_MAX_SIZE == 0 ? data->Length() / NLIB_SLICE_MAX_SIZE : data->Length() / NLIB_SLICE_MAX_SIZE + 1;
+	auto cnt = static_cast<uint16_t>(data->Length() % NLIB_SLICE_MAX_SIZE == 0 ? data->Length() / NLIB_SLICE_MAX_SIZE : data->Length() / NLIB_SLICE_MAX_SIZE + 1);
 
-	for (uint32_t i = 0; i < cnt; ++i)
+	for (uint16_t i = 0; i < cnt; ++i)
 	{
 		auto new_data = std::make_shared<ByteArray>(MAX_MTU_SIZE);
 
 		auto buffer = new ChunkPacketSome();
+		buffer->Init(_chunk_id, cnt, i);
+
 		buffer->SetData(new_data);
 
 		buffer->WriteHeader(new_data);
 
 		auto length = i == cnt - 1 ? data->Length() % NLIB_SLICE_MAX_SIZE : NLIB_SLICE_MAX_SIZE;
-		new_data->Set(NLIB_OFFSET_PAYLOAD, data->Bytes() + i * NLIB_SLICE_MAX_SIZE, length);
+		new_data->Set(NLIB_OFFSET_PAYLOAD_CHUNK, data->Bytes() + i * NLIB_SLICE_MAX_SIZE, length);
 		
 		_buffer[i] = buffer;
 	}
@@ -87,7 +89,7 @@ ByteArrayPtr ChunkHolder::GetData()
 	for (uint32_t i = 0; i < _slice_length; ++i)
 	{
 		auto buffer = _buffer[i];
-		data->Set(i * NLIB_SLICE_MAX_SIZE, buffer->GetData());
+		data->Set(i * NLIB_SLICE_MAX_SIZE, buffer->GetData(), buffer->GetPayloadOffset());
 	}
 
 	return data;

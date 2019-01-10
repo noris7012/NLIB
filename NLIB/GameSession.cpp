@@ -96,17 +96,18 @@ void GameSession::RecvPacket(ProtocolPacket* recv)
 	_network_session->RecvPacket(recv);
 }
 
-void GameSession::Read(const ReadParam& param)
+void GameSession::Read(ReadParam& param)
 {
 	auto data = param.data;
+	auto offset = param.offset;
 
-	if (data->Length() <= NLIB_OFFSET_PAYLOAD)
+	if (data->Length() <= offset)
 		return;
 
-	int length = data->Length() - NLIB_OFFSET_PAYLOAD;
+	int length = data->Length() - offset;
 
 	auto new_data = new byte[length];
-	memcpy(new_data, data->Bytes() + NLIB_OFFSET_PAYLOAD, length);
+	memcpy(new_data, data->Bytes() + offset, length);
 
 	auto packet = GamePacket::Instance();
 	packet->Set(new_data, length);

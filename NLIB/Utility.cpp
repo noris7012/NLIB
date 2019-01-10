@@ -19,6 +19,9 @@ std::string Utility::ByteToString(const byte* data, uint32_t length)
 	for (uint32_t i = 0; i < length; ++i)
 	{
 		ss << std::setw(2) << static_cast<unsigned>(data[i]);
+
+		if (i % 5 == 4)
+			ss << " ";
 	}
 
 	return ss.str();

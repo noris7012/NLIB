@@ -10,7 +10,7 @@
 class NetworkLayer
 {
 public:
-	void ReadNext(const ReadParam& param)
+	void ReadNext(ReadParam& param)
 	{
 		assert(_read_next != nullptr);
 		if (_read_next != nullptr)
@@ -31,7 +31,7 @@ public:
 			_fail_next(param);
 	}
 
-	void SetReadNext(std::function<void(const ReadParam&)> func)
+	void SetReadNext(std::function<void(ReadParam&)> func)
 	{
 		assert(_read_next == nullptr);
 		_read_next = func;
@@ -50,11 +50,11 @@ public:
 	}
 
 	virtual void Write(const WriteParam& param) { assert(false); }
-	virtual void Read(const ReadParam& param) { assert(false); }
+	virtual void Read(ReadParam& param) { assert(false); }
 	virtual void Fail(const FailParam& param) { assert(false); }
 
 private:
-	std::function<void(const ReadParam&)> _read_next = nullptr;
+	std::function<void(ReadParam&)> _read_next = nullptr;
 	std::function<void(const WriteParam&)> _write_next = nullptr;
 	std::function<void(const FailParam&)> _fail_next = nullptr;
 };

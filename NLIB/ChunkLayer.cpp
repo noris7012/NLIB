@@ -7,11 +7,12 @@ ChunkLayer::ChunkLayer(GameEndpoint* endpoint)
 {
 }
 
-void ChunkLayer::Read(const ReadParam& param)
+void ChunkLayer::Read(ReadParam& param)
 {
 	auto data = param.data;
+	auto offset = param.offset;
 
-	ByteStream stream(data, NLIB_OFFSET_CHUNK);
+	ByteStream stream(data, offset);
 	ChunkPacket* packet = ChunkPacket::Deserialize(stream);
 
 	assert(packet != nullptr);
@@ -22,7 +23,8 @@ void ChunkLayer::Read(const ReadParam& param)
 	{
 		auto p = static_cast<ChunkPacketNone*>(packet);
 
-		ReadNext(ReadParam{ p->GetData() });
+		param.offset += NLIB_HEADER_SIZE_CHUNK_NONE;
+		ReadNext(param);
 	}
 	else
 	{
@@ -41,7 +43,8 @@ void ChunkLayer::Read(const ReadParam& param)
 
 		if (holder->IsReadCompleted())
 		{
-			ReadNext(ReadParam{ holder->GetData() });
+			ReadParam new_param = { holder->GetData(), 0 };
+			ReadNext(new_param);
 		}
 	}
 }
@@ -57,17 +60,19 @@ void ChunkLayer::Write(const WriteParam& param)
 		ChunkPacketNone packet;
 		packet.WriteHeader(new_data);
 
-		new_data->Set(NLIB_OFFSET_PAYLOAD, data);
+		new_data->Set(NLIB_OFFSET_PAYLOAD, data, 0);
 
-		WriteNext(WriteParam{ new_data });
+		WriteNext(WriteParam{ new_data, NLIB_CHUNK_RETRY_LIMIT_NONE });
 	}
 	else
 	{
 		auto holder = new ChunkHolder();
+		holder->Set(_chunk_id++);
+
 		SetSendBuffer(holder->GetChunkId(), holder);
 
 		auto cnt = holder->Split(data);
-		for (uint32_t i = 0; i < cnt; ++cnt)
+		for (uint32_t i = 0; i < cnt; ++i)
 		{
 			auto packet = holder->GetPacket(i);
 
@@ -75,7 +80,7 @@ void ChunkLayer::Write(const WriteParam& param)
 			if (packet == nullptr)
 				continue;
 
-			WriteNext(WriteParam{ packet->GetData() });
+			WriteNext(WriteParam{ packet->GetData(), NLIB_CHUNK_RETRY_LIMIT_SOME });
 		}
 	}
 }

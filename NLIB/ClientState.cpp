@@ -202,7 +202,8 @@ void ClientStateConnected::RecvPacket(ProtocolPacket* p)
 	{
 		auto packet = static_cast<ProtocolPacketConnectionPayload*>(p);
 
-		_client->ReadNext(ReadParam{ packet->GetData() });
+		ReadParam param = { packet->GetData(), NLIB_HEADER_SIZE_NETWORK };
+		_client->ReadNext(param);
 	}
 	else if (p->GetID() == E_PACKET_ID::CONNECTION_DISCONNECT)
 	{

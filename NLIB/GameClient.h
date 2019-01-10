@@ -15,7 +15,7 @@ public:
 	void Disconnect();
 
 	void Update(uint64_t time) override;
-	void Read(const ReadParam& data) override;
+	void Read(ReadParam& data) override;
 	void WritePacket(const byte* bytes, uint32_t length);
 
 private:

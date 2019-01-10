@@ -143,6 +143,7 @@ void NetworkEndpoint::Send(NLIBAddress& address, const byte* data, uint32_t leng
 
 void NetworkEndpoint::Send(NLIBAddress& address, ByteArrayPtr data)
 {
+	std::cout << "[ Send ] " << Utility::ByteToString(data->Bytes(), data->Length()) << std::endl;
 #ifdef NLIB_LOG_ENABLED
 	std::cout << "[ Send ] " << Utility::ByteToString(data->Bytes(), data->Length()) << std::endl;
 #endif
@@ -167,7 +168,7 @@ void NetworkEndpoint::HandleSend(const boost::system::error_code& error, std::si
 	std::cout << "[HandleSend] " << Utility::TimeInHHMMSSMMM() << std::endl;
 #endif
 
-	_send_buffer = nullptr;
+	//_send_buffer = nullptr;
 
 	if (error)
 	{

@@ -22,8 +22,9 @@ public:
 public:
 	void Set(uint32_t index, E_PACKET_ID packet_id);
 	void Set(uint32_t index, byte value);
+	void Set(uint32_t index, uint16_t value);
 	void Set(uint32_t index, uint32_t value);
-	void Set(uint32_t index, const ByteArrayPtr& data);
+	void Set(uint32_t index, const ByteArrayPtr& data, uint32_t offset);
 	void Set(uint32_t index, const byte* bytes, uint32_t length);
 
 	void SetZero(uint32_t index, uint32_t length);

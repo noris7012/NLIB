@@ -1,6 +1,6 @@
 #include "BufferPool.h"
 
-#include <assert.h>
+#include <cassert>
 #include <iostream>
 
 BufferPool::BufferPool()

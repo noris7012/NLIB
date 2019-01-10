@@ -56,12 +56,14 @@ struct NLIBSend
 
 struct WriteParam
 {
-	ByteArrayPtr data;
+	ByteArrayPtr data = nullptr;
+	uint32_t retry_limit = 0;
 };
 
 struct ReadParam
 {
-	ByteArrayPtr data;	
+	ByteArrayPtr data = nullptr;
+	uint32_t offset = 0;
 };
 
 struct FailParam

@@ -25,7 +25,7 @@ public:
 	void RecvPacket(ProtocolPacket* recv);
 	void WritePacket(const byte* bytes, uint32_t length);
 
-	void Read(const ReadParam& param) override;
+	void Read(ReadParam& param) override;
 	void Write(const WriteParam& param) override;
 	void Fail(const FailParam& param) override;
 	void Update(uint64_t time) override;

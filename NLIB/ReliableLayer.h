@@ -18,7 +18,7 @@ public:
 	ReliableLayer(GameEndpoint* endpoint);
 
 public:
-	void Read(const ReadParam& param) override;
+	void Read(ReadParam& param) override;
 	void Write(const WriteParam& param) override;
 	void Fail(const FailParam& param) override;
 	void Update(uint64_t time);
