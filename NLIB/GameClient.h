@@ -17,6 +17,7 @@ public:
 	void Update(uint64_t time) override;
 	void Read(ReadParam& data) override;
 	void WritePacket(const byte* bytes, uint32_t length);
+	void Fail(const FailParam& param) override;
 
 private:
 	PGameClientHandler _handler;

@@ -143,7 +143,10 @@ void NetworkEndpoint::Send(NLIBAddress& address, const byte* data, uint32_t leng
 
 void NetworkEndpoint::Send(NLIBAddress& address, ByteArrayPtr data)
 {
-	std::cout << "[ Send ] " << Utility::ByteToString(data->Bytes(), data->Length()) << std::endl;
+	std::stringstream ss;
+	ss << "[ Send ] " << Utility::ByteToString(data->Bytes(), data->Length());
+	Logger::GetInstance()->Log(ss.str());
+
 #ifdef NLIB_LOG_ENABLED
 	std::cout << "[ Send ] " << Utility::ByteToString(data->Bytes(), data->Length()) << std::endl;
 #endif

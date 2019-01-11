@@ -147,6 +147,9 @@ void ReliableLayer::Update(uint64_t time)
 				ss << "[Fail  ] " << time << " : " << buffer->GetSendTime() + uint64_t(2 * rtt * 1000) << " (rtt=" << rtt << ") (index=" << buffer->GetSequenceNumber() << ")";
 				Logger::GetInstance()->Log(ss.str());
 
+				_send_buffer[i] = nullptr;
+				delete buffer;
+
 				FailNext(FailParam{ data });
 			}
 		}

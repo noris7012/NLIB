@@ -4,6 +4,7 @@
 #include "GameClientHandler.h"
 #include <iostream>
 #include "Utility.h"
+#include "Logger.h"
 
 GameClient::GameClient(PGameClientHandler handler)
 	: _handler(handler)
@@ -140,4 +141,13 @@ void GameClient::WritePacket(const byte* bytes, uint32_t length)
 	};
 
 	WriteNext(param);
+}
+
+void GameClient::Fail(const FailParam& param)
+{
+	auto data = param.data;
+
+	std::stringstream ss;
+	ss << "[ Fail ] " << Utility::ByteToString(data->Bytes(), data->Length());
+	Logger::GetInstance()->Log(ss.str());
 }

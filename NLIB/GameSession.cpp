@@ -1,6 +1,8 @@
 #include "GameSession.h"
 
 #include "GamePacket.h"
+#include "Utility.h"
+#include "Logger.h"
 
 GameSession::GameSession(PGameServerHandler handler, NetworkSession* network_session)
 	: _handler(handler)
@@ -122,6 +124,11 @@ void GameSession::Write(const WriteParam& param)
 
 void GameSession::Fail(const FailParam& param)
 {
+	auto data = param.data;
+
+	std::stringstream ss;
+	ss << "[ Fail ] " << Utility::ByteToString(data->Bytes(), data->Length());
+	Logger::GetInstance()->Log(ss.str());
 }
 
 void GameSession::Update(uint64_t time)

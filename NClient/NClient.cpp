@@ -23,6 +23,14 @@ int main()
 
 	std::this_thread::sleep_for(std::chrono::milliseconds(3000));
 
+	for (int i = 0; i < 5; ++i)
+	{
+		client->WritePacket((const byte*)"data01", 7);
+		client->WritePacket((const byte*)"data02", 7);
+		client->WritePacket((const byte*)"data03", 7);
+		std::this_thread::sleep_for(std::chrono::milliseconds(500));		
+	}
+
 	// for (int i = 0; i < 1; ++i)
 	// {
 	// 	client->WritePacket((const byte*)"data01", 7);
@@ -47,27 +55,27 @@ int main()
 	// 	std::this_thread::sleep_for(std::chrono::milliseconds(100));		
 	// }
 
-	std::stringstream ss;
-	for (int i = 1; i <= 800; ++i)
-	{
-		if (i < 10)
-		{
-			ss << "00" << i;
-		}
-		else if (i < 100)
-		{
-			ss << "0" << i;
-		}
-		else
-		{
-			ss << i;
-		}
-	}
-
-	auto str = ss.str();
-	auto cstr = str.c_str();
-	auto length = str.length() + 1;
-	client->WritePacket(reinterpret_cast<const byte*>(cstr), length);
+	// std::stringstream ss;
+	// for (int i = 1; i <= 800; ++i)
+	// {
+	// 	if (i < 10)
+	// 	{
+	// 		ss << "00" << i;
+	// 	}
+	// 	else if (i < 100)
+	// 	{
+	// 		ss << "0" << i;
+	// 	}
+	// 	else
+	// 	{
+	// 		ss << i;
+	// 	}
+	// }
+	//
+	// auto str = ss.str();
+	// auto cstr = str.c_str();
+	// auto length = str.length() + 1;
+	// client->WritePacket(reinterpret_cast<const byte*>(cstr), length);
 
 	std::this_thread::sleep_for(std::chrono::milliseconds(10000));
 
