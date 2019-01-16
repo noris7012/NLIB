@@ -989,36 +989,30 @@ SWIGEXPORT jstring JNICALL Java_com_awesomepiece_pl_swig_nlibJNI_GameConfig_1hos
 }
 
 
-SWIGEXPORT void JNICALL Java_com_awesomepiece_pl_swig_nlibJNI_GameConfig_1port_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+SWIGEXPORT void JNICALL Java_com_awesomepiece_pl_swig_nlibJNI_GameConfig_1port_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
   GameConfig *arg1 = (GameConfig *) 0 ;
-  uint32_t arg2 ;
-  uint32_t *argp2 ;
+  int arg2 ;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(GameConfig **)&jarg1; 
-  argp2 = *(uint32_t **)&jarg2; 
-  if (!argp2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null uint32_t");
-    return ;
-  }
-  arg2 = *argp2; 
+  arg2 = (int)jarg2; 
   if (arg1) (arg1)->port = arg2;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_com_awesomepiece_pl_swig_nlibJNI_GameConfig_1port_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jlong jresult = 0 ;
+SWIGEXPORT jint JNICALL Java_com_awesomepiece_pl_swig_nlibJNI_GameConfig_1port_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jint jresult = 0 ;
   GameConfig *arg1 = (GameConfig *) 0 ;
-  uint32_t result;
+  int result;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(GameConfig **)&jarg1; 
-  result =  ((arg1)->port);
-  *(uint32_t **)&jresult = new uint32_t((const uint32_t &)result); 
+  result = (int) ((arg1)->port);
+  jresult = (jint)result; 
   return jresult;
 }
 
@@ -1101,24 +1095,24 @@ SWIGEXPORT void JNICALL Java_com_awesomepiece_pl_swig_nlibJNI_delete_1GameConfig
 }
 
 
-SWIGEXPORT void JNICALL Java_com_awesomepiece_pl_swig_nlibJNI_GameClientInterface_1WritePacket(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jlong jarg3) {
+SWIGEXPORT void JNICALL Java_com_awesomepiece_pl_swig_nlibJNI_GameClientInterface_1WritePacket(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jbyteArray jarg2, jint jarg3) {
   GameClientInterface *arg1 = (GameClientInterface *) 0 ;
-  byte *arg2 = (byte *) 0 ;
-  uint32_t arg3 ;
-  uint32_t *argp3 ;
+  char *arg2 = (char *) 0 ;
+  int arg3 ;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(GameClientInterface **)&jarg1; 
-  arg2 = *(byte **)&jarg2; 
-  argp3 = *(uint32_t **)&jarg3; 
-  if (!argp3) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null uint32_t");
-    return ;
+  {
+    arg2 = (char *) jenv->GetByteArrayElements(jarg2, 0); 
   }
-  arg3 = *argp3; 
-  (arg1)->WritePacket((byte const *)arg2,arg3);
+  arg3 = (int)jarg3; 
+  (arg1)->WritePacket(arg2,arg3);
+  {
+    jenv->ReleaseByteArrayElements(jarg2, (jbyte *) arg2, 0); 
+  }
+  
 }
 
 

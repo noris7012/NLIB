@@ -28,9 +28,9 @@ int main()
 
 	for (int i = 0; i < 5; ++i)
 	{
-		client->WritePacket((const byte*)"data01", 7);
-		client->WritePacket((const byte*)"data02", 7);
-		client->WritePacket((const byte*)"data03", 7);
+		client->WritePacket(const_cast<char*>("data01"), 7);
+		client->WritePacket(const_cast<char*>("data02"), 7);
+		client->WritePacket(const_cast<char*>("data03"), 7);
 		std::this_thread::sleep_for(std::chrono::milliseconds(500));		
 	}
 

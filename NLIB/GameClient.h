@@ -17,7 +17,7 @@ public:
 
 	void Update(uint64_t time) override;
 	void Read(ReadParam& data) override;
-	void WritePacket(const byte* bytes, uint32_t length) override;
+	void WritePacket(char* bytes, int length) override;
 	void Fail(const FailParam& param) override;
 
 private:

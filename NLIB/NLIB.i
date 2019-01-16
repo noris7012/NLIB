@@ -1,5 +1,9 @@
 %module(directors="1") nlib
 
+%include various.i 
+
+%apply char* BYTE { char *bytes }; 
+
 %{
 #include "GamePacket.h"
 #include "GameConfig.h"

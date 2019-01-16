@@ -16,6 +16,7 @@ std::string Utility::ByteToString(const byte* data, uint32_t length)
 {
 	std::stringstream ss;
 	ss << std::hex << std::setfill('0');
+
 	for (uint32_t i = 0; i < length; ++i)
 	{
 		ss << std::setw(2) << static_cast<unsigned>(data[i]);

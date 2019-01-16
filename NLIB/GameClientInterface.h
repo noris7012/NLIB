@@ -9,7 +9,7 @@
 class GameClientInterface
 {
 public:
-	virtual void WritePacket(const byte* bytes, uint32_t length) = 0;
+	virtual void WritePacket(char* bytes, int length) = 0;
 
 	virtual bool Connect(GameConfig& config) = 0;
 	virtual bool IsConnected() = 0;

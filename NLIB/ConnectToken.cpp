@@ -11,8 +11,8 @@
 
 void ConnectToken::test()
 {
-	byte key[CryptoPP::AES::MAX_KEYLENGTH];
-	byte iv[CryptoPP::AES::MAX_BLOCKSIZE];
+	unsigned char key[CryptoPP::AES::MAX_KEYLENGTH];
+	unsigned char iv[CryptoPP::AES::MAX_BLOCKSIZE];
 
 	std::string plaintext = "Now is the time for all good men to come to the aide...";
 	std::string ciphertext;

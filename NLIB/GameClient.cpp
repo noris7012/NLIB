@@ -130,14 +130,14 @@ void GameClient::Read(ReadParam& param)
 	_handler->HandlePacket(this, packet);
 }
 
-void GameClient::WritePacket(const byte* bytes, uint32_t length)
+void GameClient::WritePacket(char* bytes, int length)
 {
 #ifdef NLIB_LOG_ENABLED
 	std::cout << "[WritePacket] " << Utility::TimeInHHMMSSMMM() << std::endl;
 #endif
 
 	WriteParam param {
-		std::make_shared<ByteArray>(const_cast<byte*>(bytes), length)
+		std::make_shared<ByteArray>(reinterpret_cast<const byte*>(bytes), length)
 	};
 
 	WriteNext(param);
