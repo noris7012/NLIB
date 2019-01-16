@@ -6,10 +6,9 @@
 class NClientHandler : public GameClientHandler
 {
 public:
-	void HandleConnected(PGameClient session) override;
-	void HandlePacket(PGameClient session, PGamePacket packet) override;
-	void HandleDisconnected(PGameClient session) override;
-	
+	void HandleConnected(GameClientInterface* session) override;
+	void HandlePacket(GameClientInterface* session, GamePacket packet) override;
+	void HandleDisconnected(GameClientInterface* session) override;	
 };
 
 #endif

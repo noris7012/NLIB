@@ -4,23 +4,24 @@
 #include "NetworkDefine.h"
 #include "NetworkClient.h"
 #include "ReliableLayer.h"
+#include "GameClientInterface.h"
 
-class GameClient : public std::enable_shared_from_this<GameClient>, public NetworkLayer, public GameEndpoint
+class GameClient : public NetworkLayer, public GameEndpoint, public GameClientInterface
 {
 public:
-	GameClient(PGameClientHandler handler);
+	GameClient(GameClientHandler* handler);
 
-	bool Connect(GameConfig& config);
-	bool IsConnected();
-	void Disconnect();
+	bool Connect(GameConfig& config) override;
+	bool IsConnected() override;
+	void Disconnect() override;
 
 	void Update(uint64_t time) override;
 	void Read(ReadParam& data) override;
-	void WritePacket(const byte* bytes, uint32_t length);
+	void WritePacket(const byte* bytes, uint32_t length) override;
 	void Fail(const FailParam& param) override;
 
 private:
-	PGameClientHandler _handler;
+	GameClientHandler* _handler;
 
 	NetworkClient* _network_client;
 	ReliableLayer* _reliable_layer;

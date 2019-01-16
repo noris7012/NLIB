@@ -6,7 +6,7 @@
 #include "Utility.h"
 #include "Logger.h"
 
-GameClient::GameClient(PGameClientHandler handler)
+GameClient::GameClient(GameClientHandler* handler)
 	: _handler(handler)
 {
 	_network_client = new NetworkClient(this);
@@ -124,10 +124,10 @@ void GameClient::Read(ReadParam& param)
 	auto new_data = new byte[length];
 	memcpy(new_data, data->Bytes() + offset, length);
 
-	auto packet = GamePacket::Instance();
-	packet->Set(new_data, length);
+	GamePacket packet;
+	packet.Set(new_data, length);
 
-	_handler->HandlePacket(shared_from_this(), packet);
+	_handler->HandlePacket(this, packet);
 }
 
 void GameClient::WritePacket(const byte* bytes, uint32_t length)

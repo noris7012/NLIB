@@ -85,7 +85,7 @@
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>E:\GitRepository\NLIB\lib;E:\boost_1_68_0;E:\boost_1_68_0\stage\lib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(JAVA_INCLUDE);$(JAVA_INCLUDE)\win32;E:\GitRepository\NLIB\lib;E:\boost_1_68_0;E:\boost_1_68_0\stage\lib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;_SILENCE_ALL_CXX17_DEPRECATION_WARNINGS;_WIN32_WINDOWS;_WINSOCK_DEPRECATED_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
@@ -115,7 +115,7 @@
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
       <PreprocessorDefinitions>_WINSOCK_DEPRECATED_NO_WARNINGS;_WIN32_WINDOWS;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>E:\GitRepository\NLIB\lib;E:\boost_1_68_0\stage\lib;E:\boost_1_68_0;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(JAVA_INCLUDE);$(JAVA_INCLUDE)\win32;E:\GitRepository\NLIB\lib;E:\boost_1_68_0\stage\lib;E:\boost_1_68_0;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
@@ -148,11 +148,16 @@
     <ClInclude Include="ClientState.h" />
     <ClInclude Include="ConnectToken.h" />
     <ClInclude Include="GameClient.h" />
+    <ClInclude Include="GameClientFactory.h" />
     <ClInclude Include="GameClientHandler.h" />
+    <ClInclude Include="GameClientInterface.h" />
     <ClInclude Include="GameEndpoint.h" />
     <ClInclude Include="GamePacket.h" />
+    <ClInclude Include="GameServerFactory.h" />
     <ClInclude Include="GameServerHandler.h" />
+    <ClInclude Include="GameServerInterface.h" />
     <ClInclude Include="GameSession.h" />
+    <ClInclude Include="GameSessionInterface.h" />
     <ClInclude Include="Logger.h" />
     <ClInclude Include="NetworkClient.h" />
     <ClInclude Include="GameConfig.h" />
@@ -178,15 +183,17 @@
     <ClCompile Include="ClientState.cpp" />
     <ClCompile Include="ConnectToken.cpp" />
     <ClCompile Include="GameClient.cpp" />
-    <ClCompile Include="GameClientHandler.cpp" />
+    <ClCompile Include="GameClientFactory.cpp" />
     <ClCompile Include="GameEndpoint.cpp" />
     <ClCompile Include="GamePacket.cpp" />
+    <ClCompile Include="GameServerFactory.cpp" />
     <ClCompile Include="GameSession.cpp" />
     <ClCompile Include="Logger.cpp" />
     <ClCompile Include="NetworkClient.cpp" />
     <ClCompile Include="NetworkEndpoint.cpp" />
     <ClCompile Include="GameServer.cpp" />
     <ClCompile Include="NetworkSession.cpp" />
+    <ClCompile Include="NLIB_wrap.cxx" />
     <ClCompile Include="ProtocolPacket.cpp" />
     <ClCompile Include="ReliablePacket.cpp" />
     <ClCompile Include="ReliableLayer.cpp" />

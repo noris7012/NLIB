@@ -4,7 +4,7 @@
 #include "Utility.h"
 #include "Logger.h"
 
-GameSession::GameSession(PGameServerHandler handler, NetworkSession* network_session)
+GameSession::GameSession(GameServerHandler* handler, NetworkSession* network_session)
 	: _handler(handler)
 	, _network_session(network_session)
 {
@@ -111,10 +111,11 @@ void GameSession::Read(ReadParam& param)
 	auto new_data = new byte[length];
 	memcpy(new_data, data->Bytes() + offset, length);
 
-	auto packet = GamePacket::Instance();
-	packet->Set(new_data, length);
+	GamePacket packet;
+	packet.Set(new_data, length);
 
-	_handler->HandlePacket(shared_from_this(), packet);
+	auto sft = shared_from_this();
+	_handler->HandlePacket(sft.get(), packet);
 }
 
 void GameSession::Write(const WriteParam& param)

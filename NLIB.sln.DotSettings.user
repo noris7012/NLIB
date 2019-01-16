@@ -6,6 +6,7 @@
 	<s:String x:Key="/Default/CodeStyle/Naming/CppNaming/Abbreviations/=UNLIB/@EntryIndexedValue">UNLIB</s:String>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=Acked/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=cudp/@EntryIndexedValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/UserDictionary/Words/=NCLIENT/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=NLIB/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=PNLIB/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=recv/@EntryIndexedValue">True</s:Boolean>

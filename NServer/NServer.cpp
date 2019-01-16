@@ -8,6 +8,7 @@
 
 #include "Utility.h"
 #include "NServerHandler.h"
+#include "GameServerFactory.h"
 
 int main()
 {
@@ -18,7 +19,8 @@ int main()
 		std::cout << Utility::Rand64() << std::endl;
 	}*/
 
-	GameServer server(std::make_shared<NServerHandler>());
+	auto handler = new NServerHandler();
+	auto server = GameServerFactory::Create(handler);
 
 	auto loss_mask = new std::vector<bool>();
 	loss_mask->insert(loss_mask->end(), { false, false, false, false, true });
@@ -28,7 +30,7 @@ int main()
 	config.loss_rate = 0.1f;
 	//config.loss_mask = loss_mask;
 
-	server.Listen(config);
+	server->Listen(config);
 
 	while (true)
 	{

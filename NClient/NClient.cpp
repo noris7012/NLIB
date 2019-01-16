@@ -3,12 +3,15 @@
 
 #include <thread>
 #include <chrono>
-#include "GameClient.h"
+
+#include "GameConfig.h"
 #include "NClientHandler.h"
+#include "GameClientFactory.h"
 
 int main()
 {
-	auto client = std::make_shared<GameClient>(std::make_shared<NClientHandler>());
+	auto handler = new NClientHandler();
+	auto client = GameClientFactory::Create(handler);
 
 	GameConfig config;
 	config.host = "127.0.0.1";

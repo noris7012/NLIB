@@ -6,9 +6,9 @@
 class NServerHandler : public GameServerHandler
 {
 public:
-	void HandleConnected(PGameSession session) override;
-	void HandlePacket(PGameSession session, PGamePacket packet) override;
-	void HandleDisconnected(PGameSession session) override;
+	void HandleConnected(GameSessionInterface* session) override;
+	void HandlePacket(GameSessionInterface* session, GamePacket packet) override;
+	void HandleDisconnected(GameSessionInterface* session) override;
 };
 
 #endif

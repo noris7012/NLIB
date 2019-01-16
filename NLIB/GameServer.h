@@ -12,17 +12,18 @@
 #include "ProtocolPacket.h"
 #include "GameConfig.h"
 #include "GameSession.h"
+#include "GameServerInterface.h"
 
 class NetworkSession;
 class GameSession;
 
-class GameServer : public NetworkEndpoint
+class GameServer : public NetworkEndpoint, public GameServerInterface
 {
 public:
-	GameServer(PGameServerHandler handler);
+	GameServer(GameServerHandler* handler);
 
 public:
-	bool Listen(GameConfig& config);
+	bool Listen(GameConfig& config) override;
 
 public:
 	void Update(uint64_t time) override;
@@ -42,7 +43,7 @@ public:
 	void OnDisconnected(NetworkSession* session);
 
 private:
-	PGameServerHandler _handler;
+	GameServerHandler* _handler;
 	BufferPool _buffer_pool;
 
 	std::mutex _connected_session_mutex;

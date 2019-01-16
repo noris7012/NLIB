@@ -6,7 +6,7 @@
 #include "Utility.h"
 #include "ReliableLayer.h"
 
-GameServer::GameServer(PGameServerHandler handler)
+GameServer::GameServer(GameServerHandler* handler)
 	: _handler(handler)
 {
 }

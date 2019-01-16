@@ -5,11 +5,16 @@
 
 #include "NetworkDefine.h"
 
+class GameClientInterface;
+
 class GameClientHandler
 {
 public:
-	virtual void HandleConnected(PGameClient client) = 0;
-	virtual void HandlePacket(PGameClient client, PGamePacket packet) = 0;
-	virtual void HandleDisconnected(PGameClient client) = 0;
+	virtual ~GameClientHandler() = default;
+
+public:
+	virtual void HandleConnected(GameClientInterface* client) = 0;
+	virtual void HandlePacket(GameClientInterface* client, GamePacket packet) = 0;
+	virtual void HandleDisconnected(GameClientInterface* client) = 0;
 };
 #endif

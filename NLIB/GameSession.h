@@ -10,20 +10,21 @@
 #include "ReliableLayer.h"
 #include "NetworkLayer.h"
 #include "ChunkLayer.h"
+#include "GameSessionInterface.h"
 
 class GameServerHandler;
 class NetworkSession;
 class ReliableLayer;
 class ChunkLayer;
 
-class GameSession : public std::enable_shared_from_this<GameSession>, public NetworkLayer, public GameEndpoint
+class GameSession : public std::enable_shared_from_this<GameSession>, public NetworkLayer, public GameEndpoint, public GameSessionInterface
 {
 public:
-	GameSession(std::shared_ptr<GameServerHandler> handler, NetworkSession* network_session);
+	GameSession(GameServerHandler* handler, NetworkSession* network_session);
 	~GameSession();
 
 	void RecvPacket(ProtocolPacket* recv);
-	void WritePacket(const byte* bytes, uint32_t length);
+	void WritePacket(const byte* bytes, uint32_t length) override;
 
 	void Read(ReadParam& param) override;
 	void Write(const WriteParam& param) override;
@@ -31,10 +32,11 @@ public:
 	void Update(uint64_t time) override;
 	bool IsConnected();
 
-	void Close();
+	void Close() override;
 
 private:
-	std::shared_ptr<GameServerHandler> _handler;
+	GameServerHandler* _handler;
+
 	NetworkSession* _network_session;
 	ReliableLayer* _reliable_session;
 	ChunkLayer* _chunk_layer;

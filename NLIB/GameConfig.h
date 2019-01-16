@@ -2,6 +2,7 @@
 #define NLIB_GAME_CONFIG_H
 
 #include <stdint.h>
+#include <vector>
 
 #include "NetworkDefine.h"
 

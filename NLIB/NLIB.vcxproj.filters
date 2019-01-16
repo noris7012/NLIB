@@ -99,6 +99,21 @@
     <ClInclude Include="ByteArray.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
+    <ClInclude Include="GameClientInterface.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="GameSessionInterface.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="GameClientFactory.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="GameServerFactory.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="GameServerInterface.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ByteStream.cpp">
@@ -143,9 +158,6 @@
     <ClCompile Include="GameClient.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="GameClientHandler.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
     <ClCompile Include="ReliableLayer.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
@@ -168,6 +180,15 @@
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="ByteArray.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="NLIB_wrap.cxx">
+      <Filter>헤더 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="GameClientFactory.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="GameServerFactory.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>

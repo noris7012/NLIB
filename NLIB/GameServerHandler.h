@@ -5,12 +5,17 @@
 
 #include "NetworkDefine.h"
 
+class GameSessionInterface;
+
 class GameServerHandler
 {
 public:
-	virtual void HandleConnected(PGameSession session) = 0;
-	virtual void HandlePacket(PGameSession session, PGamePacket packet) = 0;
-	virtual void HandleDisconnected(PGameSession session) = 0;
+	virtual ~GameServerHandler() = default;
+
+public:
+	virtual void HandleConnected(GameSessionInterface* session) = 0;
+	virtual void HandlePacket(GameSessionInterface* session, GamePacket packet) = 0;
+	virtual void HandleDisconnected(GameSessionInterface* session) = 0;
 };
 
 #endif
